@@ -1268,109 +1268,61 @@ class App extends Component {
     return null
   }
 
-  getAllVaults = async ({ blockInterval, periods }) => {
+  getAllVaults = async () => {
     try {
-      const vaultType = "ETH-A";
-      const collateralTypeVaultCount = await subgraphClient.request(gql`{
-        collateralType(id: "${vaultType}") {
-          vaultCount
-        }
-        vaults(where: { collateralType: "${vaultType}", collateral_not: 0, debt_not: 0 }, first: 1, orderBy: id, orderDirection: desc){
-          id
-        }
-      }`)
-      let vaultCount = 0;
-      let maxId = 0;
-      Object.entries(collateralTypeVaultCount).forEach(([key, value]) => {
-        if (key === "collateralType") {
-          vaultCount = value.vaultCount
-        } else if (key === "vaults") {
-          maxId = value[0] ? value[0].id : 0
-        }
-      })
-      console.log(JSON.stringify({ maxId, vaultCount }))
-
-      let currentId = 0;
-      let resultArray = [];
-      while (maxId && vaultCount > resultArray.length) {
-        const vaultsSubgraphClientResult = await subgraphClient.request(gql`{
-          vaults(where: { collateralType: "${vaultType}", id_gt: "${currentId}", collateral_not: 0, debt_not: 0 }, first: 1000, orderBy: id, orderDirection: asc){
-          # vaults(where: { collateralType: "${vaultType}", id_gt: "${currentId}" }, first: 1000, orderBy: id, orderDirection: asc){
-            id,
-            collateral,
-            debt,
-            cdpId,
-            # collateralType,
-            # handler,
-            owner,
-            # openedAt,
-            # openedAtBlock,
-            # openedAtTransaction,
-            updatedAt,
-            updatedAtBlock,
-            updatedAtTransaction,            
-            # logs(orderBy: timestamp, orderDirection: desc, first: 1000){
-            #   block,
-            #   transaction,
-            #   timestamp,
-            #   __typename,
-            #   ... on VaultCollateralChangeLog {
-            #     collateralBefore,
-            #     collateralAfter
-            #   },
-            #   ... on VaultSplitChangeLog {
-            #     src,
-            #     dst,
-            #     collateralToMove,
-            #     debtToMove,
-            #   }
-            # },
+      const vaultTypes = ["ETH-A", "ETH-B"]
+      const vaultTypesResultMap = vaultTypes.map(async (vaultType) => {
+        const collateralTypeVaultCount = await subgraphClient.request(gql`{
+          collateralType(id: "${vaultType}") {
+            vaultCount
+          }
+          vaults(where: { collateralType: "${vaultType}", collateral_not: 0, debt_not: 0 }, first: 1, orderBy: id, orderDirection: desc){
+            id
           }
         }`)
-        console.log(JSON.stringify({ vaultsSubgraphClientResult }))
-        const vaultsIds = vaultsSubgraphClientResult.vaults.map(v => v.id).sort();
-        currentId = vaultsIds[vaultsIds.length - 1]
-        resultArray = [...resultArray, ...(vaultsSubgraphClientResult.vaults)];
-        console.log(JSON.stringify({ currentId, resultArrayLength: resultArray.length }));
-        if (!vaultsSubgraphClientResult.vaults.length) {
-          break;
+        let vaultCount = 0;
+        let maxId = 0;
+        Object.entries(collateralTypeVaultCount).forEach(([key, value]) => {
+          if (key === "collateralType") {
+            vaultCount = value.vaultCount
+          } else if (key === "vaults") {
+            maxId = value[0] ? value[0].id : 0
+          }
+        })
+        console.log(JSON.stringify({ maxId, vaultCount }))
+
+        let currentId = 0;
+        let resultArray = [];
+        while (maxId && vaultCount > resultArray.length) {
+          const vaultsSubgraphClientResult = await subgraphClient.request(gql`{
+            vaults(where: { collateralType: "${vaultType}", id_gt: "${currentId}", collateral_not: 0, debt_not: 0 }, first: 1000, orderBy: id, orderDirection: asc){
+              id,
+              collateral,
+              debt,
+              cdpId,
+              owner
+              updatedAt,
+              updatedAtBlock,
+              updatedAtTransaction,
+            }
+          }`)
+          console.log(JSON.stringify({ vaultsSubgraphClientResult }))
+          const vaultsIds = vaultsSubgraphClientResult.vaults.map(v => v.id).sort();
+          currentId = vaultsIds[vaultsIds.length - 1]
+          resultArray = [...resultArray, ...(vaultsSubgraphClientResult.vaults)];
+          console.log(JSON.stringify({ currentId, resultArrayLength: resultArray.length }));
+          if (!vaultsSubgraphClientResult.vaults.length) {
+            break;
+          }
         }
-      }
-
-      // // fetch auction information too.
-      // const collateralTypeSubgraphClientResult = await subgraphClient.request(gql`{
-      //   collateralType(id: "${vaultType}"){
-      //     saleAuctions(where: {isActive: false}, first: 1000) {
-      //       id,
-      //       vault{
-      //         id,
-      //         cdpId,
-      //       },
-      //       startedAt,
-      //       resetedAt,
-      //       boughtAt,
-      //       deletedAt,
-      //       isActive,
-      //       amountCollateralToSell,
-      //       amountDaiToRaise,
-      //     }
-      //   }
-      // }`)
-      // console.log(JSON.stringify({ len: collateralTypeSubgraphClientResult.collateralType.saleAuctions.length, collateralTypeSubgraphClientResult }))
-
-      // collateralTypeSubgraphClientResult.collateralType.saleAuctions.map(saleAuction => {
-      //   resultArray.map((vault, index) => {
-      //     if (vault.cdpId === saleAuction.vault.cdpId) {
-      //       if (resultArray[index].saleAuction) {
-      //         resultArray[index].saleAuction.push(saleAuction)
-      //       } else {
-      //         resultArray[index].saleAuction = [saleAuction]
-      //       }
-      //     }
-      //   })
-      // })
-
-      return resultArray;
+        return resultArray;
+      })
+      let object = {};
+      (await Promise.all(vaultTypesResultMap)).map((array, index) => {
+        const key = vaultTypes[index]
+        object[key] = array
+      })
+      return object;
 
     } catch (err) {
       console.error("All vaults could not be obtained due to an error.", err)
