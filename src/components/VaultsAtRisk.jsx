@@ -20,8 +20,9 @@ function VaultsAtRisk(props) {
         const collateral = parseFloat(vault.collateral)
         const price = parseFloat(ilkETHA.price)
         const debt = parseFloat(vault.debt)
+        const rate = parseFloat(ilkETHA.rate)
         const mat = parseFloat(ilkETHA.mat)
-        const collateralIsEnough = (collateral * price * priceDropRatio) > (debt * mat)
+        const collateralIsEnough = (collateral * price * priceDropRatio) > (debt * mat * rate)
         return !collateralIsEnough
       })
 
@@ -55,7 +56,7 @@ function VaultsAtRisk(props) {
               {dangerousVaults.map((vault) =>
                 <div className="box has-text-centered" key={vault.id} >
                   <p className="subtitle is-size-6">
-                    CdpId: {vault.cdpId}
+                    CdpId: {vault.cdpId ? vault.cdpId : vault.id}
                   </p>
                   <p className="subtitle is-size-6">
                     Collateral: {vault.collateral}
@@ -64,10 +65,10 @@ function VaultsAtRisk(props) {
                     Debt: {vault.debt}
                   </p>
                   <p className="subtitle is-size-6">
-                    CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) / parseFloat(vault.debt)}
+                    CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) / (parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
                   </p>
                   <p className="subtitle is-size-6">
-                    SimulatedCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) * parseFloat(priceDropRatio) / parseFloat(vault.debt)}
+                    SimulatedCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) * parseFloat(priceDropRatio) / (parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
                   </p>
                 </div>
               )}
