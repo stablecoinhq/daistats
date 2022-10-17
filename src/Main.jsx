@@ -11,6 +11,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { useLocation, useHistory } from "react-router-dom";
 import VaultsAtRisk from './components/VaultsAtRisk';
+import IndividualVault from './components/IndividualVault';
 
 
 const formatAmount = new Intl.NumberFormat('en-US', {
@@ -76,7 +77,7 @@ const Main = (props) => {
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/vaults-at-risk']
+  const indexToTab = ['/vaults-at-risk', 'vault-information']
   function tabNameToIndex() {
     let i = indexToTab.indexOf(location.pathname)
     return (i >= 0 ? i : 0)
@@ -88,6 +89,7 @@ const Main = (props) => {
         <Tabs defaultIndex={tabNameToIndex()} onSelect={index => history.push(indexToTab[index])}>
           <TabList>
             <Tab><p className="is-size-5">Vaults at risk</p></Tab>
+            <Tab><p className="is-size-5">Vault Information</p></Tab>
           </TabList>
           <TabPanel>
             <Tabs>
@@ -100,6 +102,16 @@ const Main = (props) => {
               </TabPanel>
               <TabPanel>
                 <VaultsAtRisk {...props} ilk="ETH-B" />
+              </TabPanel>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs>
+              <TabList>
+                <Tab><p className="is-size-5">Individual Vault</p></Tab>
+              </TabList>
+              <TabPanel>
+                <IndividualVault {...props} />
               </TabPanel>
             </Tabs>
           </TabPanel>

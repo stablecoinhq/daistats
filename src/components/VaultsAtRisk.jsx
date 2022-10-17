@@ -7,7 +7,7 @@ function VaultsAtRisk(props) {
     setPriceDropRatio(priceDropRatio);
   }, [priceDropRatio]);
 
-  const allVaults = props.allVaults[props.ilk]
+  const allVaults = props.allVaults ? props.allVaults[props.ilk] : undefined
   const t = useTranslate()
   if (allVaults) {
     const ilkETHA = props.ilksByName[props.ilk]
@@ -62,7 +62,7 @@ function VaultsAtRisk(props) {
                     Collateral: {vault.collateral}
                   </p>
                   <p className="subtitle is-size-6">
-                    Debt: {vault.debt}
+                    Debt: {(parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
                   </p>
                   <p className="subtitle is-size-6">
                     CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) / (parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}

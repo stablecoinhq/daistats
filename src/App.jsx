@@ -348,7 +348,7 @@ const VEST_MKR_TREASURY_IDS = 24
 const subgraphClient = new GraphQLClient(
   //"https://api.thegraph.com/subgraphs/name/protofire/maker-protocol",
   // "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.2",
-  "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.5",
+  "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.6",
   { mode: "cors" }
 )
 
