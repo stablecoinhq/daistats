@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslate } from 'react-polyglot';
 import { gql, GraphQLClient } from "graphql-request"
+import HistoricalVaultLogChart from './HistoricalVaultLogChart';
+import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 
 function IndividualVault(props) {
 
@@ -27,7 +29,8 @@ function IndividualVault(props) {
               collateral,
               debt,
               collateralType{
-                id
+                id,
+                rate,
               },
               logs(orderBy: timestamp, orderDirection: desc, first: 1000) {
                 __typename,
@@ -67,7 +70,7 @@ function IndividualVault(props) {
             vault = vaultByCdpId
           }
         } catch (err) {
-          console.error("Vault could not be retrieved by CdpId", err)
+          console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...", err)
         }
         if (!vault) {
           try {
@@ -80,7 +83,8 @@ function IndividualVault(props) {
                 collateral,
                 debt,
                 collateralType{
-                  id
+                  id,
+                  rate,
                 },
                 logs(orderBy: timestamp, orderDirection: desc, first: 1000) {
                   __typename,
@@ -120,12 +124,195 @@ function IndividualVault(props) {
               vault = vaultById
             }
           } catch (err) {
-            console.error("Vault could not be retrieved by id", err)
+            console.log("Vault could not be retrieved by id")
           }
         }
         if (!vault) {
           console.error("Vault could not be retrieved")
           vault = undefined;
+        } else {
+          if (vault.vaults[0] && vault.vaults[0].logs) {
+            const collateralType = vault.vaults[0].collateralType
+            const reversedLogs = vault.vaults[0].logs.reverse()
+            const modifiedLogs = reversedLogs.map((log, index) => {
+
+              // Collateral Change ()
+              let collateralChange = 0;
+              let collateralBefore = undefined;
+              let collateralAfter = undefined;
+              if (log.__typename === 'VaultCollateralChangeLog') {
+                collateralChange = parseFloat(log.collateralDiff)
+                collateralBefore = parseFloat(log.collateralBefore)
+                collateralAfter = parseFloat(log.collateralAfter)
+              } else if (log.__typename === 'VaultSplitChangeLog') {
+                if (vault.id.includes(log.src)) {
+                  collateralChange = -parseFloat(log.collateralToMove)
+                } else if (vault.id.includes(log.dst)) {
+                  collateralChange = parseFloat(log.collateralToMove)
+                }
+              } else if (log.__typename === 'VaultTransferChangeLog') {
+                if (vault.id.includes(log.previousOwner)) {
+                  collateralChange = -0
+                } else if (vault.id.includes(log.nextOwner)) {
+                  collateralChange = 0
+                }
+              } else if (index !== 0 && index > 1) {
+                const previousLog = reversedLogs[index - 1]
+                collateralChange = parseFloat(log.collateral) - parseFloat(previousLog.collateral)
+                if (Number.isNaN(collateralChange)) {
+                  collateralChange = 0;
+                }
+              }
+              log.collateralBefore = collateralBefore
+              log.collateralAfter = collateralAfter
+              log.collateralChange = collateralChange;
+
+              // Debt Change (DAI)
+              let debtChange = 0;
+              let debtBefore = undefined;
+              let debtAfter = undefined;
+              if (log.__typename === 'VaultDebtChangeLog') {
+                debtChange = parseFloat(log.debtDiff)
+                debtBefore = parseFloat(log.debtBefore)
+                debtAfter = parseFloat(log.debtAfter)
+              } else if (log.__typename === 'VaultSplitChangeLog') {
+                if (vault.id.includes(log.src)) {
+                  debtChange = -parseFloat(log.debtToMove)
+                } else if (vault.id.includes(log.dst)) {
+                  debtChange = parseFloat(log.debtToMove)
+                }
+              } else if (log.__typename === 'VaultTransferChangeLog') {
+                if (vault.id.includes(log.previousOwner)) {
+                  debtChange = -0
+                } else if (vault.id.includes(log.nextOwner)) {
+                  debtChange = 0
+                }
+              } else if (index !== 0 && index > 1) {
+                const previousLog = reversedLogs[index - 1]
+                debtChange = parseFloat(log.debt) - parseFloat(previousLog.debt)
+                if (Number.isNaN(debtChange)) {
+                  debtChange = 0;
+                }
+              }
+              log.debtBefore = debtBefore
+              log.debtAfter = debtAfter
+              log.debtChange = debtChange;
+
+              // Paid fees (DAI)
+              // Market Price (USD)
+              // Oracle Price (USD)
+
+              /**
+                Collateral Change ()
+                Debt Change (DAI)
+                Paid fees (DAI)
+                Market Price (USD)
+                Oracle Price (USD)
+                Pre Collateralization Ratio
+                Post Collateralization Ratio
+               */
+              return log
+            })
+            const priceList = await Promise.all(modifiedLogs.map(log => {
+              return subgraphClient.request(gql`{
+                collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${log.timestamp}, collateral: "${collateralType.id}"}){
+                  id,
+                  newValue,
+                  newSpotPrice,
+                  block,
+                  timestamp,
+                  transaction,
+                }
+              }`)
+            }))
+
+
+            for (let logIndex = 0; logIndex < modifiedLogs.length; logIndex++) {
+              // oracle price
+              if (priceList[logIndex] &&
+                priceList[logIndex].collateralPriceUpdateLogs &&
+                priceList[logIndex].collateralPriceUpdateLogs[0] &&
+                priceList[logIndex].collateralPriceUpdateLogs[0].newValue) {
+
+                modifiedLogs[logIndex].oraclePrice = priceList[logIndex].collateralPriceUpdateLogs[0].newValue;
+              } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].oraclePrice && modifiedLogs[logIndex - 1].oraclePrice) {
+                modifiedLogs[logIndex].oraclePrice = modifiedLogs[logIndex - 1].oraclePrice
+              } else {
+                modifiedLogs[logIndex].oraclePrice = 0
+              }
+              const oraclePrice = modifiedLogs[logIndex].oraclePrice;
+
+              // spot price
+              if (priceList[logIndex] &&
+                priceList[logIndex].collateralPriceUpdateLogs &&
+                priceList[logIndex].collateralPriceUpdateLogs[0] &&
+                priceList[logIndex].collateralPriceUpdateLogs[0].newSpotPrice) {
+
+                modifiedLogs[logIndex].spotPrice = priceList[logIndex].collateralPriceUpdateLogs[0].newSpotPrice;
+              } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].spotPrice && modifiedLogs[logIndex - 1].spotPrice) {
+                modifiedLogs[logIndex].spotPrice = modifiedLogs[logIndex - 1].spotPrice
+              } else {
+                modifiedLogs[logIndex].spotPrice = 0
+              }
+
+              if (logIndex === 0) {
+                modifiedLogs[logIndex].debtBefore = 0
+                modifiedLogs[logIndex].collateralBefore = 0
+                modifiedLogs[logIndex].debtAfter = 0
+                modifiedLogs[logIndex].collateralAfter = 0
+                modifiedLogs[logIndex].preCollateralizationRatio = 0
+                modifiedLogs[logIndex].postCollateralizationRatio = 0
+
+              } else {
+
+                // debtBefore
+                if (!modifiedLogs[logIndex].debtBefore) {
+                  modifiedLogs[logIndex].debtBefore = modifiedLogs[logIndex - 1].debtAfter
+                }
+
+                // debtAfter
+                if (!modifiedLogs[logIndex].debtAfter) {
+                  if (!modifiedLogs[logIndex].debtChange) {
+                    modifiedLogs[logIndex].debtAfter = modifiedLogs[logIndex].debtBefore
+                  } else {
+                    modifiedLogs[logIndex].debtAfter = modifiedLogs[logIndex - 1].debtAfter + modifiedLogs[logIndex].debtChange
+                  }
+                }
+
+                // collateralBefore
+                if (!modifiedLogs[logIndex].collateralBefore) {
+                  modifiedLogs[logIndex].collateralBefore = modifiedLogs[logIndex - 1].collateralAfter
+                }
+
+                // collateralAfter
+                if (!modifiedLogs[logIndex].collateralAfter) {
+                  if (!modifiedLogs[logIndex].collateralChange) {
+                    modifiedLogs[logIndex].collateralAfter = modifiedLogs[logIndex].collateralBefore
+                  } else {
+                    modifiedLogs[logIndex].collateralAfter = modifiedLogs[logIndex - 1].collateralAfter + modifiedLogs[logIndex].collateralChange
+                  }
+                }
+
+                // Pre Collateralization Ratio
+                if (parseFloat(modifiedLogs[logIndex].debtBefore)) {
+                  modifiedLogs[logIndex].preCollateralizationRatio = (oraclePrice * parseFloat(modifiedLogs[logIndex].collateralBefore)) / (parseFloat(modifiedLogs[logIndex].debtBefore) * parseFloat(collateralType.rate))
+                } else {
+                  modifiedLogs[logIndex].preCollateralizationRatio = 0
+                }
+                // Post Collateralization Ratio
+                if (parseFloat(modifiedLogs[logIndex].debtAfter)) {
+                  modifiedLogs[logIndex].postCollateralizationRatio = (oraclePrice * parseFloat(modifiedLogs[logIndex].collateralAfter)) / (parseFloat(modifiedLogs[logIndex].debtAfter) * parseFloat(collateralType.rate))
+                } else {
+                  modifiedLogs[logIndex].postCollateralizationRatio = 0
+                }
+              }
+            }
+
+
+
+            vault.vaults[0].logs = modifiedLogs.reverse();
+            console.log(JSON.stringify({ msg: "logs in getSingleVault", logs: vault.vaults[0].logs }))
+          }
         }
         return vault
       }
@@ -179,6 +366,36 @@ function IndividualVault(props) {
               }
             </div>
           </div>
+        </div>
+        <div className="column">
+          <div className="box has-text-centered">
+            <h3 className="title" title={props.debt}>
+              {props.debt >= 420000000 && props.debt < 421000000 && <span role="img" aria-label="Tree">🌲</span>}
+            </h3>
+            <h4 className="subtitle is-size-3">{t('daistats.total_token', { token: 'Dai' })}</h4>
+            {vault ?
+              <HistoricalVaultLogChart data={props.historicalDebt} />
+              : <div></div>
+            }
+          </div>
+        </div>
+      </div>
+      <div className="columns">
+        <div className="column">
+          <h3 className="title" title={props.debt}>
+            {props.debt >= 420000000 && props.debt < 421000000 && <span role="img" aria-label="Tree">🌲</span>}
+          </h3>
+          {vault ?
+            <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
+              <HistoricalVaultLogTable heading={true} />
+              <tbody>
+                {vault.logs.map((log, idx) => (
+                  <HistoricalVaultLogTable key={log.id} log={log} />
+                ))}
+              </tbody>
+            </table>
+            : <div></div>
+          }
         </div>
       </div>
       <hr />
