@@ -145,15 +145,15 @@ function IndividualVault(props) {
                 collateralBefore = parseFloat(log.collateralBefore)
                 collateralAfter = parseFloat(log.collateralAfter)
               } else if (log.__typename === 'VaultSplitChangeLog') {
-                if (vault.id.includes(log.src)) {
+                if (vault && vault.id && vault.id.includes(log.src)) {
                   collateralChange = -parseFloat(log.collateralToMove)
-                } else if (vault.id.includes(log.dst)) {
+                } else if (vault && vault.id && vault.id.includes(log.dst)) {
                   collateralChange = parseFloat(log.collateralToMove)
                 }
               } else if (log.__typename === 'VaultTransferChangeLog') {
-                if (vault.id.includes(log.previousOwner)) {
+                if (vault && vault.id && vault.id.includes(log.previousOwner)) {
                   collateralChange = -0
-                } else if (vault.id.includes(log.nextOwner)) {
+                } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
                   collateralChange = 0
                 }
               } else if (index !== 0 && index > 1) {
@@ -176,15 +176,15 @@ function IndividualVault(props) {
                 debtBefore = parseFloat(log.debtBefore)
                 debtAfter = parseFloat(log.debtAfter)
               } else if (log.__typename === 'VaultSplitChangeLog') {
-                if (vault.id.includes(log.src)) {
+                if (vault && vault.id && vault.id.includes(log.src)) {
                   debtChange = -parseFloat(log.debtToMove)
-                } else if (vault.id.includes(log.dst)) {
+                } else if (vault && vault.id && vault.id.includes(log.dst)) {
                   debtChange = parseFloat(log.debtToMove)
                 }
               } else if (log.__typename === 'VaultTransferChangeLog') {
-                if (vault.id.includes(log.previousOwner)) {
+                if (vault && vault.id && vault.id.includes(log.previousOwner)) {
                   debtChange = -0
-                } else if (vault.id.includes(log.nextOwner)) {
+                } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
                   debtChange = 0
                 }
               } else if (index !== 0 && index > 1) {
@@ -213,9 +213,9 @@ function IndividualVault(props) {
                */
               return log
             })
-            const priceList = await Promise.all(modifiedLogs.map(log => {
-              return subgraphClient.request(gql`{
-                collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${log.timestamp}, collateral: "${collateralType.id}"}){
+            const priceListGql = modifiedLogs.map((log, index) => {
+              return `
+                _${index}: collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${log.timestamp}, collateral: "${collateralType.id}"}){
                   id,
                   newValue,
                   newSpotPrice,
@@ -223,18 +223,18 @@ function IndividualVault(props) {
                   timestamp,
                   transaction,
                 }
-              }`)
-            }))
-
+              `
+            })
+            const priceList = await subgraphClient.request(gql`{ ${priceListGql} }`)
 
             for (let logIndex = 0; logIndex < modifiedLogs.length; logIndex++) {
               // oracle price
-              if (priceList[logIndex] &&
-                priceList[logIndex].collateralPriceUpdateLogs &&
-                priceList[logIndex].collateralPriceUpdateLogs[0] &&
-                priceList[logIndex].collateralPriceUpdateLogs[0].newValue) {
+              if (priceList &&
+                priceList[`_${logIndex}`] &&
+                priceList[`_${logIndex}`][0] &&
+                priceList[`_${logIndex}`][0].newValue) {
 
-                modifiedLogs[logIndex].oraclePrice = priceList[logIndex].collateralPriceUpdateLogs[0].newValue;
+                modifiedLogs[logIndex].oraclePrice = priceList[`_${logIndex}`][0].newValue;
               } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].oraclePrice && modifiedLogs[logIndex - 1].oraclePrice) {
                 modifiedLogs[logIndex].oraclePrice = modifiedLogs[logIndex - 1].oraclePrice
               } else {
@@ -243,12 +243,12 @@ function IndividualVault(props) {
               const oraclePrice = modifiedLogs[logIndex].oraclePrice;
 
               // spot price
-              if (priceList[logIndex] &&
-                priceList[logIndex].collateralPriceUpdateLogs &&
-                priceList[logIndex].collateralPriceUpdateLogs[0] &&
-                priceList[logIndex].collateralPriceUpdateLogs[0].newSpotPrice) {
+              if (priceList &&
+                priceList[`_${logIndex}`] &&
+                priceList[`_${logIndex}`][0] &&
+                priceList[`_${logIndex}`][0].newSpotPrice) {
 
-                modifiedLogs[logIndex].spotPrice = priceList[logIndex].collateralPriceUpdateLogs[0].newSpotPrice;
+                modifiedLogs[logIndex].spotPrice = priceList[`_${logIndex}`][0].newSpotPrice;
               } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].spotPrice && modifiedLogs[logIndex - 1].spotPrice) {
                 modifiedLogs[logIndex].spotPrice = modifiedLogs[logIndex - 1].spotPrice
               } else {
