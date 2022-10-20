@@ -2,8 +2,11 @@ import React, { useCallback, useMemo } from "react"
 import { useTranslate } from "react-polyglot"
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts"
 
-const HistoricalVaultLogChart = ({ data }) => {
+const HistoricalVaultLogChart = ({ vault }) => {
   const t = useTranslate()
+
+  let logs = Array.from(vault.logs)
+  logs.reverse();
 
   const locale = useMemo(() => (
     t._polyglot.currentLocale
@@ -40,7 +43,11 @@ const HistoricalVaultLogChart = ({ data }) => {
 
   const ticks = useMemo(
     () => (
-      data.reduce((output, point, index, points) => {
+      logs.reduce((output, point, index, points) => {
+        if (!point || !points) {
+          return output
+        }
+
         const c = new Date(point?.timestamp * 1000)
         const p = new Date(points?.[index - 1]?.["timestamp"] * 1000)
 
@@ -51,48 +58,44 @@ const HistoricalVaultLogChart = ({ data }) => {
         return output
       }, [])
     ),
-    [data]
+    [logs]
   )
 
   const formatTick = useCallback(
     (index) => {
-      const timestamp = new Date(data[index]["timestamp"] * 1000)
+      const timestamp = new Date((logs[index]?.["timestamp"] ?? 0) * 1000)
       const month = new Date(timestamp.getFullYear(), timestamp.getMonth())
 
       return monthFormatter.format(month)
     },
-    [monthFormatter]
+    [logs, monthFormatter]
   )
 
   const formatTooltipTitle = useCallback(
     (index) => {
-      const timestamp = new Date(data[index]["timestamp"] * 1000)
+      const timestamp = new Date((logs[index]?.["timestamp"] ?? 0) * 1000)
 
       return dateFormatter.format(timestamp)
     },
-    [data, dateFormatter]
+    [logs, dateFormatter]
   )
 
   const formatTooltipValue = useCallback(
     (value, name) => {
       let output = amountFormatter.format(value)
 
-      if (name === "debtCeiling") {
-        return [output, t("maker.debt_ceiling")]
+      if (name === "debtAfter") {
+        return [output, "debtAfter"]
       }
 
-      if (name === "totalDebt") {
-        return [output, t("daistats.total_token", { token: "Dai" })]
+      if (name === "postCollateralizationRatio") {
+        return [output, "postCollateralizationRatio"]
       }
 
       return output
     },
-    [amountFormatter, t]
+    [logs, amountFormatter, t]
   )
-
-  if (!data?.length) {
-    return null
-  }
 
   return (
     <div style={{
@@ -104,7 +107,7 @@ const HistoricalVaultLogChart = ({ data }) => {
       justifyContent: "center",
     }}>
       <ResponsiveContainer>
-        <ComposedChart data={data}>
+        <ComposedChart data={logs}>
           <defs>
             <linearGradient id="totalDebtColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1AAB9B" stopOpacity={0.95} />
@@ -118,15 +121,23 @@ const HistoricalVaultLogChart = ({ data }) => {
             style={{ userSelect: 'none' }}
           />
           <Line
-            dataKey="debtCeiling"
+            dataKey="debtAfter"
             type="step"
             dot={false}
             stackId={1}
             animationDuration={750}
             stroke="#7E7E87"
           />
+          <Line
+            dataKey="mat"
+            type="step"
+            dot={false}
+            stackId={1}
+            animationDuration={750}
+            stroke="#7E0087"
+          />
           <Area
-            dataKey="totalDebt"
+            dataKey="postCollateralizationRatio"
             type="monotone"
             stackId={2}
             animationDuration={750}

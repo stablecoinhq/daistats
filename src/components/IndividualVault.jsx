@@ -374,7 +374,7 @@ function IndividualVault(props) {
             </h3>
             <h4 className="subtitle is-size-3">{t('daistats.total_token', { token: 'Dai' })}</h4>
             {vault ?
-              <HistoricalVaultLogChart data={props.historicalDebt} />
+              <HistoricalVaultLogChart vault={vault} />
               : <div></div>
             }
           </div>

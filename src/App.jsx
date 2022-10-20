@@ -1234,32 +1234,6 @@ class App extends Component {
       if (latestBlock) {
         const numberOfPoints = periods ?? latestBlock / blockInterval
         return []
-        // if (numberOfPoints > 0) {
-        //   const result = new Array(numberOfPoints)
-
-        //   const fragments = Array.from({ length: numberOfPoints }, (v, i) => {
-        //     const block = latestBlock - (i + 1) * blockInterval
-
-        //     return `
-        //     _${numberOfPoints - i}_${block}: systemState(block: { number: ${block}}, id: "current") {
-        //       block
-        //       timestamp
-        //       totalDebt
-        //       debtCeiling: totalDebtCeiling
-        //     }
-        //   `
-        //   })
-
-        //   const data = await subgraphClient.request(gql`{${fragments.concat()}}`)
-
-        //   Object.entries(data).forEach(([key, value]) => {
-        //     const [, index, block] = key.split("_")
-
-        //     result[+index - 1] = { block: +block, ...value }
-        //   })
-
-        //   return result
-        // }
       }
     } catch (err) {
       console.error("Historical debt could not be obtained due to an error.", err)
