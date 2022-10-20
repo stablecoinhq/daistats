@@ -77,11 +77,18 @@ const Main = (props) => {
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/vaults-at-risk', 'vault-information']
+  const indexToTab = ['/vaults-at-risk', '/vault-information']
   function tabNameToIndex() {
-    let i = indexToTab.indexOf(location.pathname)
+    let i = indexToTab.map((tabName) => location.pathname.includes(tabName)).indexOf(true)
+
     return (i >= 0 ? i : 0)
   }
+  const cdpId = (() => {
+    const matchList = location.pathname.match(/\/vault-information\/([^/]+)/)
+    if (matchList && matchList.length >= 2 && matchList[1]) {
+      return matchList[1]
+    }
+  })()
 
   return (
     <div>
@@ -111,7 +118,7 @@ const Main = (props) => {
                 <Tab><p className="is-size-5">Individual Vault</p></Tab>
               </TabList>
               <TabPanel>
-                <IndividualVault {...props} />
+                <IndividualVault {...props} cdpId={cdpId} />
               </TabPanel>
             </Tabs>
           </TabPanel>

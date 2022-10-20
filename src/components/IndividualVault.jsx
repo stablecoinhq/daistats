@@ -7,7 +7,7 @@ import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 function IndividualVault(props) {
 
 
-  const [cdpId, setCdpId] = useState("0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
+  const [cdpId, setCdpId] = useState(props.cdpId ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
   const [vault, setVault] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
