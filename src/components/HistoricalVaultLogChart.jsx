@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react"
 import { useTranslate } from "react-polyglot"
-import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts"
+import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
 const HistoricalVaultLogChart = ({ vault }) => {
   const t = useTranslate()
@@ -120,7 +120,17 @@ const HistoricalVaultLogChart = ({ vault }) => {
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
           />
+          <YAxis yAxisId={1} label={{ value: "DAI", angle: -90, dx: -20 }}
+            stroke="#7E7E87"
+          />
+          <YAxis
+            yAxisId={2}
+            orientation="right"
+            label={{ value: "CR", angle: -90, dx: 20 }}
+            stroke="#7E7E87"
+          />
           <Line
+            yAxisId={1}
             dataKey="debtAfter"
             type="step"
             dot={false}
@@ -137,6 +147,7 @@ const HistoricalVaultLogChart = ({ vault }) => {
             stroke="#7E0087"
           />
           <Area
+            yAxisId={2}
             dataKey="postCollateralizationRatio"
             type="monotone"
             stackId={2}

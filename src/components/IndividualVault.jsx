@@ -372,7 +372,7 @@ function IndividualVault(props) {
             <h3 className="title" title={props.debt}>
               {props.debt >= 420000000 && props.debt < 421000000 && <span role="img" aria-label="Tree">🌲</span>}
             </h3>
-            <h4 className="subtitle is-size-3">{t('daistats.total_token', { token: 'Dai' })}</h4>
+            <h4 className="subtitle is-size-3">IndividualVaultHistory</h4>
             {vault ?
               <HistoricalVaultLogChart vault={vault} />
               : <div></div>
