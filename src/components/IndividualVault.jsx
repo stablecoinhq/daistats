@@ -7,13 +7,12 @@ import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 function IndividualVault(props) {
 
 
-  const [cdpId, setCdpId] = useState(props.cdpId ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
+  const [cdpId, setCdpId] = useState(props.cdpId ?? "1");
   const [vault, setVault] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
       const subgraphClient = new GraphQLClient(
-        //"https://api.thegraph.com/subgraphs/name/protofire/maker-protocol",
-        "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.6",
+        "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6",
         { mode: "cors" }
       )
 
@@ -343,7 +342,7 @@ function IndividualVault(props) {
                 />
                 <button onClick={updateVault}>Go</button>
               </p> {
-                vault ? <div>
+                (vault && vault.collateralType && vault.collateralType.id) ? <div>
                   <p className="subtitle is-size-6">
                     MinCollateralRatio: {props.ilksByName[vault.collateralType.id].mat}
                   </p>
@@ -385,7 +384,7 @@ function IndividualVault(props) {
           <h3 className="title" title={props.debt}>
             {props.debt >= 420000000 && props.debt < 421000000 && <span role="img" aria-label="Tree">🌲</span>}
           </h3>
-          {vault ?
+          {(vault && vault.logs) ?
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <HistoricalVaultLogTable heading={true} />
               <tbody>

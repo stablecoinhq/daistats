@@ -4,8 +4,10 @@ import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis }
 
 const HistoricalVaultLogChart = ({ vault }) => {
   const t = useTranslate()
-
-  let logs = Array.from(vault.logs)
+  let logs = [];
+  if (vault && vault.logs) {
+    logs = Array.from(vault.logs)
+  }
   logs.reverse();
 
   const locale = useMemo(() => (
