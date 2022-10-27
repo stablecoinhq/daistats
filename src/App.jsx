@@ -389,6 +389,11 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
   url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.9"
 }
 
+const subgraphClient = new GraphQLClient(
+  url,
+  { mode: "cors" }
+)
+
 class App extends Component {
   state = {
     blockNumber: null,
@@ -662,7 +667,6 @@ class App extends Component {
         this.getPrice(add.MEDIAN_WSTETH, this.POSITION_MEDIAN_VAL),
         this.getPrice(add.PIP_CRVV1ETHSTETH, this.POSITION_UNIV2_NXT), //FIXME
         this.getHistoricalDebt({ blockInterval: 45500 /* ≈ 7 day */, periods: 52 /* 12 months */ }),
-        this.getAllVaults({}),
       ]
     } else {
       promises = [
@@ -671,7 +675,6 @@ class App extends Component {
         this.getPrice(add.PIP_ETH, this.POSITION_NXT),
         this.getPrice(add.MEDIAN_ETH, this.POSITION_MEDIAN_VAL),
         this.getHistoricalDebt({ blockInterval: 45500 /* ≈ 7 day */, periods: 52 /* 12 months */ }),
-        this.getAllVaults({}),
       ]
     }
 
@@ -1452,23 +1455,27 @@ class App extends Component {
 
             return `
             _${numberOfPoints - i}_${block}: systemState(block: { number: ${block}}, id: "current") {
-              block
-              timestamp
+              #block
+              #timestamp
               totalDebt
               debtCeiling: totalDebtCeiling
             }
           `
           })
 
-          const data = await subgraphClient.request(gql`{${fragments.concat()}}`)
+          try {
+            const data = await subgraphClient.request(gql`{${fragments.concat()}}`)
 
-          Object.entries(data).forEach(([key, value]) => {
-            const [, index, block] = key.split("_")
+            Object.entries(data).forEach(([key, value]) => {
+              const [, index, block] = key.split("_")
 
-            result[+index - 1] = { block: +block, ...value }
-          })
+              result[+index - 1] = { block: +block, ...value }
+            })
 
-          return result
+            return result
+          } catch (e) {
+            return []
+          }
         }
       }
     } catch (err) {
