@@ -644,7 +644,7 @@ class App extends Component {
         this.getPrice(add.PIP_MATIC, this.POSITION_NXT),
         this.getPrice(add.MEDIAN_MATIC, this.POSITION_MEDIAN_VAL),
         this.getPrice(add.PIP_UNIV2DAIETH, this.POSITION_UNIV2_NXT),
-        this.getPrice(add.MEDIAN_UNIV2DAIETH, this.POSITION_UNIV2_NXT),
+        // this.getPrice(add.MEDIAN_UNIV2DAIETH, this.POSITION_UNIV2_NXT),
         this.getPrice(add.PIP_UNIV2WBTCETH, this.POSITION_UNIV2_NXT),
         //this.getPrice(add.MEDIAN_UNIV2WBTCETH, this.POSITION_UNIV2_NXT),
         this.getPrice(add.PIP_UNIV2USDCETH, this.POSITION_UNIV2_NXT),
@@ -681,20 +681,6 @@ class App extends Component {
     }
 
     const structuredResult = await Promise.all(promises)
-
-    var block, res, ethSupply, ethPriceNxt, ethPriceMedian,
-      batPriceNxt, batPriceMedian,
-      wbtcPriceNxt, wbtcPriceMedian, kncPriceNxt, kncPriceMedian, zrxPriceNxt, zrxPriceMedian,
-      manaPriceNxt, manaPriceMedian, usdtPriceNxt, usdtPriceMedian, compPriceNxt, compPriceMedian,
-      lrcPriceNxt, lrcPriceMedian, linkPriceNxt, linkPriceMedian, balPriceNxt, balPriceMedian,
-      yfiPriceNxt, yfiPriceMedian, uniPriceNxt, uniPriceMedian, aavePriceNxt, aavePriceMedian,
-      maticPriceNxt, maticPriceMedian,
-      univ2daiethPriceNxt, univ2wbtcethPriceNxt, univ2usdcethPriceNxt, univ2daiusdcPriceNxt,
-      univ2linkethPriceNxt, univ2uniethPriceNxt, univ2wbtcdaiPriceNxt,
-      univ2aaveethPriceNxt, guniv3daiusdc1PriceNxt, guniv3daiusdc2PriceNxt, wstethPriceNxt,
-      wstethPriceMedian, crvv1ethstethPriceNext,
-      historicalDebt, allVaults
-
     if (process.env.REACT_APP_NETWORK === "mainnet") {
       var [[block, res], ethSupply, ethPriceNxt, ethPriceMedian,
         batPriceNxt, batPriceMedian,
