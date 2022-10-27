@@ -4,6 +4,13 @@ import { gql, GraphQLClient } from "graphql-request"
 import HistoricalVaultLogChart from './HistoricalVaultLogChart';
 import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 
+let url;
+if (process.env.REACT_APP_NETWORK === "mainnet") {
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
+} else {
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.9"
+}
+
 function IndividualVault(props) {
 
 
@@ -12,7 +19,7 @@ function IndividualVault(props) {
   const updateVault = () => {
     const getData = async () => {
       const subgraphClient = new GraphQLClient(
-        "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6",
+        url,
         { mode: "cors" }
       )
 
