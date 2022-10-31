@@ -212,6 +212,10 @@ const vestDai = build(add.MCD_VEST_DAI, "DssVestSuckable")
 const vestMkr = build(add.MCD_VEST_MKR, "DssVestMintable")
 const vestMkrTreasury = build(add.MCD_VEST_MKR_TREASURY, "DssVestTransferrable")
 const weth = build(add.ETH, "ERC20")
+let fau
+if (process.env.REACT_APP_NETWORK !== "mainnet") {
+  fau = build(add.FAU, "ERC20")
+}
 const bat = build(add.BAT, "ERC20")
 const usdc = build(add.USDC, "ERC20")
 const tusd = build(add.TUSD, "ERC20")
@@ -351,6 +355,7 @@ const wstethAIlkBytes = utils.formatBytes32String("WSTETH-A")
 const wstethBIlkBytes = utils.formatBytes32String("WSTETH-B")
 const d3madaiIlkBytes = utils.formatBytes32String("DIRECT-AAVEV2-DAI")
 const crvv1ethstethAIlkBytes = utils.formatBytes32String("CRVV1ETHSTETH-A")
+const fauAIlkBytes = utils.formatBytes32String("FAU-A")
 window.utils = utils
 window.add = add
 window.vat = vat
@@ -386,7 +391,7 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.9"
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.10"
 }
 
 const subgraphClient = new GraphQLClient(
@@ -605,7 +610,7 @@ class App extends Component {
         .concat(this.getVestingCalls(add.MCD_VEST_DAI, vestDai, VEST_DAI_IDS))
         .concat(this.getVestingCalls(add.MCD_VEST_MKR_TREASURY, vestMkrTreasury, VEST_MKR_TREASURY_IDS))
         .concat(this.getIlkCall(ethAIlkBytes, 'ETH_A', weth, add.ETH, add.PIP_ETH))
-        .concat(this.getIlkCall(ethAIlkBytes, 'FAU_A', weth, add.ETH, add.PIP_ETH))
+        .concat(this.getIlkCall(fauAIlkBytes, 'FAU_A', fau, add.FAU, add.PIP_FAU))
         , { blockTag: blockNumber })
     }
     let promises
@@ -675,6 +680,8 @@ class App extends Component {
         this.etherscanEthSupply(),
         this.getPrice(add.PIP_ETH, this.POSITION_NXT),
         this.getPrice(add.MEDIAN_ETH, this.POSITION_MEDIAN_VAL),
+        this.getPrice(add.PIP_FAU, this.POSITION_NXT),
+        this.getPrice(add.MEDIAN_FAU, this.POSITION_MEDIAN_VAL),
         this.getHistoricalDebt({ blockInterval: 45500 /* ≈ 7 day */, periods: 52 /* 12 months */ }),
         this.getAllVaults({}),
       ]
@@ -695,7 +702,9 @@ class App extends Component {
         wstethPriceMedian, crvv1ethstethPriceNext,
         historicalDebt, allVaults] = structuredResult
     } else {
-      var [[block, res], ethSupply, ethPriceNxt, ethPriceMedian,
+      var [[block, res], ethSupply,
+        ethPriceNxt, ethPriceMedian,
+        fauPriceNxt, fauPriceMedian,
         historicalDebt, allVaults] = structuredResult
     }
 
@@ -873,7 +882,7 @@ class App extends Component {
     } else {
       ilks = [
         this.getIlkMap(res, offset += (VEST_MKR_TREASURY_IDS * VEST_CALL_COUNT), "ETH", "ETH-A", weth, 18, base, ethPriceNxt, ethPriceMedian, DP10),
-        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", weth, 18, base, ethPriceNxt, ethPriceMedian, DP10)
+        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", fau, 18, base, fauPriceNxt, fauPriceMedian, DP10)
       ]
     }
 
@@ -1460,7 +1469,7 @@ class App extends Component {
   getAllVaults = async () => {
     try {
       // const vaultTypes = ["ETH-A", "ETH-B"]
-      const vaultTypes = ["ETH-A"]
+      const vaultTypes = ["ETH-A", "FAU-A"]
       const vaultTypesResultMap = vaultTypes.map(async (vaultType) => {
         const collateralTypeVaultCount = await subgraphClient.request(gql`{
           collateralType(id: "${vaultType}") {

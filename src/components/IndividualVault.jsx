@@ -8,13 +8,13 @@ let url;
 if (process.env.REACT_APP_NETWORK === "mainnet") {
   url = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
 } else {
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.9"
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.10"
 }
 
 function IndividualVault(props) {
 
 
-  const [cdpId, setCdpId] = useState(props.cdpId ?? "1");
+  const [cdpId, setCdpId] = useState(props.cdpId ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
   const [vault, setVault] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
@@ -326,7 +326,7 @@ function IndividualVault(props) {
       if (cdpId) {
         const vault = await getSingleVault(cdpId);
         console.log(JSON.stringify({ vault, msg: "vault in getData" }))
-        setVault((vault.vaults && vault.vaults[0]) ? vault.vaults[0] : {})
+        setVault((vault && vault.vaults && vault.vaults[0]) ? vault.vaults[0] : {})
       }
     }
     getData();

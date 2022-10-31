@@ -10,18 +10,18 @@ function VaultsAtRisk(props) {
   const allVaults = props.allVaults ? props.allVaults[props.ilk] : undefined
   const t = useTranslate()
   if (allVaults) {
-    const ilkETHA = props.ilksByName[props.ilk]
+    const ilk = props.ilksByName[props.ilk]
     console.log(allVaults);
-    console.log(JSON.stringify(ilkETHA))
+    console.log(JSON.stringify(ilk))
 
     const dangerousVaults = allVaults
       .filter((vault) => vault.debt > 0 && vault.collateral > 0)
       .filter((vault) => {
         const collateral = parseFloat(vault.collateral)
-        const price = parseFloat(ilkETHA.price)
+        const price = parseFloat(ilk.price)
         const debt = parseFloat(vault.debt)
-        const rate = parseFloat(ilkETHA.rate)
-        const mat = parseFloat(ilkETHA.mat)
+        const rate = parseFloat(ilk.rate)
+        const mat = parseFloat(ilk.mat)
         const collateralIsEnough = (collateral * price * priceDropRatio) > (debt * mat * rate)
         return !collateralIsEnough
       })
@@ -36,10 +36,10 @@ function VaultsAtRisk(props) {
                   NumberOfVaultsAtRisk: {dangerousVaults.length} of {allVaults.length}
                 </p>
                 <p className="subtitle is-size-4">
-                  MinCollateralRatio: {ilkETHA.mat}
+                  MinCollateralRatio: {ilk.mat}
                 </p>
                 <p className="subtitle is-size-4">
-                  CurrentPrice: {ilkETHA.price}
+                  CurrentPrice: {ilk.price}
                 </p>
                 <p className="subtitle is-size-4">
                   PriceDropRatio:
@@ -50,7 +50,7 @@ function VaultsAtRisk(props) {
                   />
                 </p>
                 <p className="subtitle is-size-4">
-                  SimulatedPrice: {ilkETHA.price * priceDropRatio}
+                  SimulatedPrice: {ilk.price * priceDropRatio}
                 </p>
               </div>
               {dangerousVaults.map((vault) =>
@@ -62,13 +62,13 @@ function VaultsAtRisk(props) {
                     Collateral: {vault.collateral}
                   </p>
                   <p className="subtitle is-size-6">
-                    Debt: {(parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
+                    Debt: {(parseFloat(vault.debt) * parseFloat(ilk.rate))}
                   </p>
                   <p className="subtitle is-size-6">
-                    CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) / (parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
+                    CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilk.price) / (parseFloat(vault.debt) * parseFloat(ilk.rate))}
                   </p>
                   <p className="subtitle is-size-6">
-                    SimulatedCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilkETHA.price) * parseFloat(priceDropRatio) / (parseFloat(vault.debt) * parseFloat(ilkETHA.rate))}
+                    SimulatedCollateralRatio: {parseFloat(vault.collateral) * parseFloat(ilk.price) * parseFloat(priceDropRatio) / (parseFloat(vault.debt) * parseFloat(ilk.rate))}
                   </p>
                 </div>
               )}

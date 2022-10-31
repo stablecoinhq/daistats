@@ -102,13 +102,13 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab><p className="is-size-5">ETH-A</p></Tab>
-                <Tab><p className="is-size-5">ETH-B</p></Tab>
+                <Tab><p className="is-size-5">FAU-A</p></Tab>
               </TabList>
               <TabPanel>
                 <VaultsAtRisk {...props} ilk="ETH-A" />
               </TabPanel>
               <TabPanel>
-                <VaultsAtRisk {...props} ilk="ETH-B" />
+                <VaultsAtRisk {...props} ilk="FAU-A" />
               </TabPanel>
             </Tabs>
           </TabPanel>
