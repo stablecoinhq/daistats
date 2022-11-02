@@ -8,13 +8,28 @@ let url;
 if (process.env.REACT_APP_NETWORK === "mainnet") {
   url = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
 } else {
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.10"
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.11"
 }
 
 function IndividualVault(props) {
 
+  const convertLowerCaseAddress = (cdpId) => {
+    if (!cdpId) {
+      return undefined
+    }
+    if (cdpId.match(/^[0-9]+$/)) {
+      return cdpId
+    } else {
+      const matched = cdpId.match(/^([^-]+)-(.+)$/)
+      if (matched && matched[1] && matched[2]) {
+        return matched[1].toLowerCase() + "-" + matched[2]
+      } else {
+        return undefined
+      }
+    }
+  }
 
-  const [cdpId, setCdpId] = useState(props.cdpId ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
+  const [cdpId, setCdpId] = useState(convertLowerCaseAddress(props.cdpId) ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
   const [vault, setVault] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
@@ -25,106 +40,86 @@ function IndividualVault(props) {
 
       const getSingleVault = async (cdpId) => {
         let vault;
-        try {
-          const vaultByCdpId = await subgraphClient.request(gql`{
-            vaults(first: 1, where: {cdpId: ${cdpId}}) {
+        const logsQuery = searchCondition => `
+          vaults(first: 1, where: ${searchCondition}) {
+            id,
+            cdpId,
+            openedAt,
+            updatedAt,
+            collateral,
+            debt,
+            collateralType{
               id,
-              cdpId,
-              openedAt,
-              updatedAt,
-              collateral,
-              debt,
-              collateralType{
+              rate,
+            },
+            logs(orderBy: timestamp, orderDirection: desc, first: 1000) {
+              __typename,
+              transaction,
+              timestamp,
+              ... on VaultCreationLog {
                 id,
-                rate,
               },
-              logs(orderBy: timestamp, orderDirection: desc, first: 1000) {
-                __typename,
-                transaction,
-                timestamp,
-                ... on VaultCreationLog {
-                  id,
-                },
-                ... on VaultCollateralChangeLog {
-                  id,
-                  collateralDiff,
-                  collateralAfter,
-                  collateralBefore,
-                }
-                ... on VaultDebtChangeLog {
-                  id,
-                  debtDiff,
-                  debtAfter,
-                  debtBefore
-                },
-                ... on VaultTransferChangeLog {
-                  id,
-                  previousOwner{id},
-                  nextOwner{id},
-                },
-                ...on VaultSplitChangeLog {
-                  id,
-                  dst,
-                  src,
-                  collateralToMove,
-                  debtToMove,
-                },
+              ... on VaultCollateralChangeLog {
+                id,
+                collateralDiff,
+                collateralAfter,
+                collateralBefore,
               }
+              ... on VaultDebtChangeLog {
+                id,
+                debtDiff,
+                debtAfter,
+                debtBefore
+              },
+              ... on VaultTransferChangeLog {
+                id,
+                previousOwner{id},
+                nextOwner{id},
+              },
+              ...on VaultSplitChangeLog {
+                id,
+                dst,
+                src,
+                collateralToMove,
+                debtToMove,
+              },
             }
-          }`)
-          if (vaultByCdpId) {
-            vault = vaultByCdpId
           }
-        } catch (err) {
-          console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...", err)
+        `
+        const auctionsQuery = `
+          saleAuctions{
+            id,
+            vault{
+              id
+            },
+            amountDaiToRaise,
+            amountCollateralToSell,
+            boughtAt,
+            isActive,
+            startedAt,
+            resetedAt,
+            updatedAt
+          }
+        `
+
+        if (cdpId.match(/^[0-9]+$/)) {
+          try {
+            const vaultByCdpId = await subgraphClient.request(gql`{
+              ${logsQuery(`{cdpId: ${cdpId}}`)}
+              ${auctionsQuery}
+            }`)
+            if (vaultByCdpId) {
+              vault = vaultByCdpId
+            }
+          } catch (err) {
+            console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...")
+          }
         }
         if (!vault) {
           try {
             const vaultById = await subgraphClient.request(gql`{
-              vaults(first: 1, where: {id: "${cdpId}"}) {
-                id,
-                cdpId,
-                openedAt,
-                updatedAt,
-                collateral,
-                debt,
-                collateralType{
-                  id,
-                  rate,
-                },
-                logs(orderBy: timestamp, orderDirection: desc, first: 1000) {
-                  __typename,
-                  transaction,
-                  timestamp,
-                  ... on VaultCreationLog {
-                    id,
-                  },
-                  ... on VaultCollateralChangeLog {
-                    id,
-                    collateralDiff,
-                    collateralAfter,
-                    collateralBefore,
-                  }
-                  ... on VaultDebtChangeLog {
-                    id,
-                    debtDiff,
-                    debtAfter,
-                    debtBefore
-                  },
-                  ... on VaultTransferChangeLog {
-                    id,
-                    previousOwner{id},
-                    nextOwner{id},
-                  },
-                  ...on VaultSplitChangeLog {
-                    id,
-                    dst,
-                    src,
-                    collateralToMove,
-                    debtToMove,
-                  },
-                }
-              }
+              ${logsQuery(`{id: "${cdpId}"}`)}
+              ${auctionsQuery}
             }`)
             if (vaultById) {
               vault = vaultById
@@ -314,9 +309,33 @@ function IndividualVault(props) {
               }
             }
 
+            // some auctions exist for vault, let's merge auction logs to vault change logs
+            let auctionLogs = []
+            if (vault.saleAuctions[0] && vault.saleAuctions[0].startedAt) {
+              auctionLogs = vault.saleAuctions.map(saleAuction => {
+                const resultArray = []
+                if (saleAuction.startedAt && parseInt(saleAuction.startedAt)) {
+                  resultArray.push({
+                    id: `liquidationStartLog-${saleAuction.id}`,
+                    timestamp: saleAuction.startedAt,
+                    __typename: `liquidationStartLog`
+                  })
+                }
+                if (saleAuction.boughtAt && parseInt(saleAuction.boughtAt)) {
+                  resultArray.push({
+                    id: `liquidationFinishLog-${saleAuction.id}`,
+                    timestamp: saleAuction.boughtAt,
+                    __typename: `liquidationFinishLog`
+                  })
+                }
+                return resultArray
+              }).flat()
+            }
 
-
-            vault.vaults[0].logs = modifiedLogs.reverse();
+            vault.vaults[0].logs = modifiedLogs
+              .concat(auctionLogs)
+              .sort((left, right) => left.timestamp - right.timestamp)
+              .reverse();
             console.log(JSON.stringify({ msg: "logs in getSingleVault", logs: vault.vaults[0].logs }))
           }
         }
@@ -345,7 +364,7 @@ function IndividualVault(props) {
                 <input
                   type="text"
                   value={cdpId ? cdpId : undefined}
-                  onChange={event => setCdpId(event.target.value)}
+                  onChange={event => setCdpId(convertLowerCaseAddress(event.target.value))}
                 />
                 <button onClick={updateVault}>Go</button>
               </p> {

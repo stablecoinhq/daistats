@@ -391,7 +391,7 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.10"
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.11"
 }
 
 const subgraphClient = new GraphQLClient(
@@ -1468,7 +1468,6 @@ class App extends Component {
 
   getAllVaults = async () => {
     try {
-      // const vaultTypes = ["ETH-A", "ETH-B"]
       const vaultTypes = ["ETH-A", "FAU-A"]
       const vaultTypesResultMap = vaultTypes.map(async (vaultType) => {
         const collateralTypeVaultCount = await subgraphClient.request(gql`{
