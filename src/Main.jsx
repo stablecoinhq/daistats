@@ -12,6 +12,7 @@ import 'react-tabs/style/react-tabs.css';
 import { useLocation, useHistory } from "react-router-dom";
 import VaultsAtRisk from './components/VaultsAtRisk';
 import IndividualVault from './components/IndividualVault';
+import AuctionParticipants from './components/AuctionParticipants';
 
 
 const formatAmount = new Intl.NumberFormat('en-US', {
@@ -77,7 +78,7 @@ const Main = (props) => {
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/vaults-at-risk', '/vault-information']
+  const indexToTab = ['/vaults-at-risk', '/vault-information', 'auction-participants']
   function tabNameToIndex() {
     let i = indexToTab.map((tabName) => location.pathname.includes(tabName)).indexOf(true)
 
@@ -97,6 +98,7 @@ const Main = (props) => {
           <TabList>
             <Tab><p className="is-size-5">Vaults at risk</p></Tab>
             <Tab><p className="is-size-5">Vault Information</p></Tab>
+            <Tab><p className="is-size-5">Auction Participants</p></Tab>
           </TabList>
           <TabPanel>
             <Tabs>
@@ -119,6 +121,16 @@ const Main = (props) => {
               </TabList>
               <TabPanel>
                 <IndividualVault {...props} cdpId={cdpId} />
+              </TabPanel>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs>
+              <TabList>
+                <Tab><p className="is-size-5">Auction Participants</p></Tab>
+              </TabList>
+              <TabPanel>
+                <AuctionParticipants {...props} />
               </TabPanel>
             </Tabs>
           </TabPanel>

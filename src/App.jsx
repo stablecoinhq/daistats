@@ -390,7 +390,7 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.12"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.14"
 }
 
 const subgraphClient = new GraphQLClient(
