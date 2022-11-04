@@ -4,13 +4,6 @@ import { gql, GraphQLClient } from "graphql-request"
 import HistoricalVaultLogChart from './HistoricalVaultLogChart';
 import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 
-let url;
-if (process.env.REACT_APP_NETWORK === "mainnet") {
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
-} else {
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.11"
-}
-
 function IndividualVault(props) {
 
   const convertLowerCaseAddress = (cdpId) => {
@@ -33,10 +26,7 @@ function IndividualVault(props) {
   const [vault, setVault] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
-      const subgraphClient = new GraphQLClient(
-        url,
-        { mode: "cors" }
-      )
+      const subgraphClient = props.subgraphClient
 
       const getSingleVault = async (cdpId) => {
         let vault;
@@ -86,8 +76,8 @@ function IndividualVault(props) {
             }
           }
         `
-        const auctionsQuery = `
-          saleAuctions{
+        const auctionsQuery = vaultId => `
+          saleAuctions(where: {vault: "${vaultId}"}){
             id,
             vault{
               id
@@ -106,10 +96,18 @@ function IndividualVault(props) {
           try {
             const vaultByCdpId = await subgraphClient.request(gql`{
               ${logsQuery(`{cdpId: ${cdpId}}`)}
-              ${auctionsQuery}
             }`)
-            if (vaultByCdpId) {
+
+            let saleAuctionsQueryResult;
+            if (vaultByCdpId && vaultByCdpId.vaults[0] && vaultByCdpId.vaults[0].id) {
+              saleAuctionsQueryResult = await subgraphClient.request(gql`{
+                ${auctionsQuery(vaultByCdpId.vaults[0].id)}
+              }`)
+            }
+
+            if (vaultByCdpId && saleAuctionsQueryResult) {
               vault = vaultByCdpId
+              vault.saleAuctions = saleAuctionsQueryResult.saleAuctions
             }
           } catch (err) {
             console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...")
@@ -119,7 +117,7 @@ function IndividualVault(props) {
           try {
             const vaultById = await subgraphClient.request(gql`{
               ${logsQuery(`{id: "${cdpId}"}`)}
-              ${auctionsQuery}
+              ${auctionsQuery(cdpId)}
             }`)
             if (vaultById) {
               vault = vaultById
@@ -134,86 +132,114 @@ function IndividualVault(props) {
         } else {
           if (vault.vaults[0] && vault.vaults[0].logs) {
             const collateralType = vault.vaults[0].collateralType
+            // logs are ordered from new to old, change it as from old to new
             const reversedLogs = vault.vaults[0].logs.reverse()
-            const modifiedLogs = reversedLogs.map((log, index) => {
+
+            // some auctions exist for vault, let's merge auction logs to vault change logs
+            let auctionLogs = []
+            if (vault.saleAuctions[0] && vault.saleAuctions[0].startedAt) {
+              auctionLogs = vault.saleAuctions.map(saleAuction => {
+                const resultArray = []
+                if (saleAuction.startedAt && parseInt(saleAuction.startedAt)) {
+                  resultArray.push({
+                    ...saleAuction,
+                    id: `liquidationStartLog-${saleAuction.id}`,
+                    timestamp: saleAuction.startedAt,
+                    __typename: `liquidationStartLog`,
+                  })
+                }
+                if (saleAuction.boughtAt && parseInt(saleAuction.boughtAt)) {
+                  resultArray.push({
+                    ...saleAuction,
+                    id: `liquidationFinishLog-${saleAuction.id}`,
+                    timestamp: saleAuction.boughtAt,
+                    __typename: `liquidationFinishLog`
+                  })
+                }
+                return resultArray
+              }).flat()
+            }
+            const vaultWithAuctionLogs = reversedLogs
+              .concat(auctionLogs)
+              .sort((left, right) => left.timestamp - right.timestamp)
+
+            // logs have collateral/debt change in different format.
+            // calculate before/after/change value.
+            const modifiedLogs = vaultWithAuctionLogs.map((log, mapIndex) => {
 
               // Collateral Change ()
-              let collateralChange = 0;
-              let collateralBefore = undefined;
-              let collateralAfter = undefined;
-              if (log.__typename === 'VaultCollateralChangeLog') {
-                collateralChange = parseFloat(log.collateralDiff)
-                collateralBefore = parseFloat(log.collateralBefore)
-                collateralAfter = parseFloat(log.collateralAfter)
-              } else if (log.__typename === 'VaultSplitChangeLog') {
-                if (vault && vault.id && vault.id.includes(log.src)) {
-                  collateralChange = -parseFloat(log.collateralToMove)
-                } else if (vault && vault.id && vault.id.includes(log.dst)) {
-                  collateralChange = parseFloat(log.collateralToMove)
+              const updateCollateralChange = (log, index) => {
+                let collateralChange = 0;
+                let collateralBefore = undefined;
+                let collateralAfter = undefined;
+                if (log.__typename === 'VaultCollateralChangeLog') {
+                  collateralChange = parseFloat(log.collateralDiff)
+                  collateralBefore = parseFloat(log.collateralBefore)
+                  collateralAfter = parseFloat(log.collateralAfter)
+                } else if (log.__typename === 'VaultSplitChangeLog') {
+                  if (vault && vault.id && vault.id.includes(log.src)) {
+                    collateralChange = -parseFloat(log.collateralToMove)
+                  } else if (vault && vault.id && vault.id.includes(log.dst)) {
+                    collateralChange = parseFloat(log.collateralToMove)
+                  }
+                } else if (log.__typename === 'VaultTransferChangeLog') {
+                  if (vault && vault.id && vault.id.includes(log.previousOwner)) {
+                    collateralChange = -0
+                  } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
+                    collateralChange = 0
+                  }
+                } else if (index !== 0 && index > 1) {
+                  const previousLog = vaultWithAuctionLogs[index - 1]
+                  collateralChange = parseFloat(log.collateral) - parseFloat(previousLog.collateral)
+                  if (Number.isNaN(collateralChange)) {
+                    collateralChange = 0;
+                  }
                 }
-              } else if (log.__typename === 'VaultTransferChangeLog') {
-                if (vault && vault.id && vault.id.includes(log.previousOwner)) {
-                  collateralChange = -0
-                } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
-                  collateralChange = 0
-                }
-              } else if (index !== 0 && index > 1) {
-                const previousLog = reversedLogs[index - 1]
-                collateralChange = parseFloat(log.collateral) - parseFloat(previousLog.collateral)
-                if (Number.isNaN(collateralChange)) {
-                  collateralChange = 0;
-                }
+                log.collateralBefore = collateralBefore
+                log.collateralAfter = collateralAfter
+                log.collateralChange = collateralChange;
+                return log
               }
-              log.collateralBefore = collateralBefore
-              log.collateralAfter = collateralAfter
-              log.collateralChange = collateralChange;
+              const logUpdatedCollateralChange = updateCollateralChange(log, mapIndex)
 
               // Debt Change (DAI)
-              let debtChange = 0;
-              let debtBefore = undefined;
-              let debtAfter = undefined;
-              if (log.__typename === 'VaultDebtChangeLog') {
-                debtChange = parseFloat(log.debtDiff)
-                debtBefore = parseFloat(log.debtBefore)
-                debtAfter = parseFloat(log.debtAfter)
-              } else if (log.__typename === 'VaultSplitChangeLog') {
-                if (vault && vault.id && vault.id.includes(log.src)) {
-                  debtChange = -parseFloat(log.debtToMove)
-                } else if (vault && vault.id && vault.id.includes(log.dst)) {
-                  debtChange = parseFloat(log.debtToMove)
+              const updateDebtChange = (log, index) => {
+                let debtChange = 0;
+                let debtBefore = undefined;
+                let debtAfter = undefined;
+                if (log.__typename === 'VaultDebtChangeLog') {
+                  debtChange = parseFloat(log.debtDiff)
+                  debtBefore = parseFloat(log.debtBefore)
+                  debtAfter = parseFloat(log.debtAfter)
+                } else if (log.__typename === 'VaultSplitChangeLog') {
+                  if (vault && vault.id && vault.id.includes(log.src)) {
+                    debtChange = -parseFloat(log.debtToMove)
+                  } else if (vault && vault.id && vault.id.includes(log.dst)) {
+                    debtChange = parseFloat(log.debtToMove)
+                  }
+                } else if (log.__typename === 'VaultTransferChangeLog') {
+                  if (vault && vault.id && vault.id.includes(log.previousOwner)) {
+                    debtChange = -0
+                  } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
+                    debtChange = 0
+                  }
+
+                } else if (index !== 0 && index > 1) {
+                  const previousLog = vaultWithAuctionLogs[index - 1]
+                  debtChange = parseFloat(log.debt) - parseFloat(previousLog.debt)
+                  if (Number.isNaN(debtChange)) {
+                    debtChange = 0;
+                  }
                 }
-              } else if (log.__typename === 'VaultTransferChangeLog') {
-                if (vault && vault.id && vault.id.includes(log.previousOwner)) {
-                  debtChange = -0
-                } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
-                  debtChange = 0
-                }
-              } else if (index !== 0 && index > 1) {
-                const previousLog = reversedLogs[index - 1]
-                debtChange = parseFloat(log.debt) - parseFloat(previousLog.debt)
-                if (Number.isNaN(debtChange)) {
-                  debtChange = 0;
-                }
+                log.debtBefore = debtBefore
+                log.debtAfter = debtAfter
+                log.debtChange = debtChange;
+                return log
               }
-              log.debtBefore = debtBefore
-              log.debtAfter = debtAfter
-              log.debtChange = debtChange;
-
-              // Paid fees (DAI)
-              // Market Price (USD)
-              // Oracle Price (USD)
-
-              /**
-                Collateral Change ()
-                Debt Change (DAI)
-                Paid fees (DAI)
-                Market Price (USD)
-                Oracle Price (USD)
-                Pre Collateralization Ratio
-                Post Collateralization Ratio
-               */
-              return log
+              const logUpdatedDebtChange = updateDebtChange(logUpdatedCollateralChange, mapIndex)
+              return logUpdatedDebtChange;
             })
+            // get oracle price log
             const priceListGql = modifiedLogs.map((log, index) => {
               return `
                 _${index}: collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${log.timestamp}, collateral: "${collateralType.id}"}){
@@ -228,20 +254,21 @@ function IndividualVault(props) {
             })
             const priceList = await subgraphClient.request(gql`{ ${priceListGql} }`)
 
-            for (let logIndex = 0; logIndex < modifiedLogs.length; logIndex++) {
+            // update all log records for view
+            for (let logIndex = 0; logIndex < vaultWithAuctionLogs.length; logIndex++) {
               // oracle price
               if (priceList &&
                 priceList[`_${logIndex}`] &&
                 priceList[`_${logIndex}`][0] &&
                 priceList[`_${logIndex}`][0].newValue) {
 
-                modifiedLogs[logIndex].oraclePrice = priceList[`_${logIndex}`][0].newValue;
-              } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].oraclePrice && modifiedLogs[logIndex - 1].oraclePrice) {
-                modifiedLogs[logIndex].oraclePrice = modifiedLogs[logIndex - 1].oraclePrice
+                vaultWithAuctionLogs[logIndex].oraclePrice = priceList[`_${logIndex}`][0].newValue;
+              } else if (vaultWithAuctionLogs[logIndex - 1] && vaultWithAuctionLogs[logIndex - 1].oraclePrice && vaultWithAuctionLogs[logIndex - 1].oraclePrice) {
+                vaultWithAuctionLogs[logIndex].oraclePrice = vaultWithAuctionLogs[logIndex - 1].oraclePrice
               } else {
-                modifiedLogs[logIndex].oraclePrice = 0
+                vaultWithAuctionLogs[logIndex].oraclePrice = 0
               }
-              const oraclePrice = modifiedLogs[logIndex].oraclePrice;
+              const oraclePrice = vaultWithAuctionLogs[logIndex].oraclePrice;
 
               // spot price
               if (priceList &&
@@ -249,93 +276,79 @@ function IndividualVault(props) {
                 priceList[`_${logIndex}`][0] &&
                 priceList[`_${logIndex}`][0].newSpotPrice) {
 
-                modifiedLogs[logIndex].spotPrice = priceList[`_${logIndex}`][0].newSpotPrice;
-              } else if (modifiedLogs[logIndex - 1] && modifiedLogs[logIndex - 1].spotPrice && modifiedLogs[logIndex - 1].spotPrice) {
-                modifiedLogs[logIndex].spotPrice = modifiedLogs[logIndex - 1].spotPrice
+                vaultWithAuctionLogs[logIndex].spotPrice = priceList[`_${logIndex}`][0].newSpotPrice;
+              } else if (vaultWithAuctionLogs[logIndex - 1] && vaultWithAuctionLogs[logIndex - 1].spotPrice && vaultWithAuctionLogs[logIndex - 1].spotPrice) {
+                vaultWithAuctionLogs[logIndex].spotPrice = vaultWithAuctionLogs[logIndex - 1].spotPrice
               } else {
-                modifiedLogs[logIndex].spotPrice = 0
+                vaultWithAuctionLogs[logIndex].spotPrice = 0
               }
 
+              // update all the log records so that they all have price/diff/before/after value.
               if (logIndex === 0) {
-                modifiedLogs[logIndex].debtBefore = 0
-                modifiedLogs[logIndex].collateralBefore = 0
-                modifiedLogs[logIndex].debtAfter = 0
-                modifiedLogs[logIndex].collateralAfter = 0
-                modifiedLogs[logIndex].preCollateralizationRatio = 0
-                modifiedLogs[logIndex].postCollateralizationRatio = 0
+                vaultWithAuctionLogs[logIndex].debtBefore = 0
+                vaultWithAuctionLogs[logIndex].collateralBefore = 0
+                vaultWithAuctionLogs[logIndex].debtAfter = 0
+                vaultWithAuctionLogs[logIndex].collateralAfter = 0
+                vaultWithAuctionLogs[logIndex].preCollateralizationRatio = 0
+                vaultWithAuctionLogs[logIndex].postCollateralizationRatio = 0
 
               } else {
 
                 // debtBefore
-                if (!modifiedLogs[logIndex].debtBefore) {
-                  modifiedLogs[logIndex].debtBefore = modifiedLogs[logIndex - 1].debtAfter
+                if (!vaultWithAuctionLogs[logIndex].debtBefore) {
+                  vaultWithAuctionLogs[logIndex].debtBefore = vaultWithAuctionLogs[logIndex - 1].debtAfter
                 }
 
                 // debtAfter
-                if (!modifiedLogs[logIndex].debtAfter) {
-                  if (!modifiedLogs[logIndex].debtChange) {
-                    modifiedLogs[logIndex].debtAfter = modifiedLogs[logIndex].debtBefore
-                  } else {
-                    modifiedLogs[logIndex].debtAfter = modifiedLogs[logIndex - 1].debtAfter + modifiedLogs[logIndex].debtChange
+                if (vaultWithAuctionLogs[logIndex].__typename === "liquidationFinishLog") {
+                  vaultWithAuctionLogs[logIndex].debtAfter = 0;
+                  vaultWithAuctionLogs[logIndex].debtChange = -vaultWithAuctionLogs[logIndex].debtBefore;
+                } else {
+                  if (!vaultWithAuctionLogs[logIndex].debtAfter) {
+                    if (!vaultWithAuctionLogs[logIndex].debtChange) {
+                      vaultWithAuctionLogs[logIndex].debtAfter = vaultWithAuctionLogs[logIndex].debtBefore
+                    } else {
+                      vaultWithAuctionLogs[logIndex].debtAfter = vaultWithAuctionLogs[logIndex - 1].debtAfter + vaultWithAuctionLogs[logIndex].debtChange
+                    }
                   }
                 }
 
                 // collateralBefore
-                if (!modifiedLogs[logIndex].collateralBefore) {
-                  modifiedLogs[logIndex].collateralBefore = modifiedLogs[logIndex - 1].collateralAfter
+                if (!vaultWithAuctionLogs[logIndex].collateralBefore) {
+                  vaultWithAuctionLogs[logIndex].collateralBefore = vaultWithAuctionLogs[logIndex - 1].collateralAfter
                 }
 
                 // collateralAfter
-                if (!modifiedLogs[logIndex].collateralAfter) {
-                  if (!modifiedLogs[logIndex].collateralChange) {
-                    modifiedLogs[logIndex].collateralAfter = modifiedLogs[logIndex].collateralBefore
-                  } else {
-                    modifiedLogs[logIndex].collateralAfter = modifiedLogs[logIndex - 1].collateralAfter + modifiedLogs[logIndex].collateralChange
+                if (vaultWithAuctionLogs[logIndex].__typename === "liquidationFinishLog") {
+                  vaultWithAuctionLogs[logIndex].collateralAfter = 0;
+                  vaultWithAuctionLogs[logIndex].collateralChange = -vaultWithAuctionLogs[logIndex].collateralBefore;
+                } else {
+                  if (!vaultWithAuctionLogs[logIndex].collateralAfter) {
+                    if (!vaultWithAuctionLogs[logIndex].collateralChange) {
+                      vaultWithAuctionLogs[logIndex].collateralAfter = vaultWithAuctionLogs[logIndex].collateralBefore
+                    } else {
+                      vaultWithAuctionLogs[logIndex].collateralAfter = vaultWithAuctionLogs[logIndex - 1].collateralAfter + vaultWithAuctionLogs[logIndex].collateralChange
+                    }
                   }
                 }
 
                 // Pre Collateralization Ratio
-                if (parseFloat(modifiedLogs[logIndex].debtBefore)) {
-                  modifiedLogs[logIndex].preCollateralizationRatio = (oraclePrice * parseFloat(modifiedLogs[logIndex].collateralBefore)) / (parseFloat(modifiedLogs[logIndex].debtBefore) * parseFloat(collateralType.rate))
+                if (parseFloat(vaultWithAuctionLogs[logIndex].debtBefore)) {
+                  vaultWithAuctionLogs[logIndex].preCollateralizationRatio = (oraclePrice * parseFloat(vaultWithAuctionLogs[logIndex].collateralBefore)) / (parseFloat(vaultWithAuctionLogs[logIndex].debtBefore) * parseFloat(collateralType.rate))
                 } else {
-                  modifiedLogs[logIndex].preCollateralizationRatio = 0
+                  vaultWithAuctionLogs[logIndex].preCollateralizationRatio = 0
                 }
                 // Post Collateralization Ratio
-                if (parseFloat(modifiedLogs[logIndex].debtAfter)) {
-                  modifiedLogs[logIndex].postCollateralizationRatio = (oraclePrice * parseFloat(modifiedLogs[logIndex].collateralAfter)) / (parseFloat(modifiedLogs[logIndex].debtAfter) * parseFloat(collateralType.rate))
+                if (parseFloat(vaultWithAuctionLogs[logIndex].debtAfter)) {
+                  vaultWithAuctionLogs[logIndex].postCollateralizationRatio = (oraclePrice * parseFloat(vaultWithAuctionLogs[logIndex].collateralAfter)) / (parseFloat(vaultWithAuctionLogs[logIndex].debtAfter) * parseFloat(collateralType.rate))
                 } else {
-                  modifiedLogs[logIndex].postCollateralizationRatio = 0
+                  vaultWithAuctionLogs[logIndex].postCollateralizationRatio = 0
                 }
               }
             }
 
-            // some auctions exist for vault, let's merge auction logs to vault change logs
-            let auctionLogs = []
-            if (vault.saleAuctions[0] && vault.saleAuctions[0].startedAt) {
-              auctionLogs = vault.saleAuctions.map(saleAuction => {
-                const resultArray = []
-                if (saleAuction.startedAt && parseInt(saleAuction.startedAt)) {
-                  resultArray.push({
-                    id: `liquidationStartLog-${saleAuction.id}`,
-                    timestamp: saleAuction.startedAt,
-                    __typename: `liquidationStartLog`
-                  })
-                }
-                if (saleAuction.boughtAt && parseInt(saleAuction.boughtAt)) {
-                  resultArray.push({
-                    id: `liquidationFinishLog-${saleAuction.id}`,
-                    timestamp: saleAuction.boughtAt,
-                    __typename: `liquidationFinishLog`
-                  })
-                }
-                return resultArray
-              }).flat()
-            }
-
-            vault.vaults[0].logs = modifiedLogs
-              .concat(auctionLogs)
-              .sort((left, right) => left.timestamp - right.timestamp)
-              .reverse();
+            // reverse it again to view as from new to old
+            vault.vaults[0].logs = vaultWithAuctionLogs.reverse()
             console.log(JSON.stringify({ msg: "logs in getSingleVault", logs: vault.vaults[0].logs }))
           }
         }

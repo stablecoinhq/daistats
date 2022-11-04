@@ -169,11 +169,10 @@ const reverseAddresses = Object.entries(add).reduce((add, [key, value]) => (add[
 let provider;
 let networkId;
 if (typeof window.ethereum !== 'undefined') {
-  networkId = parseInt(window.ethereum.chainId);
   window.ethereum.autoRefreshOnNetworkChange = false;
-  if (networkId === 1) {
+  if (process.env.REACT_APP_NETWORK === "mainnet") {
     provider = new ethers.providers.Web3Provider(window.ethereum);
-  } else if (networkId === 5) {
+  } else if (process.env.REACT_APP_NETWORK === "goerli") {
     provider = new ethers.providers.Web3Provider(window.ethereum);
   }
 }
@@ -383,19 +382,19 @@ const HOP = 3600 // assumes all OSM's have same hop
 const VEST_DAI_LEGACY_IDS = 37
 let VEST_DAI_IDS
 let VEST_MKR_TREASURY_IDS
-let url;
+let subgraphUrl;
 if (process.env.REACT_APP_NETWORK === "mainnet") {
   VEST_DAI_IDS = 13
   VEST_MKR_TREASURY_IDS = 24
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.11"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.12"
 }
 
 const subgraphClient = new GraphQLClient(
-  url,
+  subgraphUrl,
   { mode: "cors" }
 )
 
@@ -560,7 +559,7 @@ class App extends Component {
         .concat(this.getIlkCall(crvv1ethstethAIlkBytes, 'CRVV1ETHSTETH_A', crvv1ethsteth, add.CRVV1ETHSTETH, add.PIP_CRVV1ETHSTETH))
         , { blockTag: blockNumber })
     } else {
-      p1 = multi.callStatic.aggregate([
+      const aggregated = [
         [add.MULTICALL, multi.interface.encodeFunctionData('getCurrentBlockTimestamp', [])],
         [add.MCD_VAT, vat.interface.encodeFunctionData('Line', [])],
         [add.MCD_VAT, vat.interface.encodeFunctionData('debt', [])],
@@ -611,6 +610,13 @@ class App extends Component {
         .concat(this.getVestingCalls(add.MCD_VEST_MKR_TREASURY, vestMkrTreasury, VEST_MKR_TREASURY_IDS))
         .concat(this.getIlkCall(ethAIlkBytes, 'ETH_A', weth, add.ETH, add.PIP_ETH))
         .concat(this.getIlkCall(fauAIlkBytes, 'FAU_A', fau, add.FAU, add.PIP_FAU))
+      console.log(JSON.stringify({
+        blockNumber,
+        // manager,
+        aggregated,
+      }))
+      p1 = multi.callStatic.aggregate(
+        aggregated
         , { blockTag: blockNumber })
     }
     let promises
@@ -676,7 +682,7 @@ class App extends Component {
       ]
     } else {
       promises = [
-        p1,
+        p1.catch((e) => console.log(e)),
         this.etherscanEthSupply(),
         this.getPrice(add.PIP_ETH, this.POSITION_NXT),
         this.getPrice(add.MEDIAN_ETH, this.POSITION_MEDIAN_VAL),
@@ -991,7 +997,8 @@ class App extends Component {
           lerpHumpCurrent: utils.formatUnits(lerpHumpCurrent, 45),
           lerpHumpAdjustment: utils.formatUnits(lerpHumpCurrent.sub(surplusBuffer), 45),
           historicalDebt,
-          allVaults
+          allVaults,
+          subgraphClient,
         }
       } else {
         obj = {
@@ -1048,7 +1055,8 @@ class App extends Component {
           esmSum: utils.formatEther(esmSum),
           endWait: endWait.toNumber(),
           historicalDebt,
-          allVaults
+          allVaults,
+          subgraphClient,
         }
       }
       return obj

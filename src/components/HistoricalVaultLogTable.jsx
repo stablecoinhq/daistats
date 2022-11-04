@@ -10,6 +10,7 @@ const formatTwoDp = new Intl.NumberFormat('en-US', {
 function HistoricalVaultLogTable(props) {
   const t = useTranslate()
   const log = props.log
+  console.log(JSON.stringify({ log }))
   if (props.heading) {
     return (<thead>
       <tr>
