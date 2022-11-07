@@ -13,6 +13,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import VaultsAtRisk from './components/VaultsAtRisk';
 import IndividualVault from './components/IndividualVault';
 import AuctionParticipants from './components/AuctionParticipants';
+import RiskModel from './components/RiskModel';
 
 
 const formatAmount = new Intl.NumberFormat('en-US', {
@@ -78,7 +79,7 @@ const Main = (props) => {
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/vaults-at-risk', '/vault-information', 'auction-participants']
+  const indexToTab = ['/vaults-at-risk', '/vault-information', '/auction-participants', "/risk-model"]
   function tabNameToIndex() {
     let i = indexToTab.map((tabName) => location.pathname.includes(tabName)).indexOf(true)
 
@@ -99,6 +100,7 @@ const Main = (props) => {
             <Tab><p className="is-size-5">Vaults at risk</p></Tab>
             <Tab><p className="is-size-5">Vault Information</p></Tab>
             <Tab><p className="is-size-5">Auction Participants</p></Tab>
+            <Tab><p className="is-size-5">Risk Model</p></Tab>
           </TabList>
           <TabPanel>
             <Tabs>
@@ -131,6 +133,16 @@ const Main = (props) => {
               </TabList>
               <TabPanel>
                 <AuctionParticipants {...props} />
+              </TabPanel>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs>
+              <TabList>
+                <Tab><p className="is-size-5">Risk Model</p></Tab>
+              </TabList>
+              <TabPanel>
+                <RiskModel {...props} />
               </TabPanel>
             </Tabs>
           </TabPanel>
