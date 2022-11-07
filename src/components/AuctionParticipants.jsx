@@ -4,23 +4,6 @@ import { gql, GraphQLClient } from "graphql-request"
 import AuctionParticipantsChart from './AuctionParticipantsChart';
 
 function AuctionParticipants(props) {
-
-  const convertLowerCaseAddress = (cdpId) => {
-    if (!cdpId) {
-      return undefined
-    }
-    if (cdpId.match(/^[0-9]+$/)) {
-      return cdpId
-    } else {
-      const matched = cdpId.match(/^([^-]+)-(.+)$/)
-      if (matched && matched[1] && matched[2]) {
-        return matched[1].toLowerCase() + "-" + matched[2]
-      } else {
-        return undefined
-      }
-    }
-  }
-
   const [auctions, setAuctions] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
