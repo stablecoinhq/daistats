@@ -166,14 +166,15 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 
 const reverseAddresses = Object.entries(add).reduce((add, [key, value]) => (add[value] = key, add), {})
 
-let provider;
-let networkId;
+// metamask won't work well with daistats, so we don't use `provider` variable from `window.ethereum`.
+let provider = undefined;
+let networkId = undefined;
 if (typeof window.ethereum !== 'undefined') {
   window.ethereum.autoRefreshOnNetworkChange = false;
   if (process.env.REACT_APP_NETWORK === "mainnet") {
-    provider = new ethers.providers.Web3Provider(window.ethereum);
+    // provider = new ethers.providers.Web3Provider(window.ethereum);
   } else if (process.env.REACT_APP_NETWORK === "goerli") {
-    provider = new ethers.providers.Web3Provider(window.ethereum);
+    // provider = new ethers.providers.Web3Provider(window.ethereum);
   }
 }
 const build = (address, name) => {
@@ -386,7 +387,7 @@ let subgraphUrl;
 if (process.env.REACT_APP_NETWORK === "mainnet") {
   VEST_DAI_IDS = 13
   VEST_MKR_TREASURY_IDS = 24
-  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.8"
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
@@ -1476,7 +1477,7 @@ class App extends Component {
 
   getAllVaults = async () => {
     try {
-      const vaultTypes = ["ETH-A", "FAU-A"]
+      const vaultTypes = (process.env.REACT_APP_NETWORK === "mainnet") ? ["ETH-A"] : ["ETH-A", "FAU-A"]
       const vaultTypesResultMap = vaultTypes.map(async (vaultType) => {
         const collateralTypeVaultCount = await subgraphClient.request(gql`{
           collateralType(id: "${vaultType}") {
