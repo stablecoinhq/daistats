@@ -7,11 +7,6 @@ const RiskModelChart = (props) => {
   let logs = (props.riskPremiumByDebtExposure && props.riskPremiumByDebtExposure.length) ? props.riskPremiumByDebtExposure : []
   const maximumDebtCeiling = props.maximumDebtCeiling ?? 0
   const totalDebtByVaultType = props.totalDebtByVaultType ?? 0
-  console.log(JSON.stringify({
-    logs,
-    maximumDebtCeiling,
-    totalDebtByVaultType
-  }))
 
   const formatTooltipTitle = useCallback(
     (value, name) => {

@@ -83,12 +83,6 @@ function RiskModel(props) {
         }
         riskPremiumByDebtExposureList.push({ debtExposure: xAxisValue, riskPremium: yAxisValue })
       }
-      console.log(JSON.stringify({
-        xAxisStart,
-        xAxisEnd,
-        xAxisDiff,
-        capitalAtRiskValue, riskPremiumValue, maximumDebtCeilingValue, totalDebtByVaultTypeValue, riskPremiumByDebtExposureList
-      }))
       setCapitalAtRisk(capitalAtRiskValue)
       setRiskPremium(riskPremiumValue)
       setMaximumDebtCeiling(maximumDebtCeilingValue)
