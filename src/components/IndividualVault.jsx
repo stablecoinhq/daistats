@@ -30,6 +30,7 @@ function IndividualVault(props) {
 
       const getSingleVault = async (cdpId) => {
         let vault;
+        // get vault information and logs specified by search condition.
         const logsQuery = searchCondition => `
           vaults(first: 1, where: ${searchCondition}) {
             id,
@@ -76,6 +77,7 @@ function IndividualVault(props) {
             }
           }
         `
+        // get auctions specified by vault id
         const auctionsQuery = vaultId => `
           saleAuctions(where: {vault: "${vaultId}"}){
             id,
@@ -91,33 +93,53 @@ function IndividualVault(props) {
             updatedAt
           }
         `
-
+        // get split change logs where address is destination.
+        const vaultSplitChangeLogsDestinationAddressQuery = (destionationAddress) => `
+          vaultSplitChangeLogs(where: {dst: "${destionationAddress}"}){
+            __typename,
+            id,
+            dst,
+            src,
+            collateralToMove,
+            debtToMove,
+            transaction,
+            timestamp,
+            block,
+          }
+        `
+        // cdpId is specified by number
         if (cdpId.match(/^[0-9]+$/)) {
           try {
             const vaultByCdpId = await subgraphClient.request(gql`{
               ${logsQuery(`{cdpId: ${cdpId}}`)}
             }`)
 
-            let saleAuctionsQueryResult;
+            let saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult;
             if (vaultByCdpId && vaultByCdpId.vaults[0] && vaultByCdpId.vaults[0].id) {
-              saleAuctionsQueryResult = await subgraphClient.request(gql`{
+              const [destinationAddress, destinationIlk] = vaultByCdpId.vaults[0].id.split("-")
+              saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult = await subgraphClient.request(gql`{
                 ${auctionsQuery(vaultByCdpId.vaults[0].id)}
+                ${vaultSplitChangeLogsDestinationAddressQuery(destinationAddress)}
               }`)
             }
 
-            if (vaultByCdpId && saleAuctionsQueryResult) {
+            if (vaultByCdpId && saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult) {
               vault = vaultByCdpId
-              vault.saleAuctions = saleAuctionsQueryResult.saleAuctions
+              vault.saleAuctions = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.saleAuctions
+              vault.vaultSplitChangeLogs = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.vaultSplitChangeLogs
             }
           } catch (err) {
             console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...")
           }
         }
+        // could not get by cdpId number, use id string `address`-`ilk` format.
         if (!vault) {
+          const [destinationAddress, destinationIlk] = cdpId.split("-")
           try {
             const vaultById = await subgraphClient.request(gql`{
               ${logsQuery(`{id: "${cdpId}"}`)}
               ${auctionsQuery(cdpId)}
+              ${vaultSplitChangeLogsDestinationAddressQuery(destinationAddress)}
             }`)
             if (vaultById) {
               vault = vaultById
@@ -132,8 +154,13 @@ function IndividualVault(props) {
         } else {
           if (vault.vaults[0] && vault.vaults[0].logs) {
             const collateralType = vault.vaults[0].collateralType
+            const vaultLogs = vault.vaults[0].logs;
+
+            // merge logs from vault split change logs, where it could have destination address
+            const vaultLogsWithVaultSplitChangeLogsDestination = vaultLogs.concat(vault.vaultSplitChangeLogs);
+
             // logs are ordered from new to old, change it as from old to new
-            const reversedLogs = vault.vaults[0].logs.sort((left, right) => {
+            const reversedLogs = vaultLogsWithVaultSplitChangeLogsDestination.sort((left, right) => {
               const timestampDiff = (parseInt(left.timestamp) - parseInt(right.timestamp));
               if (timestampDiff) {
                 return timestampDiff
