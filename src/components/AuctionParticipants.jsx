@@ -37,7 +37,6 @@ function AuctionParticipants(props) {
                 // (saleAuction) => Math.abs(saleAuction.boughtAt - timestampIndex) < diffTimestamp / 2
                 (saleAuction) => timestampIndex < saleAuction.boughtAt && saleAuction.boughtAt <= timestampIndex + diffTimestamp
               )
-              console.log(auctionsInTimeWindow)
               // count unique keepers from that time
               const uniqueKeepers = new Set(auctionsInTimeWindow.map(auction => auction.userIncentives.id)).size
               // count unique takers from that time

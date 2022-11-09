@@ -9,6 +9,51 @@ const HistoricalVaultLogChart = ({ vault }) => {
     logs = Array.from(vault.logs)
   }
   logs.reverse();
+  const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
+    const liquidationRatioChangeLogList = originalData
+    const liquidationRatioChangeLogLast = liquidationRatioChangeLogList[liquidationRatioChangeLogList.length - 1];
+    const liquidationRatioChangeLogRangeMin = +logs[0].timestamp
+    const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp
+    // get list within `logs` range
+    const liquidationRatioChangeLogWithinRange = liquidationRatioChangeLogList
+      .filter(liquidationRatioChangeLog =>
+        +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp &&
+        +liquidationRatioChangeLog.timestamp < +liquidationRatioChangeLogRangeMax)
+    // if there is no element, get last element
+    if (!liquidationRatioChangeLogWithinRange.length) {
+      liquidationRatioChangeLogWithinRange.push(liquidationRatioChangeLogLast)
+    }
+    // get last change log that is *NOT* within range
+    const liquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogList
+      .filter(liquidationRatioChangeLog =>
+        +liquidationRatioChangeLogRangeMin > +liquidationRatioChangeLog.timestamp)
+    let lastLiquidationRatioChangeLogBeforeRange = undefined;
+    if (!liquidationRatioChangeLogBeforeRange.length) {
+      const liquidationRatioChangeLogAfterRange = liquidationRatioChangeLogList
+        .filter(liquidationRatioChangeLog =>
+          +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp)
+      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogAfterRange[0]
+    } else {
+      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1]
+    }
+
+    const liquidationRatioChangeLogWithBothEnds =
+      // add min value
+      [{
+        mat: (lastLiquidationRatioChangeLogBeforeRange.mat),
+        timestamp: liquidationRatioChangeLogRangeMin
+      }]
+        // original data within range
+        .concat(liquidationRatioChangeLogWithinRange)
+        // add max value
+        .concat([{
+          mat: liquidationRatioChangeLogWithinRange[liquidationRatioChangeLogWithinRange.length - 1].mat,
+          timestamp: liquidationRatioChangeLogRangeMax
+        }])
+
+    return liquidationRatioChangeLogWithBothEnds
+  }
+  const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(vault.liquidationRatioChangeLog.reverse())
 
   const locale = useMemo(() => (
     t._polyglot.currentLocale
@@ -65,18 +110,16 @@ const HistoricalVaultLogChart = ({ vault }) => {
 
   const formatTick = useCallback(
     (index) => {
-      const timestamp = new Date((logs[index]?.["timestamp"] ?? 0) * 1000)
+      const timestamp = new Date(index * 1000)
       const month = new Date(timestamp.getFullYear(), timestamp.getMonth())
-
       return monthFormatter.format(month)
     },
-    [logs, monthFormatter]
+    [monthFormatter]
   )
 
   const formatTooltipTitle = useCallback(
     (index) => {
-      const timestamp = new Date((logs[index]?.["timestamp"] ?? 0) * 1000)
-
+      const timestamp = new Date(index * 1000)
       return dateFormatter.format(timestamp)
     },
     [logs, dateFormatter]
@@ -94,9 +137,13 @@ const HistoricalVaultLogChart = ({ vault }) => {
         return [output, "postCollateralizationRatio"]
       }
 
+      if (name === "mat") {
+        return [output, "LiquidationRatio"]
+      }
+
       return output
     },
-    [logs, amountFormatter, t]
+    [amountFormatter, t]
   )
 
   return (
@@ -109,7 +156,9 @@ const HistoricalVaultLogChart = ({ vault }) => {
       justifyContent: "center",
     }}>
       <ResponsiveContainer>
-        <ComposedChart data={logs}>
+        <ComposedChart
+          data={logs}
+        >
           <defs>
             <linearGradient id="totalDebtColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1AAB9B" stopOpacity={0.95} />
@@ -118,9 +167,11 @@ const HistoricalVaultLogChart = ({ vault }) => {
           </defs>
           <XAxis
             axisLine={false}
-            ticks={ticks}
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
+            domain={[parseInt(logs[0].timestamp), parseInt(logs[logs.length - 1].timestamp)]}
+            type="number"
+            dataKey="timestamp"
           />
           <YAxis yAxisId={1} label={{ value: "DAI", angle: -90, dx: -20, fill: "#7E7E87" }}
           />
@@ -129,32 +180,33 @@ const HistoricalVaultLogChart = ({ vault }) => {
             orientation="right"
             label={{ value: "CR", angle: -90, dx: 20, fill: "#7E7E87" }}
           />
-          <Line
-            yAxisId={1}
-            dataKey="debtAfter"
-            type="step"
-            dot={false}
-            stackId={1}
-            animationDuration={750}
-            stroke="#7E7E87"
-          />
-          <Line
-            dataKey="mat"
-            type="step"
-            dot={false}
-            stackId={1}
-            animationDuration={750}
-            stroke="#7E0087"
-          />
           <Area
+            data={logs}
             yAxisId={2}
-            dataKey="postCollateralizationRatio"
+            dataKey="debtAfter"
             type="monotone"
-            stackId={2}
             animationDuration={750}
             stroke="#008E7B"
             fill="url(#totalDebtColor)"
             fillOpacity={1}
+          />
+          <Line
+            data={logs}
+            yAxisId={1}
+            dataKey="postCollateralizationRatio"
+            type="step"
+            dot={false}
+            animationDuration={750}
+            stroke="#7E7E87"
+          />
+          <Line
+            yAxisId={1}
+            data={liquidationRatioChangeLogWithBothEnds}
+            dataKey="mat"
+            type="stepAfter"
+            dot={false}
+            animationDuration={750}
+            stroke="#7E0087"
           />
           <Tooltip
             labelStyle={{ fontWeight: "bold" }}
