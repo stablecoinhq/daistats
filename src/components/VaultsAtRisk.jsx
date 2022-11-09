@@ -11,8 +11,6 @@ function VaultsAtRisk(props) {
   const t = useTranslate()
   if (allVaults) {
     const ilk = props.ilksByName[props.ilk]
-    console.log(allVaults);
-    console.log(JSON.stringify(ilk))
 
     const dangerousVaults = allVaults
       .filter((vault) => vault.debt > 0 && vault.collateral > 0)
@@ -57,8 +55,8 @@ function VaultsAtRisk(props) {
               SimulatedPrice: {ilk.price * priceDropRatio}
             </p>
           </div>
-          {dangerousVaultsChunks.map(vaultList =>
-            <div className="columns">
+          {dangerousVaultsChunks.map((vaultList, vaultListIndex) =>
+            <div className="columns" key={`vaultListIndex_${vaultListIndex}`}>
               {vaultList.map((vault) =>
                 <div className="column box has-text-centered" key={vault.id} >
                   <p className="subtitle is-size-6">
