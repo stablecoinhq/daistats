@@ -154,6 +154,7 @@ function IndividualVault(props) {
         } else {
           if (vault.vaults[0] && vault.vaults[0].logs) {
             const collateralType = vault.vaults[0].collateralType
+            const vaultId = vault.vaults[0].id
             const vaultLogs = vault.vaults[0].logs;
 
             // merge logs from vault split change logs, where it could have destination address
@@ -218,15 +219,15 @@ function IndividualVault(props) {
                   collateralBefore = parseFloat(log.collateralBefore)
                   collateralAfter = parseFloat(log.collateralAfter)
                 } else if (log.__typename === 'VaultSplitChangeLog') {
-                  if (vault && vault.id && vault.id.includes(log.src)) {
+                  if (vaultId && vaultId.includes(log.src)) {
                     collateralChange = -parseFloat(log.collateralToMove)
-                  } else if (vault && vault.id && vault.id.includes(log.dst)) {
+                  } else if (vaultId && vaultId.includes(log.dst)) {
                     collateralChange = parseFloat(log.collateralToMove)
                   }
                 } else if (log.__typename === 'VaultTransferChangeLog') {
-                  if (vault && vault.id && vault.id.includes(log.previousOwner)) {
+                  if (vaultId && vaultId.includes(log.previousOwner)) {
                     collateralChange = -0
-                  } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
+                  } else if (vaultId && vaultId.includes(log.nextOwner)) {
                     collateralChange = 0
                   }
                 } else if (index !== 0 && index > 1) {
@@ -253,15 +254,15 @@ function IndividualVault(props) {
                   debtBefore = parseFloat(log.debtBefore)
                   debtAfter = parseFloat(log.debtAfter)
                 } else if (log.__typename === 'VaultSplitChangeLog') {
-                  if (vault && vault.id && vault.id.includes(log.src)) {
+                  if (vaultId && vaultId.includes(log.src)) {
                     debtChange = -parseFloat(log.debtToMove)
-                  } else if (vault && vault.id && vault.id.includes(log.dst)) {
+                  } else if (vaultId && vaultId.includes(log.dst)) {
                     debtChange = parseFloat(log.debtToMove)
                   }
                 } else if (log.__typename === 'VaultTransferChangeLog') {
-                  if (vault && vault.id && vault.id.includes(log.previousOwner)) {
+                  if (vaultId && vaultId.includes(log.previousOwner)) {
                     debtChange = -0
-                  } else if (vault && vault.id && vault.id.includes(log.nextOwner)) {
+                  } else if (vaultId && vaultId.includes(log.nextOwner)) {
                     debtChange = 0
                   }
 
