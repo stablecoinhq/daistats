@@ -400,7 +400,7 @@ function IndividualVault(props) {
       const getLiquidationRatioChangeLog = async (ilkName) => {
         // get split change logs where address is destination.
         const collateralTypeChangeLogsQuery = `
-          collateralTypeChangeLogs(where: {collateralType: "${ilkName}"}){
+          collateralTypeChangeLogs(orderBy: timestamp, orderDirection: desc, where: {collateralType: "${ilkName}"}){
             mat,
             timestamp
           }
