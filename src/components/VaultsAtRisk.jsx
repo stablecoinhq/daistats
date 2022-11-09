@@ -25,36 +25,42 @@ function VaultsAtRisk(props) {
         const collateralIsEnough = (collateral * price * priceDropRatio) > (debt * mat * rate)
         return !collateralIsEnough
       })
+    // split vaults list into chunks for display
+    const dangerousVaultsChunks = [], chunkSize = 3;
+    for (let i = 0; i < dangerousVaults.length; i += chunkSize) {
+      const chunk = dangerousVaults.slice(i, i + chunkSize);
+      dangerousVaultsChunks.push(chunk)
+    }
 
     return (
       <div>
-        <div className="columns">
-          <div className="column">
-            <div className="has-text-centered">
-              <div className="box has-text-centered">
-                <p className="subtitle is-size-4">
-                  NumberOfVaultsAtRisk: {dangerousVaults.length} of {allVaults.length}
-                </p>
-                <p className="subtitle is-size-4">
-                  MinCollateralRatio: {ilk.mat}
-                </p>
-                <p className="subtitle is-size-4">
-                  CurrentPrice: {ilk.price}
-                </p>
-                <p className="subtitle is-size-4">
-                  PriceDropRatio:
-                  <input
-                    type="text"
-                    onChange={event => setPriceDropRatio(event.target.value)}
-                    value={priceDropRatio}
-                  />
-                </p>
-                <p className="subtitle is-size-4">
-                  SimulatedPrice: {ilk.price * priceDropRatio}
-                </p>
-              </div>
-              {dangerousVaults.map((vault) =>
-                <div className="box has-text-centered" key={vault.id} >
+        <div className="has-text-centered">
+          <div className="box has-text-centered">
+            <p className="subtitle is-size-4">
+              NumberOfVaultsAtRisk: {dangerousVaults.length} of {allVaults.length}
+            </p>
+            <p className="subtitle is-size-4">
+              MinCollateralRatio: {ilk.mat}
+            </p>
+            <p className="subtitle is-size-4">
+              CurrentPrice: {ilk.price}
+            </p>
+            <p className="subtitle is-size-4">
+              PriceDropRatio:
+              <input
+                type="text"
+                onChange={event => setPriceDropRatio(event.target.value)}
+                value={priceDropRatio}
+              />
+            </p>
+            <p className="subtitle is-size-4">
+              SimulatedPrice: {ilk.price * priceDropRatio}
+            </p>
+          </div>
+          {dangerousVaultsChunks.map(vaultList =>
+            <div className="columns">
+              {vaultList.map((vault) =>
+                <div className="column box has-text-centered" key={vault.id} >
                   <p className="subtitle is-size-6">
                     CdpId: {vault.cdpId ? vault.cdpId : vault.id}
                   </p>
@@ -73,7 +79,7 @@ function VaultsAtRisk(props) {
                 </div>
               )}
             </div>
-          </div>
+          )}
         </div>
         <hr />
       </div>
