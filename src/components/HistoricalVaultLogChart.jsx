@@ -45,6 +45,7 @@ const HistoricalVaultLogChart = ({ vault }) => {
 
   const ticks = useMemo(
     () => (
+      // logs.concat(vault.liquidationRatioChangeLog).reduce((output, point, index, points) => {
       logs.reduce((output, point, index, points) => {
         if (!point || !points) {
           return output
@@ -94,6 +95,10 @@ const HistoricalVaultLogChart = ({ vault }) => {
         return [output, "postCollateralizationRatio"]
       }
 
+      if (name === "mat") {
+        return [output, "LiquidationRatio"]
+      }
+
       return output
     },
     [logs, amountFormatter, t]
@@ -109,7 +114,7 @@ const HistoricalVaultLogChart = ({ vault }) => {
       justifyContent: "center",
     }}>
       <ResponsiveContainer>
-        <ComposedChart data={logs}>
+        <ComposedChart>
           <defs>
             <linearGradient id="totalDebtColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1AAB9B" stopOpacity={0.95} />
@@ -121,6 +126,7 @@ const HistoricalVaultLogChart = ({ vault }) => {
             ticks={ticks}
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
+            domain={[logs[0].timestamp, logs[logs.length - 1].timestamp]}
           />
           <YAxis yAxisId={1} label={{ value: "DAI", angle: -90, dx: -20, fill: "#7E7E87" }}
           />
@@ -129,9 +135,21 @@ const HistoricalVaultLogChart = ({ vault }) => {
             orientation="right"
             label={{ value: "CR", angle: -90, dx: 20, fill: "#7E7E87" }}
           />
-          <Line
-            yAxisId={1}
+          <Area
+            data={logs}
+            yAxisId={2}
             dataKey="debtAfter"
+            type="monotone"
+            stackId={2}
+            animationDuration={750}
+            stroke="#008E7B"
+            fill="url(#totalDebtColor)"
+            fillOpacity={1}
+          />
+          <Line
+            data={logs}
+            yAxisId={1}
+            dataKey="postCollateralizationRatio"
             type="step"
             dot={false}
             stackId={1}
@@ -139,22 +157,14 @@ const HistoricalVaultLogChart = ({ vault }) => {
             stroke="#7E7E87"
           />
           <Line
+            yAxisId={2}
+            data={vault.liquidationRatioChangeLog}
             dataKey="mat"
             type="step"
             dot={false}
-            stackId={1}
-            animationDuration={750}
-            stroke="#7E0087"
-          />
-          <Area
-            yAxisId={2}
-            dataKey="postCollateralizationRatio"
-            type="monotone"
             stackId={2}
             animationDuration={750}
-            stroke="#008E7B"
-            fill="url(#totalDebtColor)"
-            fillOpacity={1}
+            stroke="#7E0087"
           />
           <Tooltip
             labelStyle={{ fontWeight: "bold" }}

@@ -29,7 +29,7 @@ function IndividualVault(props) {
       const subgraphClient = props.subgraphClient
 
       const getSingleVault = async (cdpId) => {
-        let vault;
+        let fetchResult;
         // get vault information and logs specified by search condition.
         const logsQuery = searchCondition => `
           vaults(first: 1, where: ${searchCondition}) {
@@ -124,16 +124,16 @@ function IndividualVault(props) {
             }
 
             if (vaultByCdpId && saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult) {
-              vault = vaultByCdpId
-              vault.saleAuctions = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.saleAuctions
-              vault.vaultSplitChangeLogs = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.vaultSplitChangeLogs
+              fetchResult = vaultByCdpId
+              fetchResult.saleAuctions = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.saleAuctions
+              fetchResult.vaultSplitChangeLogs = saleAuctionsAndVaultSplitChangeLogsDestinationAddressQueryResult.vaultSplitChangeLogs
             }
           } catch (err) {
             console.log("Vault could not be retrieved by CdpId. Retrying with vaultId...")
           }
         }
         // could not get by cdpId number, use id string `address`-`ilk` format.
-        if (!vault) {
+        if (!fetchResult) {
           const [destinationAddress, destinationIlk] = cdpId.split("-")
           try {
             const vaultById = await subgraphClient.request(gql`{
@@ -142,23 +142,23 @@ function IndividualVault(props) {
               ${vaultSplitChangeLogsDestinationAddressQuery(destinationAddress)}
             }`)
             if (vaultById) {
-              vault = vaultById
+              fetchResult = vaultById
             }
           } catch (err) {
             console.log("Vault could not be retrieved by id")
           }
         }
-        if (!vault) {
+        if (!fetchResult) {
           console.error("Vault could not be retrieved")
-          vault = undefined;
+          fetchResult = undefined;
         } else {
-          if (vault.vaults[0] && vault.vaults[0].logs) {
-            const collateralType = vault.vaults[0].collateralType
-            const vaultId = vault.vaults[0].id
-            const vaultLogs = vault.vaults[0].logs;
+          if (fetchResult.vaults[0] && fetchResult.vaults[0].logs) {
+            const collateralType = fetchResult.vaults[0].collateralType
+            const vaultId = fetchResult.vaults[0].id
+            const vaultLogs = fetchResult.vaults[0].logs;
 
             // merge logs from vault split change logs, where it could have destination address
-            const vaultLogsWithVaultSplitChangeLogsDestination = vaultLogs.concat(vault.vaultSplitChangeLogs);
+            const vaultLogsWithVaultSplitChangeLogsDestination = vaultLogs.concat(fetchResult.vaultSplitChangeLogs);
 
             // logs are ordered from new to old, change it as from old to new
             const reversedLogs = vaultLogsWithVaultSplitChangeLogsDestination.sort((left, right) => {
@@ -179,8 +179,8 @@ function IndividualVault(props) {
 
             // some auctions exist for vault, let's merge auction logs to vault change logs
             let auctionLogs = []
-            if (vault.saleAuctions[0] && vault.saleAuctions[0].startedAt) {
-              auctionLogs = vault.saleAuctions.map(saleAuction => {
+            if (fetchResult.saleAuctions[0] && fetchResult.saleAuctions[0].startedAt) {
+              auctionLogs = fetchResult.saleAuctions.map(saleAuction => {
                 const resultArray = []
                 if (saleAuction.startedAt && parseInt(saleAuction.startedAt)) {
                   resultArray.push({
@@ -390,17 +390,46 @@ function IndividualVault(props) {
             }
 
             // reverse it again to view as from new to old
-            vault.vaults[0].logs = vaultWithAuctionLogs.reverse()
-            console.log(JSON.stringify({ msg: "logs in getSingleVault", logs: vault.vaults[0].logs }))
+            fetchResult.vaults[0].logs = vaultWithAuctionLogs.reverse()
+            console.log(JSON.stringify({ msg: "logs in getfetchResult", logs: fetchResult.vaults[0].logs }))
           }
         }
-        return vault
+        return fetchResult
+      }
+
+      const getLiquidationRatioChangeLog = async (ilkName) => {
+        // get split change logs where address is destination.
+        const collateralTypeChangeLogsQuery = `
+          collateralTypeChangeLogs(where: {collateralType: "${ilkName}"}){
+            mat,
+            timestamp
+          }
+        `
+        try {
+          const collateralTypeChangeLogsQueryResult = await subgraphClient.request(gql`{
+            ${collateralTypeChangeLogsQuery}
+          }`)
+          if (collateralTypeChangeLogsQueryResult && collateralTypeChangeLogsQueryResult.collateralTypeChangeLogs) {
+            return collateralTypeChangeLogsQueryResult.collateralTypeChangeLogs
+          } else {
+            return []
+          }
+        } catch (e) {
+          console.log(e)
+          return []
+        }
       }
 
       if (cdpId) {
-        const vault = await getSingleVault(cdpId);
-        console.log(JSON.stringify({ vault, msg: "vault in getData" }))
-        setVault((vault && vault.vaults && vault.vaults[0]) ? vault.vaults[0] : {})
+        const getSingleVaultResult = await getSingleVault(cdpId);
+        console.log(JSON.stringify({ getSingleVaultResult, msg: "vault in getData" }))
+        // get liquidation ratio change log
+        if ((getSingleVaultResult && getSingleVaultResult.vaults && getSingleVaultResult.vaults[0])) {
+          const singleVault = getSingleVaultResult.vaults[0]
+          const liquidationRatioChangeLog = await getLiquidationRatioChangeLog(singleVault.collateralType.id)
+          singleVault.liquidationRatioChangeLog = liquidationRatioChangeLog
+          setVault(singleVault)
+        }
       }
     }
     getData();
