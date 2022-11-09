@@ -133,7 +133,21 @@ function IndividualVault(props) {
           if (vault.vaults[0] && vault.vaults[0].logs) {
             const collateralType = vault.vaults[0].collateralType
             // logs are ordered from new to old, change it as from old to new
-            const reversedLogs = vault.vaults[0].logs.reverse()
+            const reversedLogs = vault.vaults[0].logs.sort((left, right) => {
+              const timestampDiff = (parseInt(left.timestamp) - parseInt(right.timestamp));
+              if (timestampDiff) {
+                return timestampDiff
+              } else {
+                const [leftTxHash, leftLogIndex, leftSuffix] = left.id.split("-")
+                const [rightTxHash, rightLogIndex, rightSuffix] = right.id.split("-")
+                const logIndexDiff = parseInt(leftLogIndex) - parseInt(rightLogIndex)
+                if (logIndexDiff) {
+                  return logIndexDiff
+                } else {
+                  return parseInt(leftSuffix) - parseInt(rightSuffix)
+                }
+              }
+            })
 
             // some auctions exist for vault, let's merge auction logs to vault change logs
             let auctionLogs = []

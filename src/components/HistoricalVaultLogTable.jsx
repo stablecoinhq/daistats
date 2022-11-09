@@ -18,7 +18,7 @@ function HistoricalVaultLogTable(props) {
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Operations</th>
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Collateral Change ()</th>
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Debt Change (DAI)</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Paid fees (DAI)</th>
+        {/* <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Paid fees (DAI)</th> */}
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Market Price (USD)</th>
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Oracle Price (USD)</th>
         <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Pre Collateralization Ratio</th>
@@ -38,7 +38,7 @@ function HistoricalVaultLogTable(props) {
         </td>
         <td className="has-text-right" title={log.collateralChange}>{log.collateralChange}</td>
         <td className="has-text-right" title={log.debtChange}>{log.debtChange}</td>
-        <td className="has-text-right" title={log.paidFees}>{log.paidFees}</td>
+        {/* <td className="has-text-right" title={log.paidFees}>{log.paidFees}</td> */}
         <td className="has-text-right" title={log.oraclePrice}>{log.oraclePrice}</td>
         <td className="has-text-right" title={log.oraclePrice}>{log.oraclePrice}</td>
         <td className="has-text-right" title={log.preCollateralizationRatio}>{log.preCollateralizationRatio}</td>
