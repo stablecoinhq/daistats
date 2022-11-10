@@ -387,11 +387,11 @@ let subgraphUrl;
 if (process.env.REACT_APP_NETWORK === "mainnet") {
   VEST_DAI_IDS = 13
   VEST_MKR_TREASURY_IDS = 24
-  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.8"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.9"
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.14"
+  subgraphUrl = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.19"
 }
 
 const subgraphClient = new GraphQLClient(
@@ -611,11 +611,7 @@ class App extends Component {
         .concat(this.getVestingCalls(add.MCD_VEST_MKR_TREASURY, vestMkrTreasury, VEST_MKR_TREASURY_IDS))
         .concat(this.getIlkCall(ethAIlkBytes, 'ETH_A', weth, add.ETH, add.PIP_ETH))
         .concat(this.getIlkCall(fauAIlkBytes, 'FAU_A', fau, add.FAU, add.PIP_FAU))
-      console.log(JSON.stringify({
-        blockNumber,
-        // manager,
-        aggregated,
-      }))
+
       p1 = multi.callStatic.aggregate(
         aggregated
         , { blockTag: blockNumber })
@@ -1513,11 +1509,9 @@ class App extends Component {
               updatedAtTransaction,
             }
           }`)
-          console.log(JSON.stringify({ vaultsSubgraphClientResult }))
           const vaultsIds = vaultsSubgraphClientResult.vaults.map(v => v.id).sort();
           currentId = vaultsIds[vaultsIds.length - 1]
           resultArray = [...resultArray, ...(vaultsSubgraphClientResult.vaults)];
-          console.log(JSON.stringify({ currentId, resultArrayLength: resultArray.length }));
           if (!vaultsSubgraphClientResult.vaults.length) {
             break;
           }
