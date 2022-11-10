@@ -611,11 +611,7 @@ class App extends Component {
         .concat(this.getVestingCalls(add.MCD_VEST_MKR_TREASURY, vestMkrTreasury, VEST_MKR_TREASURY_IDS))
         .concat(this.getIlkCall(ethAIlkBytes, 'ETH_A', weth, add.ETH, add.PIP_ETH))
         .concat(this.getIlkCall(fauAIlkBytes, 'FAU_A', fau, add.FAU, add.PIP_FAU))
-      console.log(JSON.stringify({
-        blockNumber,
-        // manager,
-        aggregated,
-      }))
+
       p1 = multi.callStatic.aggregate(
         aggregated
         , { blockTag: blockNumber })
@@ -1513,11 +1509,9 @@ class App extends Component {
               updatedAtTransaction,
             }
           }`)
-          console.log(JSON.stringify({ vaultsSubgraphClientResult }))
           const vaultsIds = vaultsSubgraphClientResult.vaults.map(v => v.id).sort();
           currentId = vaultsIds[vaultsIds.length - 1]
           resultArray = [...resultArray, ...(vaultsSubgraphClientResult.vaults)];
-          console.log(JSON.stringify({ currentId, resultArrayLength: resultArray.length }));
           if (!vaultsSubgraphClientResult.vaults.length) {
             break;
           }

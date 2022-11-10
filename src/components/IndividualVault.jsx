@@ -24,6 +24,7 @@ function IndividualVault(props) {
 
   const [cdpId, setCdpId] = useState(convertLowerCaseAddress(props.cdpId) ?? "0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A");
   const [vault, setVault] = useState(undefined);
+  const [currentCollateralRatio, setCurrentCollateralRatio] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
       const subgraphClient = props.subgraphClient
@@ -391,7 +392,6 @@ function IndividualVault(props) {
 
             // reverse it again to view as from new to old
             fetchResult.vaults[0].logs = vaultWithAuctionLogs.reverse()
-            console.log(JSON.stringify({ msg: "logs in getfetchResult", logs: fetchResult.vaults[0].logs }))
           }
         }
         return fetchResult
@@ -431,13 +431,14 @@ function IndividualVault(props) {
 
       if (cdpId) {
         const getSingleVaultResult = await getSingleVault(cdpId);
-        console.log(JSON.stringify({ getSingleVaultResult, msg: "vault in getData" }))
         // get liquidation ratio change log
         if ((getSingleVaultResult && getSingleVaultResult.vaults && getSingleVaultResult.vaults[0])) {
           const singleVault = getSingleVaultResult.vaults[0]
           const liquidationRatioChangeLog = await getLiquidationRatioChangeLog(singleVault.collateralType.id)
+          const currentCollateralRatioValue = parseFloat(singleVault.collateral) * parseFloat(props.ilksByName[singleVault.collateralType.id].price) / (parseFloat(singleVault.debt) * parseFloat(props.ilksByName[singleVault.collateralType.id].rate))
           singleVault.liquidationRatioChangeLog = liquidationRatioChangeLog
           setVault(singleVault)
+          setCurrentCollateralRatio(currentCollateralRatioValue)
         }
       }
     }
@@ -478,7 +479,7 @@ function IndividualVault(props) {
                     Debt: {(parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate))}
                   </p>
                   <p className="subtitle is-size-6">
-                    CurrentCollateralRatio: {parseFloat(vault.collateral) * parseFloat(props.ilksByName[vault.collateralType.id].price) / (parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate))}
+                    CurrentCollateralRatio: {currentCollateralRatio}
                   </p>
                 </div> : <div></div>
               }
@@ -492,7 +493,7 @@ function IndividualVault(props) {
             </h3>
             <h4 className="subtitle is-size-3">IndividualVaultHistory</h4>
             {vault ?
-              <HistoricalVaultLogChart vault={vault} />
+              <HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} />
               : <div></div>
             }
           </div>

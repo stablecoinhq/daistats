@@ -2,16 +2,23 @@ import React, { useCallback, useMemo } from "react"
 import { useTranslate } from "react-polyglot"
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
-const HistoricalVaultLogChart = ({ vault }) => {
+const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
   const t = useTranslate()
   let logs = [];
   if (vault && vault.logs) {
     logs = Array.from(vault.logs)
+    // add current situation as single point only if logs has single point that cannot form a graph
+    if (new Set(logs.map(log => log.timestamp)).size < 2) {
+      logs = [{
+        timestamp: Date.now() / 1000 | 0,
+        debtAfter: vault.debt,
+        postCollateralizationRatio: currentCollateralRatio
+      }].concat(vault.logs)
+    }
   }
   logs.reverse();
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
     const liquidationRatioChangeLogList = originalData
-    const liquidationRatioChangeLogLast = liquidationRatioChangeLogList[liquidationRatioChangeLogList.length - 1];
     const liquidationRatioChangeLogRangeMin = +logs[0].timestamp
     const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp
     // get list within `logs` range
@@ -19,10 +26,6 @@ const HistoricalVaultLogChart = ({ vault }) => {
       .filter(liquidationRatioChangeLog =>
         +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp &&
         +liquidationRatioChangeLog.timestamp < +liquidationRatioChangeLogRangeMax)
-    // if there is no element, get last element
-    if (!liquidationRatioChangeLogWithinRange.length) {
-      liquidationRatioChangeLogWithinRange.push(liquidationRatioChangeLogLast)
-    }
     // get last change log that is *NOT* within range
     const liquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogList
       .filter(liquidationRatioChangeLog =>
@@ -36,7 +39,15 @@ const HistoricalVaultLogChart = ({ vault }) => {
     } else {
       lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1]
     }
-
+    // if there is no element, get last element
+    if (!liquidationRatioChangeLogWithinRange.length) {
+      // get last element which is *before* `liquidationRatioChangeLogRangeMin`
+      liquidationRatioChangeLogWithinRange.push({
+        ...lastLiquidationRatioChangeLogBeforeRange,
+        timestamp: liquidationRatioChangeLogRangeMin
+      })
+      console.log({ msg: "not in range", lastLiquidationRatioChangeLogBeforeRange })
+    }
     const liquidationRatioChangeLogWithBothEnds =
       // add min value
       [{
