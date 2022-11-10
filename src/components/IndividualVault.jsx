@@ -400,10 +400,19 @@ function IndividualVault(props) {
       const getLiquidationRatioChangeLog = async (ilkName) => {
         // get split change logs where address is destination.
         const collateralTypeChangeLogsQuery = `
-          collateralTypeChangeLogs(orderBy: timestamp, orderDirection: desc, where: {collateralType: "${ilkName}"}){
-            mat,
-            timestamp
-          }
+          collateralTypeChangeLogs: protocolParameterChangeLogBigDecimals(
+              first: 1000,
+              orderBy: timestamp,
+              orderDirection: desc, 
+              where: {
+                  parameterKey2: "${ilkName}"
+                  parameterKey1: "mat",
+                  contractType: SPOT,
+              })
+            {
+              mat: parameterValue,
+              timestamp
+            }
         `
         try {
           const collateralTypeChangeLogsQueryResult = await subgraphClient.request(gql`{

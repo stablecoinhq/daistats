@@ -118,7 +118,7 @@ const AuctionParticipantsChart = (props) => {
           <Line
             yAxisId={1}
             dataKey="keepers"
-            type="step"
+            type="stepAfter"
             dot={false}
             stackId={1}
             animationDuration={750}
@@ -127,7 +127,7 @@ const AuctionParticipantsChart = (props) => {
           <Line
             yAxisId={1}
             dataKey="takers"
-            type="step"
+            type="stepAfter"
             dot={false}
             stackId={1}
             animationDuration={750}

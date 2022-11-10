@@ -194,7 +194,7 @@ const HistoricalVaultLogChart = ({ vault }) => {
             data={logs}
             yAxisId={1}
             dataKey="postCollateralizationRatio"
-            type="step"
+            type="stepAfter"
             dot={false}
             animationDuration={750}
             stroke="#7E7E87"
