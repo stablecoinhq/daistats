@@ -15,6 +15,7 @@ import IndividualVault from './components/IndividualVault';
 import AuctionParticipants from './components/AuctionParticipants';
 import RiskModel from './components/RiskModel';
 import ProtocolChange from "./components/ProtocolChange"
+import VoteHistory from "./components/VoteHistory"
 
 
 const formatAmount = new Intl.NumberFormat('en-US', {
@@ -80,7 +81,7 @@ const Main = (props) => {
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/vaults-at-risk', '/vault-information', '/auction-participants', "/risk-model", "/protocol-change"]
+  const indexToTab = ['/vaults-at-risk', '/vault-information', '/auction-participants', "/risk-model", "/protocol-change", "/vote-history"]
   function tabNameToIndex() {
     let i = indexToTab.map((tabName) => location.pathname.includes(tabName)).indexOf(true)
 
@@ -103,6 +104,7 @@ const Main = (props) => {
             <Tab><p className="is-size-5">Auction Participants</p></Tab>
             <Tab><p className="is-size-5">Risk Model</p></Tab>
             <Tab><p className="is-size-5">Protocol Change</p></Tab>
+            <Tab><p className="is-size-5">Vote History</p></Tab>
           </TabList>
           <TabPanel>
             <Tabs>
@@ -155,6 +157,16 @@ const Main = (props) => {
               </TabList>
               <TabPanel>
                 <ProtocolChange {...props} />
+              </TabPanel>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs>
+              <TabList>
+                <Tab><p className="is-size-5">Vote History</p></Tab>
+              </TabList>
+              <TabPanel>
+                <VoteHistory {...props} />
               </TabPanel>
             </Tabs>
           </TabPanel>
