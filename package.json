@@ -26,7 +26,15 @@
     "start": "REACT_APP_NETWORK=mainnet react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "yarn lint:es && yarn lint:style && yarn lint:prettier",
+    "lint:fix": "yarn -s lint:es:fix; yarn -s lint:style:fix; yarn -s lint:prettier:fix; yarn -s svgo",
+    "lint:es": "eslint '**/*.{js,jsx,ts,tsx}'",
+    "lint:es:fix": "eslint --fix '**/*.{js,jsx,ts,tsx}'",
+    "lint:prettier": "prettier --check '**/*.{js,jsx,ts,tsx}'",
+    "lint:prettier:fix": "prettier -w '**/*.{js,jsx,ts,tsx}'",
+    "lint:style": "stylelint '**/*.{css,less,sass,scss}'",
+    "lint:style:fix": "stylelint --fix '**/*.{css,less,sass,scss}'"
   },
   "eslintConfig": {
     "extends": "react-app"

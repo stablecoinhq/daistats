@@ -3,38 +3,42 @@ import { useTranslate } from "react-polyglot"
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts"
 
 const HistoricalDebtChart = ({ data }) => {
+  console.log({
+    msg: "HistoricalDebtChart",
+    data
+  })
   const t = useTranslate()
 
   const locale = useMemo(() => (
-      t._polyglot.currentLocale
-    ),
+    t._polyglot.currentLocale
+  ),
     [t]
   )
 
   const amountFormatter = useMemo(() => (
-      new Intl.NumberFormat(locale, {
-        style: "decimal",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      })
-    ),
+    new Intl.NumberFormat(locale, {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    })
+  ),
     [locale]
   )
 
   const dateFormatter = useMemo(() => (
-      new Intl.DateTimeFormat(locale, {
-        dateStyle: "long"
-      })
-    ),
+    new Intl.DateTimeFormat(locale, {
+      dateStyle: "long"
+    })
+  ),
     [locale]
   )
 
   const monthFormatter = useMemo(() => (
-      new Intl.DateTimeFormat(locale, {
-        month: "short",
-        year: "2-digit"
-      })
-    ),
+    new Intl.DateTimeFormat(locale, {
+      month: "short",
+      year: "2-digit"
+    })
+  ),
     [locale]
   )
 
@@ -42,7 +46,7 @@ const HistoricalDebtChart = ({ data }) => {
     () => (
       data.reduce((output, point, index, points) => {
         const c = new Date(point?.timestamp * 1000)
-        const p =  new Date(points?.[index - 1]?.["timestamp"] * 1000)
+        const p = new Date(points?.[index - 1]?.["timestamp"] * 1000)
 
         if (c.getFullYear() !== p.getFullYear() || c.getMonth() !== p.getMonth()) {
           output.push(index)

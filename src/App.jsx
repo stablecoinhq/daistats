@@ -160,8 +160,8 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 } else {
   add = require('./addresses-goerli.json')
   add["CHIEF"] = add["MCD_ADM"]
-  add["MEDIAN_ETH"] = "0xad515b7a09a4A4A2AD6A87a98318A67aaaB5D3Ce"
-  add["MEDIAN_FAU"] = "0x5210B794BA8A0c90a6DC1bFA6c9C00037C23e0b4"
+  add["MEDIAN_ETH"] = "0x5BC6C65dD9E548E347A94B85d180a772bb3A3cC2"
+  add["MEDIAN_FAU"] = "0x827e33A9c00545a6C5123Afa5ca6C6a2FabBB42E"
 }
 
 const reverseAddresses = Object.entries(add).reduce((add, [key, value]) => (add[value] = key, add), {})
@@ -301,6 +301,8 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
   adaiPip = build(add.PIP_ADAI, "DSValue")
   lerp = build(add.LERP_HUMP, "Lerp")
 }
+const fau = build(add.FAU, "ERC20")
+
 const ethAIlkBytes = utils.formatBytes32String("ETH-A")
 const ethBIlkBytes = utils.formatBytes32String("ETH-B")
 const ethCIlkBytes = utils.formatBytes32String("ETH-C")
@@ -351,6 +353,7 @@ const wstethAIlkBytes = utils.formatBytes32String("WSTETH-A")
 const wstethBIlkBytes = utils.formatBytes32String("WSTETH-B")
 const d3madaiIlkBytes = utils.formatBytes32String("DIRECT-AAVEV2-DAI")
 const crvv1ethstethAIlkBytes = utils.formatBytes32String("CRVV1ETHSTETH-A")
+const fauAIlkBytes = utils.formatBytes32String("FAU-A")
 window.utils = utils
 window.add = add
 window.vat = vat
@@ -386,7 +389,7 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
 } else {
   VEST_DAI_IDS = 0
   VEST_MKR_TREASURY_IDS = 0
-  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.9"
+  url = "https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.53"
 }
 
 const subgraphClient = new GraphQLClient(
@@ -605,9 +608,34 @@ class App extends Component {
         .concat(this.getVestingCalls(add.MCD_VEST_DAI, vestDai, VEST_DAI_IDS))
         .concat(this.getVestingCalls(add.MCD_VEST_MKR_TREASURY, vestMkrTreasury, VEST_MKR_TREASURY_IDS))
         .concat(this.getIlkCall(ethAIlkBytes, 'ETH_A', weth, add.ETH, add.PIP_ETH))
-        .concat(this.getIlkCall(ethAIlkBytes, 'FAU_A', weth, add.ETH, add.PIP_ETH))
+        .concat(this.getIlkCall(fauAIlkBytes, 'FAU_A', fau, add.FAU, add.PIP_FAU))
         , { blockTag: blockNumber })
     }
+
+    const getBlockIntervalPeriods = (networkString) => {
+      let blockInterval = 45500 /* ≈ 7 day */, periods = 52 /* 12 months */
+      // get current date
+      const currentTimestamp = Date.now() / 1000
+      let startTimestamp = 0;
+      if (networkString === "mainnet") {
+        startTimestamp = 1573640342 // at block 8928163
+      } else {
+        startTimestamp = 1649366704 // at block 6678000
+      }
+      // too early to draw entire graph
+      if (currentTimestamp < startTimestamp + 60 * 60 * 24 * 365) {
+        periods = Math.max(
+          (((currentTimestamp - startTimestamp) / (60 * 60 * 24 * 7)) | 0) - 4,
+          0
+        )
+        if (periods < 2) {
+          blockInterval = 0
+        }
+      }
+      return { blockInterval, periods }
+    }
+    const { blockInterval, periods } = getBlockIntervalPeriods(process.env.REACT_APP_NETWORK)
+
     let promises
     if (process.env.REACT_APP_NETWORK === "mainnet") {
       promises = [
@@ -666,7 +694,7 @@ class App extends Component {
         this.getPrice(add.PIP_WSTETH, this.POSITION_UNIV2_NXT), //FIXME
         this.getPrice(add.MEDIAN_WSTETH, this.POSITION_MEDIAN_VAL),
         this.getPrice(add.PIP_CRVV1ETHSTETH, this.POSITION_UNIV2_NXT), //FIXME
-        this.getHistoricalDebt({ blockInterval: 45500 /* ≈ 7 day */, periods: 52 /* 12 months */ }),
+        this.getHistoricalDebt({ blockInterval, periods }),
       ]
     } else {
       promises = [
@@ -674,7 +702,9 @@ class App extends Component {
         this.etherscanEthSupply(),
         this.getPrice(add.PIP_ETH, this.POSITION_NXT),
         this.getPrice(add.MEDIAN_ETH, this.POSITION_MEDIAN_VAL),
-        this.getHistoricalDebt({ blockInterval: 45500 /* ≈ 7 day */, periods: 52 /* 12 months */ }),
+        this.getPrice(add.PIP_FAU, this.POSITION_NXT),
+        this.getPrice(add.MEDIAN_FAU, this.POSITION_MEDIAN_VAL),
+        this.getHistoricalDebt({ blockInterval, periods }),
       ]
     }
 
@@ -691,10 +721,11 @@ class App extends Component {
         univ2linkethPriceNxt, univ2uniethPriceNxt, univ2wbtcdaiPriceNxt,
         univ2aaveethPriceNxt, guniv3daiusdc1PriceNxt, guniv3daiusdc2PriceNxt, wstethPriceNxt,
         wstethPriceMedian, crvv1ethstethPriceNext,
-        historicalDebt, allVaults] = structuredResult
+        historicalDebt] = structuredResult
     } else {
       var [[block, res], ethSupply, ethPriceNxt, ethPriceMedian,
-        historicalDebt, allVaults] = structuredResult
+        fauPriceNxt, fauPriceMedian,
+        historicalDebt] = structuredResult
     }
 
 
@@ -871,7 +902,7 @@ class App extends Component {
     } else {
       ilks = [
         this.getIlkMap(res, offset += (VEST_MKR_TREASURY_IDS * VEST_CALL_COUNT), "ETH", "ETH-A", weth, 18, base, ethPriceNxt, ethPriceMedian, DP10),
-        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", weth, 18, base, ethPriceNxt, ethPriceMedian, DP10)
+        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", fau, 18, base, fauPriceNxt, fauPriceMedian, DP10)
       ]
     }
 
@@ -980,7 +1011,6 @@ class App extends Component {
           lerpHumpCurrent: utils.formatUnits(lerpHumpCurrent, 45),
           lerpHumpAdjustment: utils.formatUnits(lerpHumpCurrent.sub(surplusBuffer), 45),
           historicalDebt,
-          allVaults
         }
       } else {
         obj = {
@@ -1037,7 +1067,6 @@ class App extends Component {
           esmSum: utils.formatEther(esmSum),
           endWait: endWait.toNumber(),
           historicalDebt,
-          allVaults
         }
       }
       return obj
@@ -1128,6 +1157,17 @@ class App extends Component {
       }
       valueBn = value
       value = utils.formatUnits(value, 45)
+
+      if (ilkName == "FAU-A") {
+        console.log({
+          zzz,
+          price,
+          tokenDp,
+          valueBn,
+          value,
+          gem, units, base, priceNxt, priceMedian
+        })
+      }
     }
 
     const r = {
@@ -1443,9 +1483,9 @@ class App extends Component {
   getHistoricalDebt = async ({ blockInterval, periods }) => {
     try {
       const latestBlock = await (provider ?? eth).getBlockNumber()
-
       if (latestBlock) {
         const numberOfPoints = periods ?? latestBlock / blockInterval
+        console.log({ latestBlock, blockInterval, periods, numberOfPoints })
 
         if (numberOfPoints > 0) {
           const result = new Array(numberOfPoints)
@@ -1456,7 +1496,7 @@ class App extends Component {
             return `
             _${numberOfPoints - i}_${block}: systemState(block: { number: ${block}}, id: "current") {
               #block
-              #timestamp
+              timestamp
               totalDebt
               debtCeiling: totalDebtCeiling
             }
@@ -1468,11 +1508,12 @@ class App extends Component {
 
             Object.entries(data).forEach(([key, value]) => {
               const [, index, block] = key.split("_")
-
-              result[+index - 1] = { block: +block, ...value }
+              if (value) {
+                result[+index - 1] = { block: +block, ...value }
+              }
             })
 
-            return result
+            return result.flat()
           } catch (e) {
             return []
           }

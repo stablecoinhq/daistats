@@ -1,73 +1,74 @@
 import React, { useCallback, useMemo } from "react"
 import { useTranslate } from "react-polyglot"
-import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell} from "recharts"
+import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts"
 
 // from bluma
 const COLORS = ["hsl(171, 100%, 41%)",
-    "hsl(217, 71%, 53%)",
-    "hsl(204, 86%, 53%)",
-    "hsl(141, 71%, 48%)",
-    "hsl(48, 100%, 67%)",
-    "hsl(348, 100%, 61%)"]
+  "hsl(217, 71%, 53%)",
+  "hsl(204, 86%, 53%)",
+  "hsl(141, 71%, 48%)",
+  "hsl(48, 100%, 67%)",
+  "hsl(348, 100%, 61%)"]
 
 const ILK_TO_COLOUR = {
-    "USDC": "hsl(171, 100%, 41%)",
-    "PSM-USDC-A": "hsl(171, 100%, 41%)",
-    "GUNIV3DAIUSDC1": "hsl(171, 100%, 36%)",
-    "GUNIV3DAIUSDC1-A": "hsl(171, 100%, 36%)",
-    "GUNIV3DAIUSDC2": "hsl(171, 100%, 36%)",
-    "GUNIV3DAIUSDC2-A": "hsl(171, 100%, 36%)",
-    "UNIV2DAIUSDC": "hsl(171, 100%, 36%)",
-    "UNIV2DAIUSDC-A": "hsl(171, 100%, 36%)",
-    "ETH": "hsl(217, 71%, 53%)",
-    "ETH-A": "hsl(217, 71%, 53%)",
-    "ETH-B": "hsl(48, 100%, 67%)",
-    "ETH-C": "hsl(48, 100%, 67%)",
-    "WSTETH": "hsl(217, 71%, 43%)",
-    "WSTETH-A": "hsl(217, 71%, 43%)",
-    "WSTETH-B": "hsl(217, 71%, 43%)",
-    "WBTC": "hsl(141, 71%, 48%)",
-    "WBTC-A": "hsl(141, 71%, 48%)",
-    "WBTC-C": "hsl(141, 71%, 48%)",
-    "USDC-A": "hsl(204, 86%, 53%)",
-    "USDP": "hsl(171, 100%, 29%)",
-    "PSM-USDP-A": "hsl(171, 100%, 29%)",
-    "ADAI": "hsl(308, 34%, 51%)",
-    "DIRECT-AAVEV2-DAI": "hsl(308, 34%, 51%)",
-    "Others": "hsl(348, 100%, 61%)"}
+  "USDC": "hsl(171, 100%, 41%)",
+  "PSM-USDC-A": "hsl(171, 100%, 41%)",
+  "GUNIV3DAIUSDC1": "hsl(171, 100%, 36%)",
+  "GUNIV3DAIUSDC1-A": "hsl(171, 100%, 36%)",
+  "GUNIV3DAIUSDC2": "hsl(171, 100%, 36%)",
+  "GUNIV3DAIUSDC2-A": "hsl(171, 100%, 36%)",
+  "UNIV2DAIUSDC": "hsl(171, 100%, 36%)",
+  "UNIV2DAIUSDC-A": "hsl(171, 100%, 36%)",
+  "ETH": "hsl(217, 71%, 53%)",
+  "ETH-A": "hsl(217, 71%, 53%)",
+  "ETH-B": "hsl(48, 100%, 67%)",
+  "ETH-C": "hsl(48, 100%, 67%)",
+  "WSTETH": "hsl(217, 71%, 43%)",
+  "WSTETH-A": "hsl(217, 71%, 43%)",
+  "WSTETH-B": "hsl(217, 71%, 43%)",
+  "WBTC": "hsl(141, 71%, 48%)",
+  "WBTC-A": "hsl(141, 71%, 48%)",
+  "WBTC-C": "hsl(141, 71%, 48%)",
+  "USDC-A": "hsl(204, 86%, 53%)",
+  "USDP": "hsl(171, 100%, 29%)",
+  "PSM-USDP-A": "hsl(171, 100%, 29%)",
+  "ADAI": "hsl(308, 34%, 51%)",
+  "DIRECT-AAVEV2-DAI": "hsl(308, 34%, 51%)",
+  "Others": "hsl(348, 100%, 61%)"
+}
 
 // bluma light
-const COLORS_LIGHT = [ "hsl(171, 100%, 96%)",
-    "hsl(219, 70%, 96%)",
-    "hsl(206, 70%, 96%)",
-    "hsl(142, 52%, 96%)",
-    "hsl(48, 100%, 96%)",
-    "hsl(347, 90%, 96%)"]
+const COLORS_LIGHT = ["hsl(171, 100%, 96%)",
+  "hsl(219, 70%, 96%)",
+  "hsl(206, 70%, 96%)",
+  "hsl(142, 52%, 96%)",
+  "hsl(48, 100%, 96%)",
+  "hsl(347, 90%, 96%)"]
 
 // bluma dark
 const COLORS_DARK = [
-    "hsl(171, 100%, 29%)",
-    "hsl(217, 71%, 45%)",
-    "hsl(204, 71%, 39%)",
-    "hsl(141, 53%, 31%)",
-    "hsl(48, 100%, 29%)",
-    "hsl(348, 86%, 43%)"]
+  "hsl(171, 100%, 29%)",
+  "hsl(217, 71%, 45%)",
+  "hsl(204, 71%, 39%)",
+  "hsl(141, 53%, 31%)",
+  "hsl(48, 100%, 29%)",
+  "hsl(348, 86%, 43%)"]
 
 const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
   const t = useTranslate()
 
   const locale = useMemo(() => (
-      t._polyglot.currentLocale
-    ),
+    t._polyglot.currentLocale
+  ),
     [t]
   )
 
   const formatPercent = useMemo(() => (
-      new Intl.NumberFormat(locale, {
-        style: 'percent',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 1
-      })), [locale]
+    new Intl.NumberFormat(locale, {
+      style: 'percent',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1
+    })), [locale]
   )
 
   const formatTwoDp = useMemo(() => (
@@ -80,13 +81,17 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
 
   function ilkPercent(ilk) {
     if (useValue) {
-      return {"name": ilk['ilk'],
-              "token": ilk['token'],
-              "value": ilk.value / debt * 100}
+      return {
+        "name": ilk['ilk'],
+        "token": ilk['token'],
+        "value": ilk.value / debt * 100
+      }
     } else {
-      return {"name": ilk['ilk'],
-              "token": ilk['token'],
-              "value": ilk.Art * ilk.rate / debt * 100}
+      return {
+        "name": ilk['ilk'],
+        "token": ilk['token'],
+        "value": ilk.Art * ilk.rate / debt * 100
+      }
     }
   }
 
@@ -110,16 +115,18 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
     return b.value - a.value;
   }
 
-  var group = function(xs, key) {
-    return xs.reduce(function(rv, x) {
+  var group = function (xs, key) {
+    return xs.reduce(function (rv, x) {
       (rv[x[key]] = rv[x[key]] || []).push(x);
-        return rv;
-      }, {});
+      return rv;
+    }, {});
   };
 
   function reduce(kv) {
-    return {"name": kv[0],
-            "value": kv[1].reduce((t, v) => t + Number(v["value"]), Number("0"))}
+    return {
+      "name": kv[0],
+      "value": kv[1].reduce((t, v) => t + Number(v["value"]), Number("0"))
+    }
   }
 
   var all;
@@ -134,8 +141,10 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
   all.sort(sortByTokenPercent)
   const others = all.filter(i => !ilkThreshold(i))
   const data = all.filter(ilkThreshold)
-  data.push({"name": "Others",
-             "value": others.reduce((t, v) => t + v["value"], 0)})
+  data.push({
+    "name": "Others",
+    "value": others.reduce((t, v) => t + v["value"], 0)
+  })
 
   // FIXME use grey instead of fill colour for labels? set stroke colour?
   //{data.map((entry, index) => <Cell fill={COLORS[index % COLORS.length]}/>)}
@@ -153,9 +162,9 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
             label={label} labelLine={false}
             animationDuration={750}
             startAngle={70} endAngle={440}>
-             {data.map((entry, index) => <Cell fill={ILK_TO_COLOUR[entry.name]}/>)}
+            {data.map((entry, index) => <Cell fill={ILK_TO_COLOUR[entry.name]} />)}
           </Pie>
-          {useValue && <Tooltip formatter={tooltip}/>}
+          {useValue && <Tooltip formatter={tooltip} />}
         </PieChart>
       </ResponsiveContainer>
     </div>
