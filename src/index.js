@@ -11,8 +11,9 @@ class Root extends Component {
     messages: {
       ...require('defi18n/en/daistats.json'),
       ...require(`defi18n/en/maker.json`),
-    }
+    },
   }
+
   constructor() {
     super()
     const locale = localStorage.getItem('ds-locale')
@@ -24,16 +25,18 @@ class Root extends Component {
       }
     }
   }
+
   toggle = (locale) => {
     this.setState({
       locale,
       messages: {
         ...require(`defi18n/${locale}/daistats.json`),
         ...require(`defi18n/${locale}/maker.json`),
-      }
+      },
     })
     localStorage.setItem('ds-locale', locale)
   }
+
   render() {
     return (
       <I18n locale={this.state.locale} messages={this.state.messages}>

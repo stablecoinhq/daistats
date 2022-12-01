@@ -11,7 +11,7 @@ function nextPrice(price, priceNxt) {
   return 'has-text-success';
 }
 
-function Pip(props) {
+var Pip = (props) => {
   const t = useTranslate()
   const ilk = props.ilksByName[props.ilk]
   return (

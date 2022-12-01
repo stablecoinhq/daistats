@@ -5,7 +5,7 @@ import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis } from "
 const HistoricalDebtChart = ({ data }) => {
   console.log({
     msg: "HistoricalDebtChart",
-    data
+    data,
   })
   const t = useTranslate()
 
@@ -19,7 +19,7 @@ const HistoricalDebtChart = ({ data }) => {
     new Intl.NumberFormat(locale, {
       style: "decimal",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     })
   ),
     [locale]
@@ -27,7 +27,7 @@ const HistoricalDebtChart = ({ data }) => {
 
   const dateFormatter = useMemo(() => (
     new Intl.DateTimeFormat(locale, {
-      dateStyle: "long"
+      dateStyle: "long",
     })
   ),
     [locale]
@@ -36,7 +36,7 @@ const HistoricalDebtChart = ({ data }) => {
   const monthFormatter = useMemo(() => (
     new Intl.DateTimeFormat(locale, {
       month: "short",
-      year: "2-digit"
+      year: "2-digit",
     })
   ),
     [locale]
@@ -65,7 +65,7 @@ const HistoricalDebtChart = ({ data }) => {
 
       return monthFormatter.format(month)
     },
-    [monthFormatter]
+    [monthFormatter, data]
   )
 
   const formatTooltipTitle = useCallback(

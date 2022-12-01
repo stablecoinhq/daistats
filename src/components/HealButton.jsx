@@ -20,7 +20,7 @@ async function healMakerProtocol(debt) {
   }
 }
 
-function HealButton(props) {
+var HealButton = (props) => {
   const [ isHealing, setHealing ] = useState(false);
   const [ healAmount, setHealAmount ] = useState('');
 

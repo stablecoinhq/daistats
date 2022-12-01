@@ -1,52 +1,52 @@
 .box {
-    height: 100%;
+  height: 100%;
 }
 
 .theme-btn {
-    opacity: 0.75;
-    position: absolute;
-    right: -6px;
-    top: -35px;
-    cursor: pointer;
+  position: absolute;
+  top: -35px;
+  right: -6px;
+  cursor: pointer;
+  opacity: 0.75;
 }
 
 .theme-btn:hover {
-    opacity: 1;
+  opacity: 1;
 }
 
 .theme-btn a .dark-icon {
-    transform: scale(0.55);
+  transform: scale(0.55);
 }
 
 .theme-btn a .light-icon {
-    display: none;
-    transform: scale(0.54);
+  display: none;
+  transform: scale(0.54);
 }
 
 body {
-    background-color: rgb(21, 32, 43);
+  background-color: rgb(21 32 43);
 }
 
 .notification {
-    background-color: #018470;
+  background-color: #018470;
 }
 
 .footer {
-    background-color: #15202b;
+  background-color: #15202b;
 }
 
 .box {
-    background-color: #192734;
+  background-color: #192734;
 }
 
-.box>p {
-    color: #e6e8f1;
+.box > p {
+  color: #e6e8f1;
 }
 
 .title {
-    color: #e6e8f1;
+  color: #e6e8f1;
 }
 
 .subtitle {
-    color: #a0a2af;
+  color: #a0a2af;
 }

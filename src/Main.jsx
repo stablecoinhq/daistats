@@ -15,49 +15,49 @@ import { useLocation, useHistory } from "react-router-dom";
 const formatAmount = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatNoDecimals = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 })
 
 const formatCurrency = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 4
+  maximumFractionDigits: 4,
 })
 
 const formatTwoDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatPercent = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatFiveDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 5,
-  maximumFractionDigits: 5
+  maximumFractionDigits: 5,
 })
 
 const formatSixDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 6,
-  maximumFractionDigits: 6
+  maximumFractionDigits: 6,
 })
 
 const formatEightDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 8,
-  maximumFractionDigits: 8
+  maximumFractionDigits: 8,
 })
 
 const Main = (props) => {
@@ -76,7 +76,7 @@ const Main = (props) => {
   const location = useLocation();
   const history = useHistory();
   const indexToTab = ['/overview', '/collateral', '/oracles', '/auctions', '/ecosystem', '/addresses', '/vesting']
-  function tabNameToIndex() {
+  const tabNameToIndex = () => {
     let i = indexToTab.indexOf(location.pathname)
     return (i >= 0 ? i : 0)
   }
@@ -1237,11 +1237,11 @@ const Main = (props) => {
                   <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
                     <Vest heading={true} />
                     <tbody>
-                      {props.vestingDaiLegacy && props.vestingDaiLegacy.map((award, idx) => (
+                      {props.vestingDaiLegacy && props.vestingDaiLegacy.map((award) => (
                         <Vest key={award.usr + award.bgn} award={award} />
                       ))}
-                      <tr><td colspan="10">&nbsp;</td></tr>
-                      {props.vestingDai.map((award, idx) => (
+                      <tr><td colSpan="10">&nbsp;</td></tr>
+                      {props.vestingDai.map((award) => (
                         <Vest key={award.usr + award.bgn} award={award} />
                       ))}
                     </tbody>
@@ -1256,7 +1256,7 @@ const Main = (props) => {
                   <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
                     <Vest heading={true} />
                     <tbody>
-                      {props.vestingMkrTreasury.map((award, idx) => (
+                      {props.vestingMkrTreasury.map((award) => (
                         <Vest key={award.usr + award.bgn} award={award} />
                       ))}
                     </tbody>

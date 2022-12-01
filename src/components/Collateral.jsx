@@ -4,31 +4,31 @@ import { useTranslate } from 'react-polyglot';
 const formatAmount = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatNoDecimals = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 })
 
 const formatDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 8,
-  maximumFractionDigits: 8
+  maximumFractionDigits: 8,
 })
 
 const formatPercent = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatPercentNoDecimals = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 })
 
 function autoLine(props, label) {
@@ -46,7 +46,7 @@ function autoLine(props, label) {
   }
 }
 
-function Collateral(props) {
+var Collateral = (props) => {
   var supply
   const t = useTranslate()
   const ilk = props.ilksByName[props.ilk]

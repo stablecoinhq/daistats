@@ -4,25 +4,25 @@ import React from 'react'
 const formatAmount = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const formatNoDecimals = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 })
 
 const formatCurrency = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 4
+  maximumFractionDigits: 4,
 })
 
 const formatPercent = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 })
 
 const Calc = (props) => {

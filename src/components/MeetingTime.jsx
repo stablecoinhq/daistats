@@ -31,7 +31,7 @@ function MeetingNote(props) {
   }
 }
 
-function MeetingTime(props) {
+var MeetingTime = (_props) => {
 
   return (
     <React.Fragment>

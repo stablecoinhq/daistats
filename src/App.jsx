@@ -3,8 +3,7 @@ import { translate } from 'react-polyglot';
 import {
   HashRouter as Router,
   Switch,
-  Link,
-  Route
+  Route,
 } from "react-router-dom";
 import { gql, GraphQLClient } from "graphql-request"
 import './App.css';
@@ -12,6 +11,7 @@ import eth from './web3';
 import Main from './Main'
 import Dai from './Dai'
 import daiLogo from './dai-pixel.png'
+import Image from 'next/image';
 // import confetti from './confetti'
 
 const ethers = require('ethers')
@@ -191,10 +191,6 @@ const vat = build(add.MCD_VAT, "Vat")
 const pot = build(add.MCD_POT, "Pot")
 const jug = build(add.MCD_JUG, "Jug")
 const vow = build(add.MCD_VOW, "Vow")
-let pit
-if (process.env.REACT_APP_NETWORK === "mainnet") {
-  pit = build(add.GEM_PIT, "GemPit")
-}
 const cat = build(add.MCD_CAT, "Cat")
 const dog = build(add.MCD_DOG, "Dog")
 const spot = build(add.MCD_SPOT, "Spotter")
@@ -209,7 +205,6 @@ const chief = build(add.CHIEF, "DSChief")
 const esm = build(add.MCD_ESM, "ESM")
 const end = build(add.MCD_END, "End")
 const vestDai = build(add.MCD_VEST_DAI, "DssVestSuckable")
-const vestMkr = build(add.MCD_VEST_MKR, "DssVestMintable")
 const vestMkrTreasury = build(add.MCD_VEST_MKR_TREASURY, "DssVestTransferrable")
 const weth = build(add.ETH, "ERC20")
 const bat = build(add.BAT, "ERC20")
@@ -277,7 +272,6 @@ const manager = build(add.CDP_MANAGER, "DssCdpManager")
 const clip = build(add.MCD_CLIP_ETH_A, "Clipper") // FIXME are these all the same now?
 // NOTE one calc instance is shared between all ilks though each ilk has its own calc contract
 const calc = build(add.MCD_CLIP_CALC_ETH_A, "StairstepExponentialDecrease")
-const calcLinear = build(add.MCD_CLIP_CALC_TUSD_A, "LinearDecrease")
 const flap = build(add.MCD_FLAP, "Flapper")
 const flop = build(add.MCD_FLOP, "Flopper")
 let d3mAdai, aaveIncentive
@@ -286,19 +280,11 @@ if (process.env.REACT_APP_NETWORK === "mainnet") {
   aaveIncentive = build(add.MCD_JOIN_DIRECT_AAVEV2_DAI_INCENTIVE, "StakedTokenIncentivesController")
 }
 const usdcPip = build(add.PIP_USDC, "DSValue")
-const tusdPip = build(add.PIP_TUSD, "DSValue")
-const paxPip = build(add.PIP_PAXUSD, "DSValue")
-const usdtPip = build(add.PIP_USDT, "DSValue")
-const gusdPip = build(add.PIP_GUSD, "DSValue")
 const rwaPip = build(add.PIP_RWA001, "DSValue")
 const pip = build(add.PIP_ETH, "OSM")
 
-let univ2Pip, univ3Pip1, univ3Pip2, adaiPip, lerp
+let lerp
 if (process.env.REACT_APP_NETWORK === "mainnet") {
-  univ2Pip = build(add.PIP_UNIV2DAIETH, "UNIV2LPOracle")
-  univ3Pip1 = build(add.PIP_GUNIV3DAIUSDC1, "GUniLPOracle")
-  univ3Pip2 = build(add.PIP_GUNIV3DAIUSDC2, "GUniLPOracle")
-  adaiPip = build(add.PIP_ADAI, "DSValue")
   lerp = build(add.LERP_HUMP, "Lerp")
 }
 const fau = build(add.FAU, "ERC20")
@@ -424,7 +410,7 @@ class App extends Component {
       eth.removeAllListeners()
     }
     this.setState({
-      paused: !this.state.paused
+      paused: !this.state.paused,
     })
   }
 
@@ -501,7 +487,7 @@ class App extends Component {
         [add.LERP_HUMP, lerp.interface.encodeFunctionData('start', [])],
         [add.LERP_HUMP, lerp.interface.encodeFunctionData('end', [])],
         [add.LERP_HUMP, lerp.interface.encodeFunctionData('startTime', [])],
-        [add.LERP_HUMP, lerp.interface.encodeFunctionData('duration', [])]
+        [add.LERP_HUMP, lerp.interface.encodeFunctionData('duration', [])],
 
       ].concat(this.getVestingCalls(add.MCD_VEST_DAI_LEGACY, vestDai, VEST_DAI_LEGACY_IDS))
         .concat(this.getVestingCalls(add.MCD_VEST_DAI, vestDai, VEST_DAI_IDS))
@@ -897,12 +883,12 @@ class App extends Component {
         this.getIlkMap(res, offset += ILK_CALL_COUNT, "WSTETH", "WSTETH-A", wsteth, 18, base, wstethPriceNxt, wstethPriceMedian, DP10),
         this.getIlkMap(res, offset += ILK_CALL_COUNT, "WSTETH", "WSTETH-B", wsteth, 18, base, wstethPriceNxt, wstethPriceMedian, DP10),
         this.getIlkMap(res, offset += ILK_CALL_COUNT, "ADAI", "DIRECT-AAVEV2-DAI", adai, 18, base),
-        this.getIlkMap(res, offset += ILK_CALL_COUNT, "CRVV1ETHSTETH", "CRVV1ETHSTETH-A", crvv1ethsteth, 18, base, crvv1ethstethPriceNext)
+        this.getIlkMap(res, offset += ILK_CALL_COUNT, "CRVV1ETHSTETH", "CRVV1ETHSTETH-A", crvv1ethsteth, 18, base, crvv1ethstethPriceNext),
       ]
     } else {
       ilks = [
         this.getIlkMap(res, offset += (VEST_MKR_TREASURY_IDS * VEST_CALL_COUNT), "ETH", "ETH-A", weth, 18, base, ethPriceNxt, ethPriceMedian, DP10),
-        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", fau, 18, base, fauPriceNxt, fauPriceMedian, DP10)
+        this.getIlkMap(res, offset += ILK_CALL_COUNT, "FAU", "FAU-A", fau, 18, base, fauPriceNxt, fauPriceMedian, DP10),
       ]
     }
 
@@ -922,7 +908,7 @@ class App extends Component {
 
     // if (parseInt(utils.formatUnits(res[1], 45)) >= 300000000) confetti.rain()
 
-    this.setState(state => {
+    this.setState(_state => {
       let obj
       if (process.env.REACT_APP_NETWORK === "mainnet") {
         obj = {
@@ -1165,7 +1151,7 @@ class App extends Component {
           tokenDp,
           valueBn,
           value,
-          gem, units, base, priceNxt, priceMedian
+          gem, units, base, priceNxt, priceMedian,
         })
       }
     }
@@ -1202,7 +1188,7 @@ class App extends Component {
       supply: utils.formatUnits(supply, units),
       price: utils.formatUnits(price, 27),
       value: value,
-      valueBn: valueBn
+      valueBn: valueBn,
     };
     if (zzz) {
       r.zzz = this.unixToTime(+zzz + HOP);
@@ -1329,7 +1315,7 @@ class App extends Component {
       locked: utils.formatUnits(locked, dp),
       supply: utils.formatUnits(supply, dp),
       value: utils.formatUnits(locked.mul(tokenDp).mul(priceBN), 45),
-      valueBn: locked.mul(tokenDp).mul(priceBN)
+      valueBn: locked.mul(tokenDp).mul(priceBN),
     }
   }
 
@@ -1361,7 +1347,7 @@ class App extends Component {
         tot: utils.formatEther(award.tot),
         rxd: utils.formatEther(award.rxd),
         accrued: utils.formatEther(vest.interface.decodeFunctionResult('accrued', res[idx + (i * 3) + 1])[0]),
-        unpaid: utils.formatEther(vest.interface.decodeFunctionResult('unpaid', res[idx + (i * 3) + 2])[0])
+        unpaid: utils.formatEther(vest.interface.decodeFunctionResult('unpaid', res[idx + (i * 3) + 2])[0]),
       })
     }
     return r
@@ -1391,6 +1377,7 @@ class App extends Component {
     const d = new Date(stamp * 1000)
     return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2)
   }
+
   unixToTime = stamp => new Date(stamp * 1000).toLocaleTimeString("en-US")
 
   calcFee = rate => parseFloat(utils.formatUnits(rate, 27)) ** (60 * 60 * 24 * 365) * 1 - 1;
@@ -1574,7 +1561,7 @@ class App extends Component {
         <section className="section">
           <div className="container has-text-centered">
             <figure className="image is-128x128 container">
-              <img src={daiLogo} alt="Dai Logo" />
+              <Image src={daiLogo} alt="Dai Logo" />
             </figure>
             <br />
             <progress className="progress is-small is-primary" max="100">15%</progress>
@@ -1586,16 +1573,4 @@ class App extends Component {
   }
 }
 
-const NavBar = () => {
-  return (
-    <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="container">
-        <div className="navbar-brand">
-          <Link className="navbar-item" to="/">Home</Link>
-          <Link className="navbar-item" to="/dai">What's the total supply of Dai?</Link>
-        </div>
-      </div>
-    </nav>
-  )
-}
 export default translate()(App)

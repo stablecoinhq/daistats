@@ -21,7 +21,7 @@ async function flapMakerProtocol(debt, surplus) {
   }
 }
 
-function FlapButton(props) {
+var FlapButton = (props) => {
   const [ isFlapping, setFlapping ] = useState(false);
   const [ debtAmount, surplusAmount ] = useState('');
   const minSurplus = Number(props.surplusBuffer) + Number(props.surplusBump);

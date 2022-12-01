@@ -1,14 +1,6 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useMemo } from "react"
 import { useTranslate } from "react-polyglot"
 import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts"
-
-// from bluma
-const COLORS = ["hsl(171, 100%, 41%)",
-  "hsl(217, 71%, 53%)",
-  "hsl(204, 86%, 53%)",
-  "hsl(141, 71%, 48%)",
-  "hsl(48, 100%, 67%)",
-  "hsl(348, 100%, 61%)"]
 
 const ILK_TO_COLOUR = {
   "USDC": "hsl(171, 100%, 41%)",
@@ -34,7 +26,7 @@ const ILK_TO_COLOUR = {
   "PSM-USDP-A": "hsl(171, 100%, 29%)",
   "ADAI": "hsl(308, 34%, 51%)",
   "DIRECT-AAVEV2-DAI": "hsl(308, 34%, 51%)",
-  "Others": "hsl(348, 100%, 61%)"
+  "Others": "hsl(348, 100%, 61%)",
 }
 
 // bluma light
@@ -67,39 +59,31 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
     new Intl.NumberFormat(locale, {
       style: 'percent',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 1
+      maximumFractionDigits: 1,
     })), [locale]
   )
 
-  const formatTwoDp = useMemo(() => (
-    new Intl.NumberFormat(locale, {
-      style: 'decimal',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })), [locale]
-  )
-
-  function ilkPercent(ilk) {
+  const ilkPercent = (ilk) => {
     if (useValue) {
       return {
         "name": ilk['ilk'],
         "token": ilk['token'],
-        "value": ilk.value / debt * 100
+        "value": ilk.value / debt * 100,
       }
     } else {
       return {
         "name": ilk['ilk'],
         "token": ilk['token'],
-        "value": ilk.Art * ilk.rate / debt * 100
+        "value": ilk.Art * ilk.rate / debt * 100,
       }
     }
   }
 
-  function ilkThreshold(v) {
+  const ilkThreshold = (v) => {
     return v["value"] >= 2.2
   }
 
-  function label(i) {
+  const label = (i) => {
     if (useValue) {
       return i["name"]
     } else {
@@ -107,25 +91,25 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
     }
   }
 
-  function tooltip(value, name, props) {
+  const tooltip = (value, _name, _props) => {
     return formatPercent.format(value / 100) //+ " " + formatTwoDp.format(props.value) + "B"
   }
 
-  function sortByTokenPercent(a, b) {
+  const sortByTokenPercent = (a, b) => {
     return b.value - a.value;
   }
 
-  var group = function (xs, key) {
-    return xs.reduce(function (rv, x) {
+  var group = (xs, key) => {
+    return xs.reduce((rv, x) => {
       (rv[x[key]] = rv[x[key]] || []).push(x);
       return rv;
     }, {});
   };
 
-  function reduce(kv) {
+  const reduce = (kv) => {
     return {
       "name": kv[0],
-      "value": kv[1].reduce((t, v) => t + Number(v["value"]), Number("0"))
+      "value": kv[1].reduce((t, v) => t + Number(v["value"]), Number("0")),
     }
   }
 
@@ -143,7 +127,7 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
   const data = all.filter(ilkThreshold)
   data.push({
     "name": "Others",
-    "value": others.reduce((t, v) => t + v["value"], 0)
+    "value": others.reduce((t, v) => t + v["value"], 0),
   })
 
   // FIXME use grey instead of fill colour for labels? set stroke colour?
@@ -162,7 +146,7 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
             label={label} labelLine={false}
             animationDuration={750}
             startAngle={70} endAngle={440}>
-            {data.map((entry, index) => <Cell fill={ILK_TO_COLOUR[entry.name]} />)}
+            {data.map((entry, idx) => <Cell fill={ILK_TO_COLOUR[entry.name]} key={idx} />)}
           </Pie>
           {useValue && <Tooltip formatter={tooltip} />}
         </PieChart>
