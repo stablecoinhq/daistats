@@ -54,8 +54,8 @@
     "lint:es:fix": "eslint --fix '**/*.{js,jsx,ts,tsx}'",
     "lint:prettier": "prettier --check '**/*.{js,jsx,ts,tsx}'",
     "lint:prettier:fix": "prettier -w '**/*.{js,jsx,ts,tsx}'",
-    "lint:style": "stylelint '**/*.{css,less,sass,scss}'",
-    "lint:style:fix": "stylelint --fix '**/*.{css,less,sass,scss}'"
+    "lint:style": "stylelint 'src/**/*.{css,less,sass,scss}'",
+    "lint:style:fix": "stylelint --fix 'src/**/*.{css,less,sass,scss}'"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -1,5 +1,6 @@
 .box {
   height: 100%;
+  background-color: #192734;
 }
 
 .theme-btn {
@@ -33,10 +34,6 @@ body {
 
 .footer {
   background-color: #15202b;
-}
-
-.box {
-  background-color: #192734;
 }
 
 .box > p {
