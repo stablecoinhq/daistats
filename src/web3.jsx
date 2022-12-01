@@ -1,10 +1,10 @@
-const ethers = require('ethers')
-window.ethers = ethers
-let eth;
-if (process.env.REACT_APP_NETWORK === "mainnet") {
-    eth = new ethers.providers.InfuraProvider()
+const ethers = require('ethers');
+window.ethers = ethers;
+let web3;
+if (process.env.REACT_APP_NETWORK === 'mainnet') {
+  web3 = new ethers.providers.InfuraProvider();
 } else {
-    const network = ethers.providers.getNetwork("goerli");
-    eth = new ethers.providers.InfuraProvider(network)
+  const network = ethers.providers.getNetwork('goerli');
+  web3 = new ethers.providers.InfuraProvider(network);
 }
-export default eth
+export default web3;

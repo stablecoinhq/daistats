@@ -1,175 +1,145 @@
-import React, { useCallback, useMemo } from "react"
-import { useTranslate } from "react-polyglot"
-import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import React, { useCallback, useMemo } from 'react';
+import { useTranslate } from 'react-polyglot';
+import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
-  const t = useTranslate()
-  let logs = [];
-  if (vault && vault.logs) {
-    logs = Array.from(vault.logs)
-    // add current situation as single point only if logs has single point that cannot form a graph
-    if (new Set(logs.map(log => log.timestamp)).size < 2) {
-      logs = [{
-        timestamp: Date.now() / 1000 | 0,
-        debtAfter: vault.debt,
-        postCollateralizationRatio: currentCollateralRatio
-      }].concat(vault.logs)
-    }
-  }
-  logs.reverse();
+const HistoricalVaultLogChart = ({ vault }) => {
+  const t = useTranslate();
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
-    const liquidationRatioChangeLogList = originalData
-    const liquidationRatioChangeLogRangeMin = +logs[0].timestamp
-    const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp
+    const liquidationRatioChangeLogList = originalData;
+    const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;
+    const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp;
     // get list within `logs` range
-    const liquidationRatioChangeLogWithinRange = liquidationRatioChangeLogList
-      .filter(liquidationRatioChangeLog =>
+    const liquidationRatioChangeLogWithinRange = liquidationRatioChangeLogList.filter(
+      (liquidationRatioChangeLog) =>
         +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp &&
-        +liquidationRatioChangeLog.timestamp < +liquidationRatioChangeLogRangeMax)
+        +liquidationRatioChangeLog.timestamp < +liquidationRatioChangeLogRangeMax,
+    );
     // get last change log that is *NOT* within range
-    const liquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogList
-      .filter(liquidationRatioChangeLog =>
-        +liquidationRatioChangeLogRangeMin > +liquidationRatioChangeLog.timestamp)
+    const liquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogList.filter(
+      (liquidationRatioChangeLog) => +liquidationRatioChangeLogRangeMin > +liquidationRatioChangeLog.timestamp,
+    );
     let lastLiquidationRatioChangeLogBeforeRange = undefined;
     if (!liquidationRatioChangeLogBeforeRange.length) {
-      const liquidationRatioChangeLogAfterRange = liquidationRatioChangeLogList
-        .filter(liquidationRatioChangeLog =>
-          +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp)
-      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogAfterRange[0]
+      const liquidationRatioChangeLogAfterRange = liquidationRatioChangeLogList.filter(
+        (liquidationRatioChangeLog) => +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp,
+      );
+      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogAfterRange[0];
     } else {
-      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1]
+      lastLiquidationRatioChangeLogBeforeRange =
+        liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1];
     }
     // if there is no element, get last element
     if (!liquidationRatioChangeLogWithinRange.length) {
       // get last element which is *before* `liquidationRatioChangeLogRangeMin`
       liquidationRatioChangeLogWithinRange.push({
         ...lastLiquidationRatioChangeLogBeforeRange,
-        timestamp: liquidationRatioChangeLogRangeMin
-      })
-      console.log({ msg: "not in range", lastLiquidationRatioChangeLogBeforeRange })
+        timestamp: liquidationRatioChangeLogRangeMin,
+      });
+      console.log({ msg: 'not in range', lastLiquidationRatioChangeLogBeforeRange });
     }
     const liquidationRatioChangeLogWithBothEnds =
       // add min value
-      [{
-        mat: (lastLiquidationRatioChangeLogBeforeRange.mat),
-        timestamp: liquidationRatioChangeLogRangeMin
-      }]
+      [
+        {
+          mat: lastLiquidationRatioChangeLogBeforeRange.mat,
+          timestamp: liquidationRatioChangeLogRangeMin,
+        },
+      ]
         // original data within range
         .concat(liquidationRatioChangeLogWithinRange)
         // add max value
-        .concat([{
-          mat: liquidationRatioChangeLogWithinRange[liquidationRatioChangeLogWithinRange.length - 1].mat,
-          timestamp: liquidationRatioChangeLogRangeMax
-        }])
+        .concat([
+          {
+            mat: liquidationRatioChangeLogWithinRange[liquidationRatioChangeLogWithinRange.length - 1].mat,
+            timestamp: liquidationRatioChangeLogRangeMax,
+          },
+        ]);
 
-    return liquidationRatioChangeLogWithBothEnds
-  }
-  const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(vault.liquidationRatioChangeLog.reverse())
+    return liquidationRatioChangeLogWithBothEnds;
+  };
+  const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(
+    vault.liquidationRatioChangeLog.reverse(),
+  );
 
-  const locale = useMemo(() => (
-    t._polyglot.currentLocale
-  ),
-    [t]
-  )
+  const locale = useMemo(() => t._polyglot.currentLocale, [t]);
 
-  const amountFormatter = useMemo(() => (
-    new Intl.NumberFormat(locale, {
-      style: "decimal",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    })
-  ),
-    [locale]
-  )
+  const amountFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: 'decimal',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }),
+    [locale],
+  );
 
-  const dateFormatter = useMemo(() => (
-    new Intl.DateTimeFormat(locale, {
-      dateStyle: "long"
-    })
-  ),
-    [locale]
-  )
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        dateStyle: 'long',
+      }),
+    [locale],
+  );
 
-  const monthFormatter = useMemo(() => (
-    new Intl.DateTimeFormat(locale, {
-      month: "short",
-      year: "2-digit"
-    })
-  ),
-    [locale]
-  )
-
-  const ticks = useMemo(
-    () => (
-      logs.reduce((output, point, index, points) => {
-        if (!point || !points) {
-          return output
-        }
-
-        const c = new Date(point?.timestamp * 1000)
-        const p = new Date(points?.[index - 1]?.["timestamp"] * 1000)
-
-        if (c.getFullYear() !== p.getFullYear() || c.getMonth() !== p.getMonth()) {
-          output.push(index)
-        }
-
-        return output
-      }, [])
-    ),
-    [logs]
-  )
-
+  const monthFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        year: '2-digit',
+      }),
+    [locale],
+  );
   const formatTick = useCallback(
     (index) => {
-      const timestamp = new Date(index * 1000)
-      const month = new Date(timestamp.getFullYear(), timestamp.getMonth())
-      return monthFormatter.format(month)
+      const timestamp = new Date(index * 1000);
+      const month = new Date(timestamp.getFullYear(), timestamp.getMonth());
+      return monthFormatter.format(month);
     },
-    [monthFormatter]
-  )
+    [monthFormatter],
+  );
 
   const formatTooltipTitle = useCallback(
     (index) => {
-      const timestamp = new Date(index * 1000)
-      return dateFormatter.format(timestamp)
+      const timestamp = new Date(index * 1000);
+      return dateFormatter.format(timestamp);
     },
-    [logs, dateFormatter]
-  )
+    [dateFormatter],
+  );
 
   const formatTooltipValue = useCallback(
     (value, name) => {
-      let output = amountFormatter.format(value)
+      let output = amountFormatter.format(value);
 
-      if (name === "debtAfter") {
-        return [output, "debtAfter"]
+      if (name === 'debtAfter') {
+        return [output, 'debtAfter'];
       }
 
-      if (name === "postCollateralizationRatio") {
-        return [output, "postCollateralizationRatio"]
+      if (name === 'postCollateralizationRatio') {
+        return [output, 'postCollateralizationRatio'];
       }
 
-      if (name === "mat") {
-        return [output, "LiquidationRatio"]
+      if (name === 'mat') {
+        return [output, 'LiquidationRatio'];
       }
 
-      return output
+      return output;
     },
-    [amountFormatter, t]
-  )
+    [amountFormatter],
+  );
 
   return (
-    <div style={{
-      width: "100%",
-      height: 180,
-      marginTop: -24,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
+    <div
+      style={{
+        width: '100%',
+        height: 180,
+        marginTop: -24,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <ResponsiveContainer>
-        <ComposedChart
-          data={logs}
-        >
+        <ComposedChart data={logs}>
           <defs>
             <linearGradient id="totalDebtColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1AAB9B" stopOpacity={0.95} />
@@ -184,13 +154,8 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             type="number"
             dataKey="timestamp"
           />
-          <YAxis yAxisId={1} label={{ value: "DAI", angle: -90, dx: -20, fill: "#7E7E87" }}
-          />
-          <YAxis
-            yAxisId={2}
-            orientation="right"
-            label={{ value: "CR", angle: -90, dx: 20, fill: "#7E7E87" }}
-          />
+          <YAxis yAxisId={1} label={{ value: 'DAI', angle: -90, dx: -20, fill: '#7E7E87' }} />
+          <YAxis yAxisId={2} orientation="right" label={{ value: 'CR', angle: -90, dx: 20, fill: '#7E7E87' }} />
           <Area
             data={logs}
             yAxisId={2}
@@ -219,15 +184,11 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             animationDuration={750}
             stroke="#7E0087"
           />
-          <Tooltip
-            labelStyle={{ fontWeight: "bold" }}
-            formatter={formatTooltipValue}
-            labelFormatter={formatTooltipTitle}
-          />
+          <Tooltip labelStyle={{ fontWeight: 'bold' }} formatter={formatTooltipValue} labelFormatter={formatTooltipTitle} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
-  )
-}
+  );
+};
 
-export default HistoricalVaultLogChart
+export default HistoricalVaultLogChart;
