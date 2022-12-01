@@ -369,7 +369,7 @@ if (process.env.REACT_APP_NETWORK === 'mainnet') {
 } else {
   VEST_DAI_IDS = 0;
   VEST_MKR_TREASURY_IDS = 0;
-  subgraphUrl = 'https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.54';
+  subgraphUrl = 'https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.56';
 }
 
 const subgraphClient = new GraphQLClient(subgraphUrl, { mode: 'cors' });
