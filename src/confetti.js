@@ -9,23 +9,23 @@ let raining = false;
 
 const particleColors = {
   colorOptions: [
-    "DodgerBlue",
-    "OliveDrab",
-    "Gold",
-    "pink",
-    "SlateBlue",
-    "lightblue",
-    "Violet",
-    "PaleGreen",
-    "SteelBlue",
-    "SandyBrown",
-    "Chocolate",
-    "Crimson"
+    'DodgerBlue',
+    'OliveDrab',
+    'Gold',
+    'pink',
+    'SlateBlue',
+    'lightblue',
+    'Violet',
+    'PaleGreen',
+    'SteelBlue',
+    'SandyBrown',
+    'Chocolate',
+    'Crimson',
   ],
   colorIndex: 0,
   colorIncrementer: 0,
   colorThreshold: 10,
-  getColor: function() {
+  getColor: () => {
     if (this.colorIncrementer >= 10) {
       this.colorIncrementer = 0;
       this.colorIndex++;
@@ -35,10 +35,10 @@ const particleColors = {
     }
     this.colorIncrementer++;
     return this.colorOptions[this.colorIndex];
-  }
+  },
 };
 
-function confettiParticle(color) {
+const confettiParticle = (color) => {
   this.x = Math.random() * W;
   this.y = Math.random() * H - H;
   this.r = RandomFromTo(10, 30);
@@ -48,7 +48,7 @@ function confettiParticle(color) {
   this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
   this.tiltAngle = 0;
 
-  this.draw = function() {
+  this.draw = () => {
     ctx.beginPath();
     ctx.lineWidth = this.r / 2;
     ctx.strokeStyle = this.color;
@@ -56,22 +56,22 @@ function confettiParticle(color) {
     ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 4);
     return ctx.stroke();
   };
-}
+};
 
-const requestAnimFrame = (function() {
+const requestAnimFrame = (() => {
   return (
     window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame ||
-    function(callback) {
+    ((callback) => {
       return window.setTimeout(callback, 1000 / 60);
-    }
+    })
   );
 })();
 
-function draw() {
+const draw = () => {
   ctx.clearRect(0, 0, W, H);
   const results = [];
   for (let i = 0; i < mp; i++) {
@@ -89,60 +89,48 @@ function draw() {
 
     if (particle.x > W + 20 || particle.x < -20 || particle.y > H) {
       if (i % 5 > 0 || i % 2 === 0) {
-        reposition(
-          particle,
-          Math.random() * W,
-          -10,
-          Math.floor(Math.random() * 10) - 20
-        );
+        reposition(particle, Math.random() * W, -10, Math.floor(Math.random() * 10) - 20);
       } else {
         if (Math.sin(angle) > 0) {
-          reposition(
-            particle,
-            -20,
-            Math.random() * H,
-            Math.floor(Math.random() * 10) - 20
-          );
+          reposition(particle, -20, Math.random() * H, Math.floor(Math.random() * 10) - 20);
         } else {
-          reposition(
-            particle,
-            W + 20,
-            Math.random() * H,
-            Math.floor(Math.random() * 10) - 20
-          );
+          reposition(particle, W + 20, Math.random() * H, Math.floor(Math.random() * 10) - 20);
         }
       }
     }
   }
 
   return results;
-}
+};
 
-function RandomFromTo(from, to) {
+const RandomFromTo = (from, to) => {
   return Math.floor(Math.random() * (to - from + 1) + from);
-}
+};
 
-function reposition(particle, xCoordinate, yCoordinate, tilt) {
+const reposition = (particle, xCoordinate, yCoordinate, tilt) => {
   particle.x = xCoordinate;
   particle.y = yCoordinate;
   particle.tilt = tilt;
-}
+};
 
-export default {
-  rain() {
-    if (raining) return;
+const confetti = {
+  rain: () => {
+    if (raining) {
+      return;
+    }
     raining = true;
-    canvas = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
     canvas.width = W = window.innerWidth;
     canvas.height = H = window.innerHeight;
     particles = [];
     for (let i = 0; i < mp; i++) {
       particles.push(new confettiParticle(particleColors.getColor()));
     }
-    (function animloop() {
+    (() => {
       requestAnimFrame(animloop);
       return draw();
     })();
-  }
+  },
 };
+export default confetti;

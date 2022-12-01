@@ -1,99 +1,108 @@
-import React from 'react'
+import React from 'react';
 import { useTranslate } from 'react-polyglot';
 import Collateral from './components/Collateral';
 import Psm from './components/Psm';
 import HistoricalDebtChart from './components/HistoricalDebtChart';
-import Pip from './components/Pip'
+import Pip from './components/Pip';
 import CollateralChart from './components/CollateralChart';
 import Clip from './components/Clip';
 import Vest from './components/Vest';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import { useLocation, useHistory } from "react-router-dom";
-
+import { useLocation, useHistory } from 'react-router-dom';
 
 const formatAmount = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2
-})
+  maximumFractionDigits: 2,
+});
 
 const formatNoDecimals = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
-})
+  maximumFractionDigits: 0,
+});
 
 const formatCurrency = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 4
-})
+  maximumFractionDigits: 4,
+});
 
 const formatTwoDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-})
+  maximumFractionDigits: 2,
+});
 
 const formatPercent = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-})
+  maximumFractionDigits: 2,
+});
 
 const formatFiveDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 5,
-  maximumFractionDigits: 5
-})
+  maximumFractionDigits: 5,
+});
 
 const formatSixDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 6,
-  maximumFractionDigits: 6
-})
+  maximumFractionDigits: 6,
+});
 
 const formatEightDp = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 8,
-  maximumFractionDigits: 8
-})
+  maximumFractionDigits: 8,
+});
 
 const Main = (props) => {
-  const t = useTranslate()
-  document.title = `${formatNoDecimals.format(props.debt)} - Dai Stats`
-  const sysCollat = props.sysLocked / props.debt
+  const t = useTranslate();
+  document.title = `${formatNoDecimals.format(props.debt)} - Dai Stats`;
+  const sysCollat = props.sysLocked / props.debt;
 
   const nextFlap = () =>
-    formatAmount.format(
-      (Number(props.surplusBuffer)
-        + Number(props.surplusBump))
-      - Number(props.sysSurplus)
-    )
+    formatAmount.format(Number(props.surplusBuffer) + Number(props.surplusBump) - Number(props.sysSurplus));
 
   // hack till Main component is broken into component per section
   const location = useLocation();
   const history = useHistory();
-  const indexToTab = ['/overview', '/collateral', '/oracles', '/auctions', '/ecosystem', '/addresses', '/vesting']
-  function tabNameToIndex() {
-    let i = indexToTab.indexOf(location.pathname)
-    return (i >= 0 ? i : 0)
-  }
-  const isMainnet = (process.env.REACT_APP_NETWORK === "mainnet")
+  const indexToTab = ['/overview', '/collateral', '/oracles', '/auctions', '/ecosystem', '/addresses', '/vesting'];
+  const tabNameToIndex = () => {
+    let i = indexToTab.indexOf(location.pathname);
+    return i >= 0 ? i : 0;
+  };
+  const isMainnet = process.env.REACT_APP_NETWORK === 'mainnet';
 
   return (
     <div>
       <div className="container">
-        <Tabs defaultIndex={tabNameToIndex()} onSelect={index => history.push(indexToTab[index])}>
+        <Tabs defaultIndex={tabNameToIndex()} onSelect={(index) => history.push(indexToTab[index])}>
           <TabList>
-            <Tab><p className="is-size-5">Overview</p></Tab>
-            <Tab><p className="is-size-5">Collateral</p></Tab>
-            <Tab><p className="is-size-5">Oracles</p></Tab>
-            <Tab><p className="is-size-5">Auctions</p></Tab>
-            <Tab><p className="is-size-5">Ecosystem</p></Tab>
-            <Tab><p className="is-size-5">Addresses</p></Tab>
-            <Tab><p className="is-size-5">Vesting</p></Tab>
+            <Tab>
+              <p className="is-size-5">Overview</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Collateral</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Oracles</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Auctions</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Ecosystem</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Addresses</p>
+            </Tab>
+            <Tab>
+              <p className="is-size-5">Vesting</p>
+            </Tab>
           </TabList>
 
           <TabPanel>
@@ -101,7 +110,12 @@ const Main = (props) => {
               <div className="column">
                 <div className="box has-text-centered">
                   <h3 className="title" title={props.debt}>
-                    {props.debt >= 420000000 && props.debt < 421000000 && <span role="img" aria-label="Tree">🌲</span>} {formatAmount.format(props.debt)} / {formatAmount.format(props.Line)}
+                    {props.debt >= 420000000 && props.debt < 421000000 && (
+                      <span role="img" aria-label="Tree">
+                        🌲
+                      </span>
+                    )}{' '}
+                    {formatAmount.format(props.debt)} / {formatAmount.format(props.Line)}
                   </h3>
                   <h4 className="subtitle is-size-3">{t('daistats.total_token', { token: 'Dai' })}</h4>
                   <HistoricalDebtChart data={props.historicalDebt} />
@@ -125,13 +139,17 @@ const Main = (props) => {
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.sysLocked}>${formatAmount.format(props.sysLocked)}</h3>
+                  <h3 className="title" title={props.sysLocked}>
+                    ${formatAmount.format(props.sysLocked)}
+                  </h3>
                   <h4 className="subtitle is-size-4">{t('daistats.total_locked')}</h4>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={sysCollat}>{formatPercent.format(sysCollat)}</h3>
+                  <h3 className="title" title={sysCollat}>
+                    {formatPercent.format(sysCollat)}
+                  </h3>
                   <h4 className="title subtitle is-size-4">{t('daistats.collat_ratio')}</h4>
                 </div>
               </div>
@@ -140,17 +158,30 @@ const Main = (props) => {
           <TabPanel>
             <Tabs>
               <TabList>
-                <Tab><p className="is-size-5">ERC-20</p></Tab>
-                <Tab><p className="is-size-5">ERC-20 LP</p></Tab>
-                <Tab><p className="is-size-5">Real World Assets</p></Tab>
-                <Tab><p className="is-size-5">Peg Stability Modules</p></Tab>
-                <Tab><p className="is-size-5">Direct Deposits</p></Tab>
-                <Tab><p className="is-size-5">Deprecated</p></Tab>
+                <Tab>
+                  <p className="is-size-5">ERC-20</p>
+                </Tab>
+                <Tab>
+                  <p className="is-size-5">ERC-20 LP</p>
+                </Tab>
+                <Tab>
+                  <p className="is-size-5">Real World Assets</p>
+                </Tab>
+                <Tab>
+                  <p className="is-size-5">Peg Stability Modules</p>
+                </Tab>
+                <Tab>
+                  <p className="is-size-5">Direct Deposits</p>
+                </Tab>
+                <Tab>
+                  <p className="is-size-5">Deprecated</p>
+                </Tab>
               </TabList>
 
               <TabPanel>
                 <Collateral {...props} ilk="ETH-A" supply={props.ethSupply} />
-                {(isMainnet) && (
+                <Collateral {...props} ilk="FAU-A" />
+                {isMainnet && (
                   <span>
                     <Collateral {...props} ilk="ETH-B" supply={props.ethSupply} />
                     <Collateral {...props} ilk="ETH-C" supply={props.ethSupply} />
@@ -171,7 +202,7 @@ const Main = (props) => {
                 )}
               </TabPanel>
               <TabPanel>
-                {(isMainnet) && (
+                {isMainnet && (
                   <span>
                     <Collateral {...props} ilk="UNIV2USDCETH-A" showLockedDecimals={true} />
                     <Collateral {...props} ilk="UNIV2DAIUSDC-A" showLockedDecimals={true} />
@@ -182,7 +213,7 @@ const Main = (props) => {
                 )}
               </TabPanel>
               <TabPanel>
-                {(isMainnet) && (
+                {isMainnet && (
                   <span>
                     <Collateral {...props} ilk="RWA001-A" />
                     <Collateral {...props} ilk="RWA002-A" />
@@ -196,7 +227,7 @@ const Main = (props) => {
                 )}
               </TabPanel>
               <TabPanel>
-                {(isMainnet) && (
+                {isMainnet && (
                   <span>
                     <Psm {...props} ilk="PSM-USDC-A" />
                     <Psm {...props} ilk="PSM-USDP-A" />
@@ -205,86 +236,121 @@ const Main = (props) => {
                 )}
               </TabPanel>
               <TabPanel>
-                <div className="columns">
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span>
-                          <h3 className="title" title={props.d3mAdaiTargetSupply}>{formatAmount.format(props.d3mAdaiTargetSupply)}</h3>
-                          <h4 className="title subtitle is-size-4">aDAI Target Supply</h4>
-                          <h6 className="subtitle is-size-6" title={props.d3mAdaiAdjustment}>Adjustment: {formatAmount.format(props.d3mAdaiAdjustment)}</h6>
-                        </span>
-                      )}
+                {isMainnet && (
+                  <div>
+                    <div className="columns">
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          <span>
+                            <h3 className="title" title={props.d3mAdaiTargetSupply}>
+                              {formatAmount.format(props.d3mAdaiTargetSupply)}
+                            </h3>
+                            <h4 className="title subtitle is-size-4">aDAI Target Supply</h4>
+                            <h6 className="subtitle is-size-6" title={props.d3mAdaiAdjustment}>
+                              Adjustment: {formatAmount.format(props.d3mAdaiAdjustment)}
+                            </h6>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          {isMainnet && (
+                            <span>
+                              <h3 className="title" title={props.d3mAdaiAvailableLiquidity}>
+                                {formatAmount.format(props.d3mAdaiAvailableLiquidity)}
+                              </h3>
+                              <h4 className="title subtitle is-size-4">Available Liquidity</h4>
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span>
-                          <h3 className="title" title={props.d3mAdaiAvailableLiquidity}>{formatAmount.format(props.d3mAdaiAvailableLiquidity)}</h3>
-                          <h4 className="title subtitle is-size-4">Available Liquidity</h4>
-                        </span>
-                      )}
+                    <div className="columns">
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          <h3 className="title" title={props.d3mAdaiTotalSupply}>
+                            {formatAmount.format(props.d3mAdaiTotalSupply)}
+                          </h3>
+                          {isMainnet && (
+                            <span>
+                              <h4 className="title subtitle is-size-4">aDAI Total Supply</h4>
+                              <h6 className="title subtitle is-size-6">
+                                Variable Debt: {formatAmount.format(props.d3mAdaiTotalSupplyVariable)}
+                              </h6>
+                              <h6 className="title subtitle is-size-6">
+                                Stable Debt: {formatAmount.format(props.d3mAdaiTotalSupplyFixed)}
+                              </h6>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          {isMainnet && (
+                            <span>
+                              <h3 className="title" title={props.d3mAdaiBar}>
+                                {formatPercent.format(props.d3mAdaiBar)}
+                              </h3>
+                              <h4 className="title subtitle is-size-4">aDAI Target Interest Rate</h4>
+                              <h6 className="title subtitle is-size-6" title={props.d3mAdaiFeesPending}>
+                                Fees Pending: {formatAmount.format(props.d3mAdaiFeesPending)}
+                              </h6>
+                              <h6 className="title subtitle is-size-6" title={props.d3mAdaiIncentive}>
+                                Incentive Balance: {formatAmount.format(props.d3mAdaiIncentive)} stkAAVE
+                              </h6>{' '}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="columns">
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      <h3 className="title" title={props.d3mAdaiTotalSupply}>{formatAmount.format(props.d3mAdaiTotalSupply)}</h3>
-                      {(isMainnet) && (
-                        <span>
-                          <h4 className="title subtitle is-size-4">aDAI Total Supply</h4>
-                          <h6 className="title subtitle is-size-6">Variable Debt: {formatAmount.format(props.d3mAdaiTotalSupplyVariable)}</h6>
-                          <h6 className="title subtitle is-size-6">Stable Debt: {formatAmount.format(props.d3mAdaiTotalSupplyFixed)}</h6>
-                        </span>
-                      )}
+                    <div className="columns">
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          {isMainnet && (
+                            <span>
+                              <h3 className="title" title={props.d3mAdaiDepositAPR}>
+                                {formatPercent.format(props.d3mAdaiDepositAPR)}
+                              </h3>
+                              <h4 className="title subtitle is-size-4">Deposit Rate (APR)</h4>{' '}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          {isMainnet && (
+                            <span>
+                              <h3 className="title" title={props.d3mAdaiVariableBorrowAPR}>
+                                {formatPercent.format(props.d3mAdaiVariableBorrowAPR)}
+                              </h3>
+                              <h4 className="title subtitle is-size-4">Variable Borrow Rate (APR)</h4>{' '}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="column">
+                        <div className="box has-text-centered">
+                          {isMainnet && (
+                            <span>
+                              <h3 className="title" title={props.d3mAdaiStableBorrowAPR}>
+                                {formatPercent.format(props.d3mAdaiStableBorrowAPR)}
+                              </h3>
+                              <h4 className="title subtitle is-size-4">Stable Borrow Rate (APR)</h4>{' '}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
+                    <span>
+                      <Collateral {...props} ilk="DIRECT-AAVEV2-DAI" />{' '}
+                    </span>
                   </div>
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span><h3 className="title" title={props.d3mAdaiBar}>{formatPercent.format(props.d3mAdaiBar)}</h3>
-                          <h4 className="title subtitle is-size-4">aDAI Target Interest Rate</h4>
-                          <h6 className="title subtitle is-size-6" title={props.d3mAdaiFeesPending}>Fees Pending: {formatAmount.format(props.d3mAdaiFeesPending)}</h6>
-                          <h6 className="title subtitle is-size-6" title={props.d3mAdaiIncentive}>Incentive Balance: {formatAmount.format(props.d3mAdaiIncentive)} stkAAVE</h6> </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="columns">
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span><h3 className="title" title={props.d3mAdaiDepositAPR}>{formatPercent.format(props.d3mAdaiDepositAPR)}</h3>
-                          <h4 className="title subtitle is-size-4">Deposit Rate (APR)</h4> </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span><h3 className="title" title={props.d3mAdaiVariableBorrowAPR}>{formatPercent.format(props.d3mAdaiVariableBorrowAPR)}</h3>
-                          <h4 className="title subtitle is-size-4">Variable Borrow Rate (APR)</h4> </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      {(isMainnet) && (
-                        <span><h3 className="title" title={props.d3mAdaiStableBorrowAPR}>{formatPercent.format(props.d3mAdaiStableBorrowAPR)}</h3>
-                          <h4 className="title subtitle is-size-4">Stable Borrow Rate (APR)</h4> </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {(isMainnet) && (
-                  <span><Collateral {...props} ilk="DIRECT-AAVEV2-DAI" /> </span>
                 )}
               </TabPanel>
               <TabPanel>
-                {(isMainnet) && (
-                  <span><Collateral {...props} ilk="AAVE-A" />
+                {isMainnet && (
+                  <span>
+                    <Collateral {...props} ilk="AAVE-A" />
                     <Collateral {...props} ilk="BAL-A" />
                     <Collateral {...props} ilk="BAT-A" />
                     <Collateral {...props} ilk="COMP-A" />
@@ -300,7 +366,8 @@ const Main = (props) => {
                     <Collateral {...props} ilk="UNIV2WBTCETH-A" showLockedDecimals={true} />
                     <Collateral {...props} ilk="USDC-B" />
                     <Collateral {...props} ilk="USDT-A" />
-                    <Collateral {...props} ilk="ZRX-A" /> </span>
+                    <Collateral {...props} ilk="ZRX-A" />{' '}
+                  </span>
                 )}
               </TabPanel>
             </Tabs>
@@ -308,95 +375,130 @@ const Main = (props) => {
           <TabPanel>
             <div className="columns">
               <Pip {...props} token="ETH" ilk="ETH-A" formater={formatTwoDp} />
-              {(isMainnet) && (
-                <span><Pip {...props} token="wstETH" ilk="WSTETH-A" formater={formatTwoDp} />
-                  <Pip {...props} token="BTC" ilk="WBTC-A" formater={formatTwoDp} /> </span>
+              <Pip {...props} token="FAU" ilk="FAU-A" formater={formatTwoDp} />
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="wstETH" ilk="WSTETH-A" formater={formatTwoDp} />
+                  <Pip {...props} token="BTC" ilk="WBTC-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="LINK" ilk="LINK-A" formater={formatTwoDp} />
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="LINK" ilk="LINK-A" formater={formatTwoDp} />
                   <Pip {...props} token="MANA" ilk="MANA-A" formater={formatCurrency} />
-                  <Pip {...props} token="MATIC" ilk="MATIC-A" formater={formatCurrency} /> </span>
+                  <Pip {...props} token="MATIC" ilk="MATIC-A" formater={formatCurrency} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="YFI" ilk="YFI-A" formater={formatTwoDp} />
-                  <Pip {...props} token="USDC, TUSD, USDP, GUSD, aDAI" ilk="USDC-A" formater={formatCurrency} /> </span>
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="YFI" ilk="YFI-A" formater={formatTwoDp} />
+                  <Pip {...props} token="USDC, TUSD, USDP, GUSD, aDAI" ilk="USDC-A" formater={formatCurrency} />{' '}
+                </span>
+              )}
+            </div>
+            <div className="columns"></div>
+            <div className="columns">
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="UniV2UsdcEth" ilk="UNIV2USDCETH-A" formater={formatNoDecimals} />
+                  <Pip {...props} token="UniV2DaiUsdc" ilk="UNIV2DAIUSDC-A" formater={formatNoDecimals} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-            </div>
-            <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="UniV2UsdcEth" ilk="UNIV2USDCETH-A" formater={formatNoDecimals} />
-                  <Pip {...props} token="UniV2DaiUsdc" ilk="UNIV2DAIUSDC-A" formater={formatNoDecimals} /> </span>
-              )}
-            </div>
-            <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="GUniV3DaiUsdc1" ilk="GUNIV3DAIUSDC1-A" formater={formatTwoDp} />
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="GUniV3DaiUsdc1" ilk="GUNIV3DAIUSDC1-A" formater={formatTwoDp} />
                   <Pip {...props} token="GUniV3DaiUsdc2" ilk="GUNIV3DAIUSDC2-A" formater={formatFiveDp} />
-                  <Pip {...props} token="CrvV1EthSteth" ilk="CRVV1ETHSTETH-A" formater={formatTwoDp} /> </span>
+                  <Pip {...props} token="CrvV1EthSteth" ilk="CRVV1ETHSTETH-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="RWA001" ilk="RWA001-A" formater={formatTwoDp} />
-                  <Pip {...props} token="RWA002" ilk="RWA002-A" formater={formatTwoDp} /> </span>
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="RWA001" ilk="RWA001-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA002" ilk="RWA002-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="RWA003" ilk="RWA003-A" formater={formatTwoDp} />
-                  <Pip {...props} token="RWA004" ilk="RWA004-A" formater={formatTwoDp} /> </span>
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="RWA003" ilk="RWA003-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA004" ilk="RWA004-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="RWA005" ilk="RWA005-A" formater={formatTwoDp} />
-                  <Pip {...props} token="RWA006" ilk="RWA006-A" formater={formatTwoDp} /> </span>
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="RWA005" ilk="RWA005-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA006" ilk="RWA006-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
             <div className="columns">
-              {(isMainnet) && (
-                <span><Pip {...props} token="RWA008" ilk="RWA008-A" formater={formatTwoDp} />
-                  <Pip {...props} token="RWA009" ilk="RWA009-A" formater={formatTwoDp} /> </span>
+              {isMainnet && (
+                <span>
+                  <Pip {...props} token="RWA008" ilk="RWA008-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA009" ilk="RWA009-A" formater={formatTwoDp} />{' '}
+                </span>
               )}
             </div>
 
-            {(isMainnet) && (
-              <span><div className="column">
-                <div className="box has-text-centered">
-                  <h3 className="title" title={props.mkrPrice}>${formatCurrency.format(props.mkrPrice)}</h3>
-                  <p className="title subtitle is-size-4">MKR Price</p>
-                </div>
-              </div> </span>
+            {isMainnet && (
+              <span>
+                <div className="column">
+                  <div className="box has-text-centered">
+                    <h3 className="title" title={props.mkrPrice}>
+                      ${formatCurrency.format(props.mkrPrice)}
+                    </h3>
+                    <p className="title subtitle is-size-4">MKR Price</p>
+                  </div>
+                </div>{' '}
+              </span>
             )}
-
           </TabPanel>
           <TabPanel>
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.flapKicks}>{formatAmount.format(props.flapKicks)}</h3>
+                  <h3 className="title" title={props.flapKicks}>
+                    {formatAmount.format(props.flapKicks)}
+                  </h3>
                   <p className="title subtitle is-size-4">{t('daistats.dai_surplus_auctions')}</p>
-                  <p className="subtitle is-size-6">{t('daistats.till_next_flap')}: {nextFlap()}</p>
-                  <p className="title subtitle is-size-6">Beg: {formatPercent.format(props.flapBeg - 1)} Ttl: {props.flapTtl / 60}m Tau: {props.flapTau / 60 / 60}h</p>
-                  <p className="title subtitle is-size-6" title={props.surplusBump}>{t('daistats.lot')}: {formatAmount.format(props.surplusBump)} Lid: {formatAmount.format(props.flapLid)}</p>
-                  <p className="title subtitle is-size-6" title={props.flapFill}>Fill: {formatAmount.format(props.flapFill)}</p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.till_next_flap')}: {nextFlap()}
+                  </p>
+                  <p className="title subtitle is-size-6">
+                    Beg: {formatPercent.format(props.flapBeg - 1)} Ttl: {props.flapTtl / 60}m Tau: {props.flapTau / 60 / 60}h
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.surplusBump}>
+                    {t('daistats.lot')}: {formatAmount.format(props.surplusBump)} Lid: {formatAmount.format(props.flapLid)}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.flapFill}>
+                    Fill: {formatAmount.format(props.flapFill)}
+                  </p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.cdps}>{props.cdps}</h3>
+                  <h3 className="title" title={props.cdps}>
+                    {props.cdps}
+                  </h3>
                   <p className="subtitle is-size-4">{t('daistats.vaults_opened')}</p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.mkrSupply}>{formatAmount.format(props.mkrSupply)}</h3>
+                  <h3 className="title" title={props.mkrSupply}>
+                    {formatAmount.format(props.mkrSupply)}
+                  </h3>
                   <p className="subtitle is-size-4">{t('daistats.token_supply', { token: 'MKR' })}</p>
                   <a href={`https://etherscan.io/address/${props.MCD_PAUSE_PROXY}`} target="_blank" rel="noopener noreferrer">
                     <p className="subtitle is-size-6" title={props.protocolTreasury}>
@@ -409,44 +511,83 @@ const Main = (props) => {
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.flopKicks}>{formatAmount.format(props.flopKicks)}</h3>
+                  <h3 className="title" title={props.flopKicks}>
+                    {formatAmount.format(props.flopKicks)}
+                  </h3>
                   <p className="title subtitle is-size-4">{t('daistats.debt_flop_auctions')}</p>
-                  <p className="title subtitle is-size-6">{t('daistats.initial_lot_size')}: {formatAmount.format(props.debtDump)} MKR</p>
-                  <p className="title subtitle is-size-6">{t('daistats.initial_price')}: ${formatAmount.format(props.debtSize / props.debtDump)}</p>
-                  <p className="title subtitle is-size-6">Beg: {formatPercent.format(props.flopBeg - 1)} Pad: {formatPercent.format(props.flopPad - 1)}</p>
-                  <p className="title subtitle is-size-6">Ttl: {props.flopTtl / 60}m Tau: {props.flopTau / 60 / 60}h</p>
+                  <p className="title subtitle is-size-6">
+                    {t('daistats.initial_lot_size')}: {formatAmount.format(props.debtDump)} MKR
+                  </p>
+                  <p className="title subtitle is-size-6">
+                    {t('daistats.initial_price')}: ${formatAmount.format(props.debtSize / props.debtDump)}
+                  </p>
+                  <p className="title subtitle is-size-6">
+                    Beg: {formatPercent.format(props.flopBeg - 1)} Pad: {formatPercent.format(props.flopPad - 1)}
+                  </p>
+                  <p className="title subtitle is-size-6">
+                    Ttl: {props.flopTtl / 60}m Tau: {props.flopTau / 60 / 60}h
+                  </p>
                   <p className="title subtitle is-size-6">Flop delay: {props.flopDelay / 60 / 60}h</p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={Math.min(props.vow_dai, props.sysDebt)}>{formatAmount.format(Math.min(props.vow_dai, props.sysDebt))}</h3>
+                  <h3 className="title" title={Math.min(props.vow_dai, props.sysDebt)}>
+                    {formatAmount.format(Math.min(props.vow_dai, props.sysDebt))}
+                  </h3>
                   <p className="title subtitle is-size-4">{t('daistats.debt_available_heal')}</p>
-                  <p className="title subtitle is-size-6">{t('daistats.debt_buffer')}: {formatAmount.format(props.debtSize)}</p>
+                  <p className="title subtitle is-size-6">
+                    {t('daistats.debt_buffer')}: {formatAmount.format(props.debtSize)}
+                  </p>
                   {/*<p className="title subtitle is-size-6" title={props.vice}>Total Unbacked Dai (vice): {formatAmount.format(props.vice)}</p>*/}
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.sysSurplus}>{formatAmount.format(props.sysSurplus)}</h3>
+                  <h3 className="title" title={props.sysSurplus}>
+                    {formatAmount.format(props.sysSurplus)}
+                  </h3>
                   <p className="title subtitle is-size-4">{t('daistats.system_surplus')}</p>
-                  <p className="title subtitle is-size-6" title={props.surplusBuffer}>{t('daistats.surplus_buffer')}: {formatAmount.format(props.surplusBuffer)}</p>
+                  <p className="title subtitle is-size-6" title={props.surplusBuffer}>
+                    {t('daistats.surplus_buffer')}: {formatAmount.format(props.surplusBuffer)}
+                  </p>
                   <p className="title subtitle is-size-4">Hump Lerp</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpStart}>Start: {formatNoDecimals.format(props.lerpHumpStart)}</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpCurrent}>Value: {formatNoDecimals.format(props.lerpHumpCurrent)}</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpEnd}>End: {formatNoDecimals.format(props.lerpHumpEnd)}</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpStartTime}>Start Date: {props.lerpHumpStartTime}</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpDuration}>Duration: {formatAmount.format(props.lerpHumpDuration / 86400)} Days</p>
-                  <p className="title subtitle is-size-6" title={props.lerpHumpAdjustment}>Pending Change: {formatNoDecimals.format(props.lerpHumpAdjustment)}</p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpStart}>
+                    Start: {formatNoDecimals.format(props.lerpHumpStart)}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpCurrent}>
+                    Value: {formatNoDecimals.format(props.lerpHumpCurrent)}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpEnd}>
+                    End: {formatNoDecimals.format(props.lerpHumpEnd)}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpStartTime}>
+                    Start Date: {props.lerpHumpStartTime}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpDuration}>
+                    Duration: {formatAmount.format(props.lerpHumpDuration / 86400)} Days
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.lerpHumpAdjustment}>
+                    Pending Change: {formatNoDecimals.format(props.lerpHumpAdjustment)}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.dirt}>{formatAmount.format(props.dirt)}</h3>
-                  <p className="title subtitle is-size-4" title="Aggregate Dai collection target of all active auctions across all collateral types">{/*t('daistats.Dirt')*/}Total Unbacked Dai including Penalties (Dirt)</p>
-                  <p className="subtitle is-size-6" title={props.hole}>{/*t('daistats.Hole')*/}Global Limit (Hole) {formatAmount.format(props.hole)}</p>
+                  <h3 className="title" title={props.dirt}>
+                    {formatAmount.format(props.dirt)}
+                  </h3>
+                  <p
+                    className="title subtitle is-size-4"
+                    title="Aggregate Dai collection target of all active auctions across all collateral types"
+                  >
+                    {/*t('daistats.Dirt')*/}Total Unbacked Dai including Penalties (Dirt)
+                  </p>
+                  <p className="subtitle is-size-6" title={props.hole}>
+                    {/*t('daistats.Hole')*/}Global Limit (Hole) {formatAmount.format(props.hole)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -456,8 +597,10 @@ const Main = (props) => {
                   <Clip heading={true} />
                   <tbody>
                     <Clip {...props} token="ETH-A" ilk="ETH-A" />
-                    {(isMainnet) && (
-                      <span><Clip {...props} token="ETH-B" ilk="ETH-B" />
+                    <Clip {...props} token="FAU-A" ilk="FAU-A" />
+                    {isMainnet && (
+                      <span>
+                        <Clip {...props} token="ETH-B" ilk="ETH-B" />
                         <Clip {...props} token="ETH-C" ilk="ETH-C" />
                         <Clip {...props} token="WSTETH-A" ilk="WSTETH-A" />
                         <Clip {...props} token="WSTETH-B" ilk="WSTETH-B" />
@@ -497,7 +640,8 @@ const Main = (props) => {
                         <Clip {...props} token="PSM-USDC-A" ilk="PSM-USDC-A" />
                         <Clip {...props} token="PSM-USDP-A" ilk="PSM-USDP-A" />
                         <Clip {...props} token="PSM-GUSD-A" ilk="PSM-GUSD-A" />
-                        <Clip {...props} token="DIRECT-AAVEV2-DAI" ilk="DIRECT-AAVEV2-DAI" /> </span>
+                        <Clip {...props} token="DIRECT-AAVEV2-DAI" ilk="DIRECT-AAVEV2-DAI" />{' '}
+                      </span>
                     )}
                   </tbody>
                 </table>
@@ -508,25 +652,39 @@ const Main = (props) => {
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.pauseDelay}>{props.pauseDelay / 60 / 60}h</h3>
+                  <h3 className="title" title={props.pauseDelay}>
+                    {props.pauseDelay / 60 / 60}h
+                  </h3>
                   <p className="title subtitle is-size-4">{/*t('daistats.gsm_pause_delay')*/}GSM Pause Delay</p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.flashLine}>{formatAmount.format(props.flashLine)}</h3>
+                  <h3 className="title" title={props.flashLine}>
+                    {formatAmount.format(props.flashLine)}
+                  </h3>
                   <p className="title subtitle is-size-4">{/*t('daistats.flash_loan_limit')*/}Dai Flash Loan Limit</p>
                   <p className="subtitle is-size-6">{/*t('daistats.fee')}*/}Fee: 0.00%</p>
-                  <p className="title subtitle is-size-6" title={props.flashLegacyLine}>Legacy Limit: {formatAmount.format(props.flashLegacyLine)}</p>
-                  <p className="title subtitle is-size-6">{/*t('daistats.fee')}*/}Legacy Fee: {formatPercent.format(props.flashLegacyToll)}</p>
+                  <p className="title subtitle is-size-6" title={props.flashLegacyLine}>
+                    Legacy Limit: {formatAmount.format(props.flashLegacyLine)}
+                  </p>
+                  <p className="title subtitle is-size-6">
+                    {/*t('daistats.fee')}*/}Legacy Fee: {formatPercent.format(props.flashLegacyToll)}
+                  </p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.esmMin}>{formatAmount.format(props.esmMin)}</h3>
+                  <h3 className="title" title={props.esmMin}>
+                    {formatAmount.format(props.esmMin)}
+                  </h3>
                   <p className="title subtitle is-size-4">{/*t('daistats.esm_threshold')*/}ESM Threshold</p>
-                  <p className="subtitle is-size-6" title={props.esmSum}>{/*t('daistats.total_MKR_burned')}*/}Total MKR Burned: {formatSixDp.format(props.esmSum)}</p>
-                  <p className="title subtitle is-size-6" title={props.endWait}>{/*t('daistats.end_wait')}*/}ESM Delay: {props.endWait / 60 / 60}h</p>
+                  <p className="subtitle is-size-6" title={props.esmSum}>
+                    {/*t('daistats.total_MKR_burned')}*/}Total MKR Burned: {formatSixDp.format(props.esmSum)}
+                  </p>
+                  <p className="title subtitle is-size-6" title={props.endWait}>
+                    {/*t('daistats.end_wait')}*/}ESM Delay: {props.endWait / 60 / 60}h
+                  </p>
                 </div>
               </div>
             </div>
@@ -536,285 +694,402 @@ const Main = (props) => {
                   <h3 className="title" title={props.daiSupply}>
                     {formatAmount.format(props.daiSupply)}
                   </h3>
-                  <p className="subtitle is-size-4">{
-                    t('daistats.token_supply', { token: 'Dai (ERC20)' })} ({formatAmount.format(props.daiSupply / props.debt * 100)}%)
+                  <p className="subtitle is-size-4">
+                    {t('daistats.token_supply', { token: 'Dai (ERC20)' })} (
+                    {formatAmount.format((props.daiSupply / props.debt) * 100)}%)
                   </p>
                 </div>
               </div>
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.savingsDai}>{formatAmount.format(props.savingsDai)}</h3>
-                  <p className="title subtitle is-size-4">{t('daistats.dai_in_dsr')}
-                    ({formatAmount.format(props.savingsDai / props.debt * 100)}%)</p>
-                  <p className="subtitle is-size-6">({t('daistats.pie_in_dsr')}: {formatAmount.format(props.savingsPie)})</p>
+                  <h3 className="title" title={props.savingsDai}>
+                    {formatAmount.format(props.savingsDai)}
+                  </h3>
+                  <p className="title subtitle is-size-4">
+                    {t('daistats.dai_in_dsr')}({formatAmount.format((props.savingsDai / props.debt) * 100)}%)
+                  </p>
+                  <p className="subtitle is-size-6">
+                    ({t('daistats.pie_in_dsr')}: {formatAmount.format(props.savingsPie)})
+                  </p>
                 </div>
               </div>
 
               <div className="column">
                 <div className="box has-text-centered">
-                  <h3 className="title" title={props.potFee}>{formatPercent.format(props.potFee)}</h3>
+                  <h3 className="title" title={props.potFee}>
+                    {formatPercent.format(props.potFee)}
+                  </h3>
                   <p className="title subtitle is-size-4">{t('daistats.dai_savings_rate')}</p>
-                  <p className="subtitle is-size-6">{t('daistats.last_drip')}: {props.potDrip}</p>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <h3 className="title" title={props.optimisticDaiSupply}>{formatAmount.format(props.optimisticDaiSupply)}</h3>
-                  <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Optimism' })}</p>
-                  <p className="title subtitle is-size-6">
-                    <a href="https://gateway.optimism.io/" target="_blank" rel="noopener noreferrer">
-                      Optimism Gateway
-                    </a>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.last_drip')}: {props.potDrip}
                   </p>
-                  {(isMainnet) && (
-                    <span>
-                      <p className="subtitle is-size-6">{t('daistats.token_in_dex', { token: 'ETH', dex: 'Optimism' })}: {formatAmount.format(props.optimisticEthSupply)}</p> </span>
-                  )}
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.starknetDaiSupply}>{formatAmount.format(props.starknetDaiSupply)}</h3>
-                      <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Starknet' })}</p> </span>
-                  )}
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.balancerV2Dai}>{formatAmount.format(props.balancerV2Dai)}</h3>
-                      <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Balancer V2' })}</p> </span>
-                  )}
                 </div>
               </div>
             </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.chaiSupply}>{formatAmount.format(props.chaiSupply)}</h3>
-                      <p className="title subtitle is-size-4">{t('daistats.token_supply', { token: 'Chai' })} <span role="img" aria-label="chai">🍵</span></p>
-                      <p className="subtitle is-size-6">({t('daistats.dai_brewing')}: {formatAmount.format(props.daiBrewing)})</p> </span>
-                  )}
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.oasisDexDai}>{formatAmount.format(props.oasisDexDai)}</h3>
-                      <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Oasis Dex' })}</p> </span>
-                  )}
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.uniswapDai}>{formatAmount.format(props.uniswapDai)}</h3>
-                      <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Uniswap V2 (Dai/ETH)' })}</p> </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  {(isMainnet) && (
-                    <span><h3 className="title" title={props.bkrSupply}>{formatAmount.format(props.bkrSupply)}</h3>
-                      <p className="title subtitle is-size-4">
-                        <a href={`https://etherscan.io/token/${props.BKR}`} target="_blank" rel="noopener noreferrer">
-                          {t('daistats.token_supply', { token: 'Breaker (BKR)' })}
+            {isMainnet && (
+              <div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <h3 className="title" title={props.optimisticDaiSupply}>
+                        {formatAmount.format(props.optimisticDaiSupply)}
+                      </h3>
+                      <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Optimism' })}</p>
+                      <p className="title subtitle is-size-6">
+                        <a href="https://gateway.optimism.io/" target="_blank" rel="noopener noreferrer">
+                          Optimism Gateway
                         </a>
                       </p>
-                      <p className="title subtitle is-size-6" title={props.mkrBroken}>MKR Broken: {formatEightDp.format(props.mkrBroken)}</p>
-                      <p className="title subtitle is-size-6">
-                        <a href="https://makerbreak.io/" target="_blank" rel="noopener noreferrer">Convert MKR to BKR with Makerbreak.io</a>
-                      </p> </span>
-                  )}
+                      <span>
+                        <p className="subtitle is-size-6">
+                          {t('daistats.token_in_dex', { token: 'ETH', dex: 'Optimism' })}:{' '}
+                          {formatAmount.format(props.optimisticEthSupply)}
+                        </p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.starknetDaiSupply}>
+                          {formatAmount.format(props.starknetDaiSupply)}
+                        </h3>
+                        <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Starknet' })}</p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.balancerV2Dai}>
+                          {formatAmount.format(props.balancerV2Dai)}
+                        </h3>
+                        <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Balancer V2' })}</p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.chaiSupply}>
+                          {formatAmount.format(props.chaiSupply)}
+                        </h3>
+                        <p className="title subtitle is-size-4">
+                          {t('daistats.token_supply', { token: 'Chai' })}{' '}
+                          <span role="img" aria-label="chai">
+                            🍵
+                          </span>
+                        </p>
+                        <p className="subtitle is-size-6">
+                          ({t('daistats.dai_brewing')}: {formatAmount.format(props.daiBrewing)})
+                        </p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.oasisDexDai}>
+                          {formatAmount.format(props.oasisDexDai)}
+                        </h3>
+                        <p className="subtitle is-size-4">{t('daistats.token_in_dex', { token: 'Dai', dex: 'Oasis Dex' })}</p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.uniswapDai}>
+                          {formatAmount.format(props.uniswapDai)}
+                        </h3>
+                        <p className="subtitle is-size-4">
+                          {t('daistats.token_in_dex', { token: 'Dai', dex: 'Uniswap V2 (Dai/ETH)' })}
+                        </p>{' '}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <span>
+                        <h3 className="title" title={props.bkrSupply}>
+                          {formatAmount.format(props.bkrSupply)}
+                        </h3>
+                        <p className="title subtitle is-size-4">
+                          <a href={`https://etherscan.io/token/${props.BKR}`} target="_blank" rel="noopener noreferrer">
+                            {t('daistats.token_supply', { token: 'Breaker (BKR)' })}
+                          </a>
+                        </p>
+                        <p className="title subtitle is-size-6" title={props.mkrBroken}>
+                          MKR Broken: {formatEightDp.format(props.mkrBroken)}
+                        </p>
+                        <p className="title subtitle is-size-6">
+                          <a href="https://makerbreak.io/" target="_blank" rel="noopener noreferrer">
+                            Convert MKR to BKR with Makerbreak.io
+                          </a>
+                        </p>{' '}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </TabPanel>
           <TabPanel>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.GOV_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> GovAlpha</h3>
-                    <p className="subtitle is-size-7">{props.GOV_MULTISIG}</p>
-                  </a>
-                  <a href={`https://etherscan.io/address/${props.GOV_MULTISIG_2}`} target="_blank" rel="noopener noreferrer">
-                    <p className="subtitle is-size-7">{props.GOV_MULTISIG_2}</p>
-                  </a>
+            {isMainnet && (
+              <div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.GOV_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> GovAlpha
+                        </h3>
+                        <p className="subtitle is-size-7">{props.GOV_MULTISIG}</p>
+                      </a>
+                      <a
+                        href={`https://etherscan.io/address/${props.GOV_MULTISIG_2}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p className="subtitle is-size-7">{props.GOV_MULTISIG_2}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.RISK_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Risk Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RISK_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.GRO_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Growth Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.GRO_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.IN_WALLET}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Data Insights Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.IN_WALLET}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.COM_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Governance Communications Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.COM_MULTISIG}</p>
+                      </a>
+                      <a
+                        href={`https://etherscan.io/address/${props.COM_ER_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p className="subtitle is-size-7">{props.COM_ER_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.RWF_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Real World Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWF_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.CP_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Content Production Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.CP_MULTISIG}</p>
+                      </a>
+                      <a href={`https://etherscan.io/address/${props.CP_MULTISIG_2}`} target="_blank" rel="noopener noreferrer">
+                        <p className="subtitle is-size-7">{props.CP_MULTISIG_2}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.SES_AUDITORS_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Sustainable Ecosystem Scaling Core Unit (SES)
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SES_AUDITORS_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> SES Permanent Team
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SES_PERMANENT_TEAM_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> SES Incubation Program
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SES_INCUBATION_PROGRAM_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> SES Grants Program
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SES_GRANTS_PROGRAM_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.SNE_WALLET}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> StarkNet Engineering Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SNE_WALLET}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.SH_WALLET}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Strategic Happiness Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.SH_WALLET}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.PE_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Protocol Engineering Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.PE_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.ORA_MULTISIG}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Oracle Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.ORA_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.ORA_ER_MULTISIG}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Oracle Emergency Fund
+                        </h3>
+                        <p className="subtitle is-size-7">{props.ORA_ER_MULTISIG}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/address/${props.DAIF_WALLET}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Dai Foundation Core Unit
+                        </h3>
+                        <p className="subtitle is-size-7">{props.DAIF_WALLET}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://etherscan.io/address/${props.DAIF_EF_WALLET}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Dai Foundation Emergency Fund
+                        </h3>
+                        <p className="subtitle is-size-7">{props.DAIF_EF_WALLET}</p>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.RISK_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Risk Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.RISK_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.GRO_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Growth Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.GRO_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.IN_WALLET}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Data Insights Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.IN_WALLET}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.COM_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Governance Communications Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.COM_MULTISIG}</p>
-                  </a>
-                  <a href={`https://etherscan.io/address/${props.COM_ER_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <p className="subtitle is-size-7">{props.COM_ER_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.RWF_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Real World Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.RWF_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.CP_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Content Production Unit</h3>
-                    <p className="subtitle is-size-7">{props.CP_MULTISIG}</p>
-                  </a>
-                  <a href={`https://etherscan.io/address/${props.CP_MULTISIG_2}`} target="_blank" rel="noopener noreferrer">
-                    <p className="subtitle is-size-7">{props.CP_MULTISIG_2}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SES_AUDITORS_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Sustainable Ecosystem Scaling Core Unit (SES)</h3>
-                    <p className="subtitle is-size-7">{props.SES_AUDITORS_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> SES Permanent Team</h3>
-                    <p className="subtitle is-size-7">{props.SES_PERMANENT_TEAM_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> SES Incubation Program</h3>
-                    <p className="subtitle is-size-7">{props.SES_INCUBATION_PROGRAM_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SES_PERMANENT_TEAM_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> SES Grants Program</h3>
-                    <p className="subtitle is-size-7">{props.SES_GRANTS_PROGRAM_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SNE_WALLET}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> StarkNet Engineering Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.SNE_WALLET}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.SH_WALLET}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Strategic Happiness Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.SH_WALLET}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.PE_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Protocol Engineering Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.PE_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.ORA_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Oracle Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.ORA_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.ORA_ER_MULTISIG}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Oracle Emergency Fund</h3>
-                    <p className="subtitle is-size-7">{props.ORA_ER_MULTISIG}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.DAIF_WALLET}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Dai Foundation Core Unit</h3>
-                    <p className="subtitle is-size-7">{props.DAIF_WALLET}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/address/${props.DAIF_EF_WALLET}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Dai Foundation Emergency Fund</h3>
-                    <p className="subtitle is-size-7">{props.DAIF_EF_WALLET}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
+            )}
             <hr />
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
                   <a href={`https://etherscan.io/address/${props.hat}#code`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Hat</h3>
+                    <h3 className="title">
+                      <i className="fal fa-file-code"></i> Hat
+                    </h3>
                     <p className="subtitle is-size-7">{props.hat}</p>
                   </a>
                 </div>
@@ -824,7 +1099,11 @@ const Main = (props) => {
             <div className="columns">
               <div className="column">
                 <div className="box has-text-centered">
-                  <a href="https://tokenlists.org/token-list?url=https://daistats.com/makerdao.tokenlist.json" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://tokenlists.org/token-list?url=https://daistats.com/makerdao.tokenlist.json"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <h3 className="title">MakerDAO Tokenlist v0.7.1</h3>
                   </a>
                   <a href="/makerdao.tokenlist.json" target="_blank" rel="noopener noreferrer">
@@ -846,7 +1125,9 @@ const Main = (props) => {
               <div className="column">
                 <div className="box has-text-centered">
                   <a href={`https://etherscan.io/token/${props.MCD_DAI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Dai</h3>
+                    <h3 className="title">
+                      <i className="fal fa-file-code"></i> Dai
+                    </h3>
                     <p className="subtitle is-size-7">{props.MCD_DAI}</p>
                   </a>
                 </div>
@@ -854,373 +1135,476 @@ const Main = (props) => {
               <div className="column">
                 <div className="box has-text-centered">
                   <a href={`https://etherscan.io/token/${props.MCD_GOV}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> MKR</h3>
+                    <h3 className="title">
+                      <i className="fal fa-file-code"></i> MKR
+                    </h3>
                     <p className="subtitle is-size-7">{props.MCD_GOV}</p>
                   </a>
                 </div>
               </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.BAT}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> BAT</h3>
-                    <p className="subtitle is-size-7">{props.BAT}</p>
-                  </a>
+              {isMainnet && (
+                <div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.BAT}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> BAT
+                        </h3>
+                        <p className="subtitle is-size-7">{props.BAT}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.USDC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> USDC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.USDC}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.WBTC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> WBTC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.WBTC}</p>
+                      </a>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.USDC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> USDC</h3>
-                    <p className="subtitle is-size-7">{props.USDC}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.WBTC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> WBTC</h3>
-                    <p className="subtitle is-size-7">{props.WBTC}</p>
-                  </a>
-                </div>
-              </div>
+              )}
             </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.AAVE}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> AAVE</h3>
-                    <p className="subtitle is-size-7">{props.AAVE}</p>
-                  </a>
+
+            {isMainnet && (
+              <div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.AAVE}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> AAVE
+                        </h3>
+                        <p className="subtitle is-size-7">{props.AAVE}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.TUSD}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> TUSD
+                        </h3>
+                        <p className="subtitle is-size-7">{props.TUSD}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.KNC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> KNC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.KNC}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.ZRX}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> ZRX
+                        </h3>
+                        <p className="subtitle is-size-7">{props.ZRX}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RENBTC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> renBTC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RENBTC}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.MANA}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> MANA
+                        </h3>
+                        <p className="subtitle is-size-7">{props.MANA}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.PAXUSD}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> USDP
+                        </h3>
+                        <p className="subtitle is-size-7">{props.PAXUSD}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.USDT}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> USDT
+                        </h3>
+                        <p className="subtitle is-size-7">{props.USDT}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.COMP}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> COMP
+                        </h3>
+                        <p className="subtitle is-size-7">{props.COMP}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.LRC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> LRC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.LRC}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.LINK}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> LINK
+                        </h3>
+                        <p className="subtitle is-size-7">{props.LINK}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.BAL}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> BAL
+                        </h3>
+                        <p className="subtitle is-size-7">{props.BAL}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.YFI}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> YFI
+                        </h3>
+                        <p className="subtitle is-size-7">{props.YFI}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.GUSD}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> GUSD
+                        </h3>
+                        <p className="subtitle is-size-7">{props.GUSD}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNI}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UNI
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNI}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.MATIC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> MATIC
+                        </h3>
+                        <p className="subtitle is-size-7">{props.MATIC}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.ADAI}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> ADAI
+                        </h3>
+                        <p className="subtitle is-size-7">{props.ADAI}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2DAIETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2DaiEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2DAIETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2WBTCETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2WbtcEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2WBTCETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2USDCETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2UsdcEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2USDCETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2DAIUSDC}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2DaiUsdc
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2DAIUSDC}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2LINKETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2LinkEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2LINKETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2UNIETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2UniEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2UNIETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2WBTCDAI}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2WbtcDai
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2WBTCDAI}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.UNIV2AAVEETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> UniV2AaveEth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.UNIV2AAVEETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.GUNIV3DAIUSDC1}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> GUniV3DaiUsdc1
+                        </h3>
+                        <p className="subtitle is-size-7">{props.GUNIV3DAIUSDC1}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.GUNIV3DAIUSDC2}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> GUniV3DaiUsdc2
+                        </h3>
+                        <p className="subtitle is-size-7">{props.GUNIV3DAIUSDC2}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA001}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA001
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA001}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA002}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA002
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA002}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA003}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA003
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA003}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA004}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA004
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA004}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA005}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA005
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA005}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA006}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA006
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA006}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.WSTETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> WSTETH
+                        </h3>
+                        <p className="subtitle is-size-7">{props.WSTETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.CRVV1ETHSTETH}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> CrvV1EthSteth
+                        </h3>
+                        <p className="subtitle is-size-7">{props.CRVV1ETHSTETH}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA008}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA008
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA008}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a href={`https://etherscan.io/token/${props.RWA009}`} target="_blank" rel="noopener noreferrer">
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> RWA009
+                        </h3>
+                        <p className="subtitle is-size-7">{props.RWA009}</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <div className="columns">
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://optimistic.etherscan.io/token/${props.OPTIMISTIC_DAI}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Optimistic Dai
+                        </h3>
+                        <p className="subtitle is-size-7">{props.OPTIMISTIC_DAI}</p>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="box has-text-centered">
+                      <a
+                        href={`https://optimistic.etherscan.io/token/${props.OPTIMISTIC_MKR}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="title">
+                          <i className="fal fa-file-code"></i> Optimistic MKR
+                        </h3>
+                        <p className="subtitle is-size-7">{props.OPTIMISTIC_MKR}</p>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.TUSD}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> TUSD</h3>
-                    <p className="subtitle is-size-7">{props.TUSD}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.KNC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> KNC</h3>
-                    <p className="subtitle is-size-7">{props.KNC}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.ZRX}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> ZRX</h3>
-                    <p className="subtitle is-size-7">{props.ZRX}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RENBTC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> renBTC</h3>
-                    <p className="subtitle is-size-7">{props.RENBTC}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.MANA}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> MANA</h3>
-                    <p className="subtitle is-size-7">{props.MANA}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.PAXUSD}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> USDP</h3>
-                    <p className="subtitle is-size-7">{props.PAXUSD}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.USDT}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> USDT</h3>
-                    <p className="subtitle is-size-7">{props.USDT}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.COMP}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> COMP</h3>
-                    <p className="subtitle is-size-7">{props.COMP}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.LRC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> LRC</h3>
-                    <p className="subtitle is-size-7">{props.LRC}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.LINK}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> LINK</h3>
-                    <p className="subtitle is-size-7">{props.LINK}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.BAL}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> BAL</h3>
-                    <p className="subtitle is-size-7">{props.BAL}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.YFI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> YFI</h3>
-                    <p className="subtitle is-size-7">{props.YFI}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.GUSD}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> GUSD</h3>
-                    <p className="subtitle is-size-7">{props.GUSD}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UNI</h3>
-                    <p className="subtitle is-size-7">{props.UNI}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.MATIC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> MATIC</h3>
-                    <p className="subtitle is-size-7">{props.MATIC}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.ADAI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> ADAI</h3>
-                    <p className="subtitle is-size-7">{props.ADAI}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2DAIETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2DaiEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2DAIETH}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2WBTCETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2WbtcEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2WBTCETH}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2USDCETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2UsdcEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2USDCETH}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2DAIUSDC}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2DaiUsdc</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2DAIUSDC}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2LINKETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2LinkEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2LINKETH}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2UNIETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2UniEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2UNIETH}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2WBTCDAI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2WbtcDai</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2WBTCDAI}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.UNIV2AAVEETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> UniV2AaveEth</h3>
-                    <p className="subtitle is-size-7">{props.UNIV2AAVEETH}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.GUNIV3DAIUSDC1}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> GUniV3DaiUsdc1</h3>
-                    <p className="subtitle is-size-7">{props.GUNIV3DAIUSDC1}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.GUNIV3DAIUSDC2}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> GUniV3DaiUsdc2</h3>
-                    <p className="subtitle is-size-7">{props.GUNIV3DAIUSDC2}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA001}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA001</h3>
-                    <p className="subtitle is-size-7">{props.RWA001}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA002}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA002</h3>
-                    <p className="subtitle is-size-7">{props.RWA002}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA003}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA003</h3>
-                    <p className="subtitle is-size-7">{props.RWA003}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA004}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA004</h3>
-                    <p className="subtitle is-size-7">{props.RWA004}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA005}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA005</h3>
-                    <p className="subtitle is-size-7">{props.RWA005}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA006}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA006</h3>
-                    <p className="subtitle is-size-7">{props.RWA006}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.WSTETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> WSTETH</h3>
-                    <p className="subtitle is-size-7">{props.WSTETH}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.CRVV1ETHSTETH}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> CrvV1EthSteth</h3>
-                    <p className="subtitle is-size-7">{props.CRVV1ETHSTETH}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA008}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA008</h3>
-                    <p className="subtitle is-size-7">{props.RWA008}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://etherscan.io/token/${props.RWA009}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> RWA009</h3>
-                    <p className="subtitle is-size-7">{props.RWA009}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <hr />
-            <div className="columns">
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://optimistic.etherscan.io/token/${props.OPTIMISTIC_DAI}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Optimistic Dai</h3>
-                    <p className="subtitle is-size-7">{props.OPTIMISTIC_DAI}</p>
-                  </a>
-                </div>
-              </div>
-              <div className="column">
-                <div className="box has-text-centered">
-                  <a href={`https://optimistic.etherscan.io/token/${props.OPTIMISTIC_MKR}`} target="_blank" rel="noopener noreferrer">
-                    <h3 className="title"><i className="fal fa-file-code"></i> Optimistic MKR</h3>
-                    <p className="subtitle is-size-7">{props.OPTIMISTIC_MKR}</p>
-                  </a>
-                </div>
-              </div>
-            </div>
+            )}
           </TabPanel>
           <TabPanel>
             <div className="columns">
@@ -1230,11 +1614,12 @@ const Main = (props) => {
                   <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
                     <Vest heading={true} />
                     <tbody>
-                      {props.vestingDaiLegacy && props.vestingDaiLegacy.map((award, idx) => (
-                        <Vest key={award.usr + award.bgn} award={award} />
-                      ))}
-                      <tr><td colspan="10">&nbsp;</td></tr>
-                      {props.vestingDai.map((award, idx) => (
+                      {props.vestingDaiLegacy &&
+                        props.vestingDaiLegacy.map((award) => <Vest key={award.usr + award.bgn} award={award} />)}
+                      <tr>
+                        <td colSpan="10">&nbsp;</td>
+                      </tr>
+                      {props.vestingDai.map((award) => (
                         <Vest key={award.usr + award.bgn} award={award} />
                       ))}
                     </tbody>
@@ -1249,7 +1634,7 @@ const Main = (props) => {
                   <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
                     <Vest heading={true} />
                     <tbody>
-                      {props.vestingMkrTreasury.map((award, idx) => (
+                      {props.vestingMkrTreasury.map((award) => (
                         <Vest key={award.usr + award.bgn} award={award} />
                       ))}
                     </tbody>
@@ -1261,7 +1646,7 @@ const Main = (props) => {
         </Tabs>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Main
+export default Main;

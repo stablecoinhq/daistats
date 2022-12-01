@@ -1,30 +1,33 @@
-import React from 'react'
+import React from 'react';
 
 const formatAmount = new Intl.NumberFormat('en-US', {
   style: 'decimal',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2
-})
+  maximumFractionDigits: 2,
+});
 
 const Dai = (props) => {
-  document.title = `Total Supply of Dai - Dai Stats`
-  const {debt, vice, daiSupply, savingsDai, vow_dai, vow_sin, bigSin} = props
+  document.title = `Total Supply of Dai - Dai Stats`;
+  const { debt, vice, daiSupply, savingsDai, vow_dai, vow_sin, bigSin } = props;
   return (
     <div>
       <section className="section">
         <div className="container">
-        <div className="columns">
+          <div className="columns">
             <div className="column">
               <div className="box">
-                <p>This page is dynamic and queries the Maker Protocol each Ethereum block. You can pause it at any time using the link at the top of the page.</p>
+                <p>
+                  This page is dynamic and queries the Maker Protocol each Ethereum block. You can pause it at any time using
+                  the link at the top of the page.
+                </p>
                 <h1 className="is-size-1">So how much Dai is there?</h1>
                 <p>There is {formatAmount.format(debt)} Dai</p>
-                <p>More specifically, there's {debt} Dai in the Vat (the MCD Vault database)</p>
+                <p>More specifically, there&apos;s {debt} Dai in the Vat (the MCD Vault database)</p>
                 <h2 className="is-size-2">But wait!</h2>
                 <p>There is only {formatAmount.format(daiSupply)} ERC20 Dai, you might say</p>
-                <p>Yes! There's actually {daiSupply} ERC20 Dai</p>
+                <p>Yes! There&apos;s actually {daiSupply} ERC20 Dai</p>
                 <h2 className="is-size-2">What about the DSR?</h2>
-                <p>There's {formatAmount.format(savingsDai)} Dai locked up in DSR</p>
+                <p>There&apos;s {formatAmount.format(savingsDai)} Dai locked up in DSR</p>
                 <p>And more exactly, {savingsDai} Dai</p>
                 <h2 className="is-size-2">Is ERC20 Dai + DSR Dai = Total Supply of Dai?</h2>
                 <p>Nope! </p>
@@ -44,7 +47,9 @@ const Dai = (props) => {
           <div className="columns">
             <div className="column">
               <div className="box has-text-centered">
-                <h3 className="title" title={debt}>{formatAmount.format(debt)}</h3>
+                <h3 className="title" title={debt}>
+                  {formatAmount.format(debt)}
+                </h3>
                 <h4 className="subtitle is-size-3">Total Dai</h4>
               </div>
             </div>
@@ -52,7 +57,7 @@ const Dai = (props) => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default Dai
+export default Dai;
