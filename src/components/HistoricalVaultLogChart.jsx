@@ -2,8 +2,23 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslate } from 'react-polyglot';
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-const HistoricalVaultLogChart = ({ vault }) => {
+const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
   const t = useTranslate();
+  let logs = [];
+  if (vault && vault.logs) {
+    logs = Array.from(vault.logs);
+    // add current situation as single point only if logs has single point that cannot form a graph
+    if (new Set(logs.map((log) => log.timestamp)).size < 2) {
+      logs = [
+        {
+          timestamp: (Date.now() / 1000) | 0,
+          debtAfter: vault.debt,
+          postCollateralizationRatio: currentCollateralRatio,
+        },
+      ].concat(vault.logs);
+    }
+  }
+  logs.reverse();
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
     const liquidationRatioChangeLogList = originalData;
     const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;

@@ -36,7 +36,7 @@ const AuctionParticipantsChart = (props) => {
   const ticks = useMemo(() => {
     let logs = props.auctions && props.auctions.length ? props.auctions : [];
 
-    logs.reduce((output, point, index, points) => {
+    return logs.reduce((output, point, index, points) => {
       if (!point || !points) {
         return output;
       }
@@ -102,7 +102,7 @@ const AuctionParticipantsChart = (props) => {
       }}
     >
       <ResponsiveContainer>
-        <ComposedChart data={logs}>
+        <ComposedChart data={props.auctions ?? []}>
           <XAxis axisLine={false} ticks={ticks} tickFormatter={formatTick} style={{ userSelect: 'none' }} />
           <YAxis yAxisId={1} label={{ value: 'DAI', angle: -90, dx: -20, fill: '#7E7E87' }} />
           <Line
