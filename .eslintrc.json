@@ -38,20 +38,7 @@
     "no-restricted-imports": [
       "error",
       {
-        "patterns": [
-          {
-            "group": [
-              "generated/types/*"
-            ],
-            "message": "Direct imports from `generated/types/*` are prohibited. Please use `generated/types` instead."
-          }
-        ]
-      }
-    ],
-    "no-void": [
-      "error",
-      {
-        "allowAsStatement": true
+        "patterns": []
       }
     ],
     "object-curly-newline": "off",
