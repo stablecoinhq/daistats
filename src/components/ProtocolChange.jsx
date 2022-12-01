@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { useTranslate } from 'react-polyglot';
-import { gql, GraphQLClient } from "graphql-request"
+import { gql } from 'graphql-request';
 import ProtocolChangeTable from './ProtocolChangeTable';
 
-function ProtocolChange(props) {
+var ProtocolChange = (props) => {
   const [logs, setLogs] = useState(undefined);
   const updateLogs = () => {
     const getData = async () => {
-      const subgraphClient = props.subgraphClient
+      const subgraphClient = props.subgraphClient;
       const getProtocolParameterChangeLog = async (ilkName) => {
         const protocolParameterChangeLogsQuery = `
           protocolParameterChangeLogs(
@@ -33,30 +33,30 @@ function ProtocolChange(props) {
             ... on ProtocolParameterChangeLogBigInt {parameterValue},
             ... on ProtocolParameterChangeLogBytes {parameterValue},
           }
-        `
+        `;
         try {
           const protocolParameterChangeLogsQueryResult = await subgraphClient.request(gql`{
             ${protocolParameterChangeLogsQuery}
-          }`)
+          }`);
           if (protocolParameterChangeLogsQueryResult && protocolParameterChangeLogsQueryResult.protocolParameterChangeLogs) {
-            return protocolParameterChangeLogsQueryResult.protocolParameterChangeLogs
+            return protocolParameterChangeLogsQueryResult.protocolParameterChangeLogs;
           } else {
-            return []
+            return [];
           }
         } catch (e) {
-          console.log(e)
-          return []
+          console.log(e);
+          return [];
         }
-      }
+      };
 
-      const protocolParameterChangeLogs = await getProtocolParameterChangeLog()
-      setLogs(protocolParameterChangeLogs)
-    }
+      const protocolParameterChangeLogs = await getProtocolParameterChangeLog();
+      setLogs(protocolParameterChangeLogs);
+    };
     getData();
-  }
-  useEffect(updateLogs, []);
+  };
+  useEffect(updateLogs, [props]);
 
-  const t = useTranslate()
+  const _t = useTranslate();
   return (
     <div>
       <div className="columns">
@@ -113,22 +113,23 @@ function ProtocolChange(props) {
       </div>
       <div className="columns">
         <div className="column" key="ProtocolChangeTable">
-          {(logs) ?
+          {logs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <ProtocolChangeTable heading={true} />
               <tbody>
                 {logs.map((log, idx) => (
-                  <ProtocolChangeTable log={log} />
+                  <ProtocolChangeTable log={log} key={idx} />
                 ))}
               </tbody>
             </table>
-            : <div></div>
-          }
+          ) : (
+            <div></div>
+          )}
         </div>
       </div>
       <hr />
     </div>
-  )
-}
+  );
+};
 
-export default ProtocolChange
+export default ProtocolChange;
