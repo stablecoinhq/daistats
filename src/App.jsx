@@ -1926,7 +1926,7 @@ class App extends Component {
         <section className="section">
           <div className="container has-text-centered">
             <figure className="image is-128x128 container">
-              <Image src={daiLogo} alt="Dai Logo" />
+              <Image src={daiLogo} alt="Dai Logo" width={128} height={128} />
             </figure>
             <br />
             <progress className="progress is-small is-primary" max="100">
