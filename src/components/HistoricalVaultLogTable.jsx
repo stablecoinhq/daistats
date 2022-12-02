@@ -3,6 +3,7 @@ import { useTranslate } from 'react-polyglot';
 
 function HistoricalVaultLogTable(props) {
   const t = useTranslate();
+  const round = (num, digits = 2) => new Number(+num).toFixed(digits);
   const log = props.log;
   if (props.heading) {
     return (
@@ -72,10 +73,10 @@ function HistoricalVaultLogTable(props) {
           {log.oraclePrice}
         </td>
         <td className="has-text-right" title={log.preCollateralizationRatio}>
-          {log.preCollateralizationRatio}
+          {round(100 * log.preCollateralizationRatio)}%
         </td>
         <td className="has-text-right" title={log.postCollateralizationRatio}>
-          {log.postCollateralizationRatio}
+          {round(100 * log.postCollateralizationRatio)}%
         </td>
       </tr>
     );
