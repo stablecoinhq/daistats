@@ -99,14 +99,14 @@ var RiskModel = (props) => {
   };
   setTimeout(updateModel, 1000);
 
-  const _t = useTranslate();
+  const t = useTranslate();
   return (
     <div>
       <div className="columns">
         <div className="column">
           <div className="box has-text-centered">
             <p className="subtitle is-size-6">
-              VaultType:
+              {t("daistats.risk_model.vault_type")}:
               <input
                 type="text"
                 value={vaultType ? vaultType : defaultVaultType}
@@ -114,7 +114,7 @@ var RiskModel = (props) => {
               />
             </p>
             <p className="subtitle is-size-6">
-              JumpSeverity:
+              {t("daistats.risk_model.jump_severity")}:
               <input
                 type="text"
                 value={jumpSeverity ? jumpSeverity : defaultJumpSeverity}
@@ -122,7 +122,7 @@ var RiskModel = (props) => {
               />
             </p>
             <p className="subtitle is-size-6">
-              JumpFrequency:
+              {t("daistats.risk_model.jump_frequency")}:
               <input
                 type="text"
                 value={jumpFrequency ? jumpFrequency : defaultJumpFrequency}
@@ -130,7 +130,7 @@ var RiskModel = (props) => {
               />
             </p>
             <p className="subtitle is-size-6">
-              KeeperProfit:
+              {t("daistats.risk_model.keeper_profit")}:
               <input
                 type="text"
                 value={keeperProfit ? keeperProfit : defaultKeeperProfit}
@@ -138,23 +138,22 @@ var RiskModel = (props) => {
               />
             </p>
             <p className="subtitle is-size-6">
-              <button onClick={updateModel}>Go</button>
+              <button onClick={updateModel}>{t("daistats.risk_model.go")}</button>
             </p>
             <div>
               <p className="subtitle is-size-6">
-                Maximum Debt Ceiling (Risk Premium = 10%) is ${(maximumDebtCeiling | 0).toLocaleString()}
+                {t("daistats.risk_model.maximum_debt_ceiling_for_risk_premium", { riskPremium: 10, maximumDebtCeiling: (maximumDebtCeiling | 0).toLocaleString() })}
               </p>
               <p className="subtitle is-size-6">
-                Risk Premium at current Debt Exposure (${(totalDebtByVaultType | 0).toLocaleString()}) is{' '}
-                {(riskPremium * 100).toLocaleString()}%
+                {t("daistats.risk_model.risk_premium_at_current_debt_exposure", { totalDebtExposure: (totalDebtByVaultType | 0).toLocaleString(), riskPremium: (riskPremium * 100).toLocaleString() })}
               </p>
-              <p className="subtitle is-size-6">Capital at Risk: ${(capitalAtRisk | 0).toLocaleString()}</p>
+              <p className="subtitle is-size-6">{t("daistats.risk_model.capital_at_risk")}: ￥{(capitalAtRisk | 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
         <div className="column">
           <div className="box has-text-centered">
-            <h4 className="subtitle is-size-3">RiskModel</h4>
+            <h4 className="subtitle is-size-3">{t("daistats.risk_model.risk_model_chart")}</h4>
             <div>
               {riskPremiumByDebtExposure ? (
                 <RiskModelChart

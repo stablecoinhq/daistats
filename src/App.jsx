@@ -1848,12 +1848,10 @@ class App extends Component {
           {/* <NavBar /> */}
           <div className="notification is-primary has-text-centered">
             {/* eslint-disable-next-line */}
-            {t('daistats.block')}: <strong>{this.state.blockNumber}</strong> Time:{' '}
+            {t('daistats.block')}: <strong>{this.state.blockNumber}</strong> {t('daistats.header_time')}:{' '}
             <strong title={this.state.timestamp}>{this.state.timestampHHMM}</strong>.{' '}
             {this.state.paused ? `${t('daistats.pause')}.` : `${t('daistats.auto_updating')}.`}{' '}
             <a onClick={this.togglePause}>{this.state.paused ? t('daistats.restart') : t('daistats.pause')}</a>
-            <br />
-            Welcome Societe Generale 🇫🇷 and H.V. BANK 🏦
             <br />
             <div className="buttons is-centered">
               <button className="button is-small is-rounded" onClick={() => this.props.toggle('en')}>

@@ -2,18 +2,18 @@ import React from 'react';
 import { useTranslate } from 'react-polyglot';
 
 function ProtocolChangeTable(props) {
-  const _t = useTranslate();
+  const t = useTranslate();
   const log = props.log;
   if (props.heading) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Time</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Transaction</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Contract</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Changed Parameter</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Changed Parameter Category</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Changed Value</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.time")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.transaction")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.contract")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_parameter")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_parameter_category")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_value")}</th>
         </tr>
       </thead>
     );
