@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslate } from 'react-polyglot';
 import RiskModelChart from './RiskModelChart';
 
@@ -97,7 +97,7 @@ var RiskModel = (props) => {
     };
     run();
   };
-  useEffect(updateModel, [jumpFrequency, jumpSeverity, keeperProfit, props, vaultType]);
+  setTimeout(updateModel, 1000);
 
   const _t = useTranslate();
   return (
