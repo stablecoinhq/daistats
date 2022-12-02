@@ -3,19 +3,25 @@ import { useTranslate } from 'react-polyglot';
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceLine, Label } from 'recharts';
 
 const RiskModelChart = (props) => {
-  const _t = useTranslate();
+  const t = useTranslate();
   let logs = props.riskPremiumByDebtExposure && props.riskPremiumByDebtExposure.length ? props.riskPremiumByDebtExposure : [];
   const maximumDebtCeiling = props.maximumDebtCeiling ?? 0;
   const totalDebtByVaultType = props.totalDebtByVaultType ?? 0;
 
-  const formatTooltipTitle = useCallback((value, _name) => {
-    return `debtExposure: ${(value | 0).toLocaleString()} DAI`;
-  }, []);
+  const formatTooltipTitle = useCallback(
+    (value, _name) => {
+      return `${t('daistats.risk_model.debt_exposure')}: ${(value | 0).toLocaleString()} JPYSC`;
+    },
+    [t],
+  );
 
-  const formatTooltipValue = useCallback((value, _name) => {
-    let output = `${(value * 100).toLocaleString()} %`;
-    return [output, 'riskPremium'];
-  }, []);
+  const formatTooltipValue = useCallback(
+    (value, _name) => {
+      let output = `${(value * 100).toLocaleString()} %`;
+      return [output, t('daistats.risk_model.risk_premium')];
+    },
+    [t],
+  );
 
   return logs.length > 0 ? (
     <div
@@ -36,20 +42,18 @@ const RiskModelChart = (props) => {
           <Tooltip labelStyle={{ fontWeight: 'bold' }} formatter={formatTooltipValue} labelFormatter={formatTooltipTitle} />
           <ReferenceLine
             x={maximumDebtCeiling}
-            label={<Label value={'maximumDebtCeiling'} position="insideTop" />}
+            label={<Label value={t('daistats.risk_model.maximum_debt_ceiling')} position="insideTop" />}
             stroke={'green'}
             strokeWidth={2}
             strokeOpacity={0.5}
-            // alwaysShow={true}
             scale="auto"
           />
           <ReferenceLine
             x={totalDebtByVaultType}
-            label={<Label value={'totalDebtByVaultType'} position="insideBottom" />}
+            label={<Label value={t('daistats.risk_model.total_debt_by_vault_type')} position="insideBottom" />}
             stroke={'green'}
             strokeWidth={2}
             strokeOpacity={0.5}
-            // alwaysShow={true}
             scale="auto"
           />
         </LineChart>

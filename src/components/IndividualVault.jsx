@@ -464,7 +464,7 @@ var IndividualVault = (props) => {
   };
   useEffect(updateVault, [cdpId, props]);
 
-  const _t = useTranslate();
+  const t = useTranslate();
   return (
     <div>
       <div className="columns">
@@ -472,25 +472,36 @@ var IndividualVault = (props) => {
           <div className="has-text-centered">
             <div className="box has-text-centered">
               <p className="subtitle is-size-6">
-                CdpId/VaultId:
+                {t('daistats.vault_information.cdp_id_or_vault_id')}:
                 <input
                   type="text"
                   value={cdpId ? cdpId : undefined}
                   onChange={(event) => setCdpId(convertLowerCaseAddress(event.target.value))}
                 />
-                <button onClick={updateVault}>Go</button>
+                <button onClick={updateVault}>{t('daistats.vault_information.go')}</button>
               </p>{' '}
               {vault && vault.collateralType && vault.collateralType.id ? (
                 <div>
-                  <p className="subtitle is-size-6">CollateralType: {vault.collateralType.id}</p>
-                  <p className="subtitle is-size-6">MinCollateralRatio: {props.ilksByName[vault.collateralType.id].mat}</p>
-                  <p className="subtitle is-size-6">CurrentPrice: {props.ilksByName[vault.collateralType.id].price}</p>
-                  <p className="subtitle is-size-6">CdpId: {vault.cdpId ? vault.cdpId : vault.id}</p>
-                  <p className="subtitle is-size-6">Collateral: {vault.collateral}</p>
                   <p className="subtitle is-size-6">
-                    Debt: {parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate)}
+                    {t('daistats.vault_information.collateral_type')}: {vault.collateralType.id}
                   </p>
-                  <p className="subtitle is-size-6">CurrentCollateralRatio: {currentCollateralRatio}</p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.vault_information.min_collateral_ratio')}: {props.ilksByName[vault.collateralType.id].mat}
+                  </p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.vault_information.current_price')}: {props.ilksByName[vault.collateralType.id].price}
+                  </p>
+                  <p className="subtitle is-size-6">CDP ID: {vault.cdpId ? vault.cdpId : vault.id}</p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.vault_information.collateral')}: {vault.collateral}
+                  </p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.vault_information.debt')}:{' '}
+                    {parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate)}
+                  </p>
+                  <p className="subtitle is-size-6">
+                    {t('daistats.vault_information.current_collateral_ratio')}: {currentCollateralRatio}
+                  </p>
                 </div>
               ) : (
                 <div></div>
@@ -507,7 +518,7 @@ var IndividualVault = (props) => {
                 </span>
               )}
             </h3>
-            <h4 className="subtitle is-size-3">IndividualVaultHistory</h4>
+            <h4 className="subtitle is-size-3">{t('daistats.vault_information.individual_vault_history')}</h4>
             {vault ? <HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} /> : <div></div>}
           </div>
         </div>

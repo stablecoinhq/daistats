@@ -126,20 +126,20 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       let output = amountFormatter.format(value);
 
       if (name === 'debtAfter') {
-        return [output, 'debtAfter'];
+        return [output, t('daistats.vault_information.debt')];
       }
 
       if (name === 'postCollateralizationRatio') {
-        return [output, 'postCollateralizationRatio'];
+        return [output, t('daistats.vault_information.collateral_ratio')];
       }
 
       if (name === 'mat') {
-        return [output, 'LiquidationRatio'];
+        return [output, t('daistats.vault_information.liquidation_ratio')];
       }
 
       return output;
     },
-    [amountFormatter],
+    [amountFormatter, t],
   );
 
   return (

@@ -73,31 +73,42 @@ var VoteHistory = (props) => {
                     }`);
           if (voteLogsQueryResult && voteLogsQueryResult.voteLogs) {
             voteLogsQueryResult.voteLogs = voteLogsQueryResult.voteLogs.map((voteLog) => {
-              voteLog.description = `${
-                voteLog.sender ? voteLog.sender.id : 'Someone'
-              } sent a transaction for ${voteLog.__typename.replace('VoteLog', '')}. `;
+              voteLog.description = t('daistats.vote_history.description.sent_transaction', {
+                sender: voteLog.sender ? voteLog.sender.id : 'Someone',
+                type: voteLog.__typename.replace('VoteLog', ''),
+              });
               if (voteLog.__typename == 'VoteLogLock') {
-                voteLog.description += `The user locked ${voteLog.wad} MKR tokens for vote.`;
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
               } else if (voteLog.__typename == 'VoteLogFree') {
-                voteLog.description += `The user unlocked ${voteLog.wad} MKR tokens for vote.`;
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
               } else if (voteLog.__typename == 'VoteLogLift') {
                 let message = '';
                 if (voteLog.oldHat) {
-                  message = `Now the contract ${voteLog.hat.id} gathered the most votes instead of ${voteLog.oldHat.id}.`;
+                  message = t('daistats.vote_history.description.vote_log_lift.old_hat', {
+                    newHat: voteLog.hat.id,
+                    oldHat: voteLog.oldHat.id,
+                  });
                 } else {
-                  message = `Now the contract ${voteLog.hat.id} gathered the most votes.`;
+                  message = t('daistats.vote_history.description.vote_log_lift.not_old_hat', { newHat: voteLog.hat.id });
                 }
                 voteLog.description += message;
               } else if (voteLog.__typename == 'VoteLogEtch') {
-                voteLog.description += `New set of candidates are registered: ${voteLog.yays.join(', ')}.`;
+                voteLog.description += t('daistats.vote_history.description.vote_log_etch', {
+                  candidates: voteLog.yays.join(', '),
+                });
               } else if (voteLog.__typename == 'VoteLogVote') {
                 let message = '';
                 if (voteLog.oldSlate) {
-                  message =
-                    `The user voted ${voteLog.sender.voteWeight} to ${voteLog.newSlate.addresses.join(', ')}` +
-                    ` and removed votes from ${voteLog.oldSlate.addresses.join(', ')}.`;
+                  message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
+                    yendao: voteLog.sender.voteWeight,
+                    newAddresses: voteLog.newSlate.addresses.join(', '),
+                    oldAddresses: voteLog.oldSlate.addresses.join(', '),
+                  });
                 } else {
-                  message = `The user voted ${voteLog.sender.voteWeight} to ${voteLog.newSlate.addresses.join(', ')}.`;
+                  message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
+                    yendao: voteLog.sender.voteWeight,
+                    newAddresses: voteLog.newSlate.addresses.join(', '),
+                  });
                 }
                 voteLog.description += message;
               }
@@ -119,9 +130,9 @@ var VoteHistory = (props) => {
     };
     getData();
   };
-  useEffect(updateLogs, [props]);
+  useEffect(updateLogs, [props, t]);
 
-  const _t = useTranslate();
+  const t = useTranslate();
   return (
     <div>
       <div className="columns">

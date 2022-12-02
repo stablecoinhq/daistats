@@ -2,17 +2,17 @@ import React from 'react';
 import { useTranslate } from 'react-polyglot';
 
 function VoteHistoryLogTable(props) {
-  const _t = useTranslate();
+  const t = useTranslate();
   const log = props.log;
   if (props.heading) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Time</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Transaction</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.time')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.transaction')}</th>
           {/* <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Type</th> */}
           {/* <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Sender</th> */}
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Description</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.description')}</th>
         </tr>
       </thead>
     );
