@@ -78,16 +78,16 @@ const AuctionParticipantsChart = (props) => {
       let output = amountFormatter.format(value);
 
       if (name === 'keepers') {
-        return [output, t("daistats.auction_participants.keepers")];
+        return [output, t('daistats.auction_participants.keepers')];
       }
 
       if (name === 'takers') {
-        return [output, t("daistats.auction_participants.takers")];
+        return [output, t('daistats.auction_participants.takers')];
       }
 
       return output;
     },
-    [amountFormatter],
+    [amountFormatter, t],
   );
 
   return (

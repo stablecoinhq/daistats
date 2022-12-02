@@ -73,7 +73,7 @@ var AuctionParticipants = (props) => {
       <div className="columns">
         <div className="column">
           <div className="box has-text-centered">
-            <h4 className="subtitle is-size-3">{t("daistats.auction_participants.auction_participants_chart")}</h4>
+            <h4 className="subtitle is-size-3">{t('daistats.auction_participants.auction_participants_chart')}</h4>
             {auctions ? <AuctionParticipantsChart auctions={auctions} /> : <div></div>}
           </div>
         </div>

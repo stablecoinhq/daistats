@@ -8,11 +8,11 @@ function VoteHistoryLogTable(props) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vote_history.time")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vote_history.transaction")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.time')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.transaction')}</th>
           {/* <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Type</th> */}
           {/* <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Sender</th> */}
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vote_history.description")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.description')}</th>
         </tr>
       </thead>
     );

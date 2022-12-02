@@ -8,14 +8,20 @@ const RiskModelChart = (props) => {
   const maximumDebtCeiling = props.maximumDebtCeiling ?? 0;
   const totalDebtByVaultType = props.totalDebtByVaultType ?? 0;
 
-  const formatTooltipTitle = useCallback((value, _name) => {
-    return `${t("daistats.risk_model.debt_exposure")}: ${(value | 0).toLocaleString()} JPYSC`;
-  }, [t]);
+  const formatTooltipTitle = useCallback(
+    (value, _name) => {
+      return `${t('daistats.risk_model.debt_exposure')}: ${(value | 0).toLocaleString()} JPYSC`;
+    },
+    [t],
+  );
 
-  const formatTooltipValue = useCallback((value, _name) => {
-    let output = `${(value * 100).toLocaleString()} %`;
-    return [output, t("daistats.risk_model.risk_premium")];
-  }, [t]);
+  const formatTooltipValue = useCallback(
+    (value, _name) => {
+      let output = `${(value * 100).toLocaleString()} %`;
+      return [output, t('daistats.risk_model.risk_premium')];
+    },
+    [t],
+  );
 
   return logs.length > 0 ? (
     <div
@@ -36,7 +42,7 @@ const RiskModelChart = (props) => {
           <Tooltip labelStyle={{ fontWeight: 'bold' }} formatter={formatTooltipValue} labelFormatter={formatTooltipTitle} />
           <ReferenceLine
             x={maximumDebtCeiling}
-            label={<Label value={t("daistats.risk_model.maximum_debt_ceiling")} position="insideTop" />}
+            label={<Label value={t('daistats.risk_model.maximum_debt_ceiling')} position="insideTop" />}
             stroke={'green'}
             strokeWidth={2}
             strokeOpacity={0.5}
@@ -44,7 +50,7 @@ const RiskModelChart = (props) => {
           />
           <ReferenceLine
             x={totalDebtByVaultType}
-            label={<Label value={t("daistats.risk_model.total_debt_by_vault_type")} position="insideBottom" />}
+            label={<Label value={t('daistats.risk_model.total_debt_by_vault_type')} position="insideBottom" />}
             stroke={'green'}
             strokeWidth={2}
             strokeOpacity={0.5}

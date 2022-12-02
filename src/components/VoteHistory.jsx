@@ -73,27 +73,42 @@ var VoteHistory = (props) => {
                     }`);
           if (voteLogsQueryResult && voteLogsQueryResult.voteLogs) {
             voteLogsQueryResult.voteLogs = voteLogsQueryResult.voteLogs.map((voteLog) => {
-              voteLog.description = t("daistats.vote_history.description.sent_transaction", { sender: voteLog.sender ? voteLog.sender.id : 'Someone', type: voteLog.__typename.replace('VoteLog', '') })
+              voteLog.description = t('daistats.vote_history.description.sent_transaction', {
+                sender: voteLog.sender ? voteLog.sender.id : 'Someone',
+                type: voteLog.__typename.replace('VoteLog', ''),
+              });
               if (voteLog.__typename == 'VoteLogLock') {
-                voteLog.description += t("daistats.vote_history.description.vote_log_lock", { mkr: voteLog.wad })
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
               } else if (voteLog.__typename == 'VoteLogFree') {
-                voteLog.description += t("daistats.vote_history.description.vote_log_lock", { mkr: voteLog.wad })
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
               } else if (voteLog.__typename == 'VoteLogLift') {
                 let message = '';
                 if (voteLog.oldHat) {
-                  message = t("daistats.vote_history.description.vote_log_lift.old_hat", { newHat: voteLog.hat.id, oldHat: voteLog.oldHat.id })
+                  message = t('daistats.vote_history.description.vote_log_lift.old_hat', {
+                    newHat: voteLog.hat.id,
+                    oldHat: voteLog.oldHat.id,
+                  });
                 } else {
-                  message = t("daistats.vote_history.description.vote_log_lift.not_old_hat", { newHat: voteLog.hat.id })
+                  message = t('daistats.vote_history.description.vote_log_lift.not_old_hat', { newHat: voteLog.hat.id });
                 }
                 voteLog.description += message;
               } else if (voteLog.__typename == 'VoteLogEtch') {
-                voteLog.description += t("daistats.vote_history.description.vote_log_etch", { candidates: voteLog.yays.join(', ') })
+                voteLog.description += t('daistats.vote_history.description.vote_log_etch', {
+                  candidates: voteLog.yays.join(', '),
+                });
               } else if (voteLog.__typename == 'VoteLogVote') {
                 let message = '';
                 if (voteLog.oldSlate) {
-                  message = t("daistats.vote_history.description.vote_log_vote.old_slate", { yendao: voteLog.sender.voteWeight, newAddresses: voteLog.newSlate.addresses.join(', '), oldAddresses: voteLog.oldSlate.addresses.join(', ') })
+                  message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
+                    yendao: voteLog.sender.voteWeight,
+                    newAddresses: voteLog.newSlate.addresses.join(', '),
+                    oldAddresses: voteLog.oldSlate.addresses.join(', '),
+                  });
                 } else {
-                  message = t("daistats.vote_history.description.vote_log_vote.not_old_slate", { yendao: voteLog.sender.voteWeight, newAddresses: voteLog.newSlate.addresses.join(', ') })
+                  message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
+                    yendao: voteLog.sender.voteWeight,
+                    newAddresses: voteLog.newSlate.addresses.join(', '),
+                  });
                 }
                 voteLog.description += message;
               }
@@ -115,7 +130,7 @@ var VoteHistory = (props) => {
     };
     getData();
   };
-  useEffect(updateLogs, [props]);
+  useEffect(updateLogs, [props, t]);
 
   const t = useTranslate();
   return (

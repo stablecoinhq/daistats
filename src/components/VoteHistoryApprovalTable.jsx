@@ -8,8 +8,8 @@ const VoteHistoryApprovalTable = (props) => {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vote_history.address")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vote_history.approvals")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.address')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vote_history.approvals')}</th>
         </tr>
       </thead>
     );

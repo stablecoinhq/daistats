@@ -8,42 +8,42 @@ function HistoricalVaultLogTable(props) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.time")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.operations")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.collateral_change")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.debt_change")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.market_price")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.oracle_price")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.pre_collateralization_ratio")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.vault_information.post_collateralization_ratio")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.time')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.operations')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.collateral_change')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.debt_change')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.market_price')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.oracle_price')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.pre_collateralization_ratio')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.post_collateralization_ratio')}</th>
         </tr>
       </thead>
     );
   } else {
-    let typeName = ""
+    let typeName = '';
     switch (log.__typename) {
-      case "VaultCreationLog": {
-        typeName = t("daistats.vault_information.vault_creation_log")
+      case 'VaultCreationLog': {
+        typeName = t('daistats.vault_information.vault_creation_log');
         break;
       }
-      case "VaultCollateralChangeLog": {
-        typeName = t("daistats.vault_information.vault_collateral_change_log")
+      case 'VaultCollateralChangeLog': {
+        typeName = t('daistats.vault_information.vault_collateral_change_log');
         break;
       }
-      case "VaultDebtChangeLog": {
-        typeName = t("daistats.vault_information.vault_debt_change_log")
+      case 'VaultDebtChangeLog': {
+        typeName = t('daistats.vault_information.vault_debt_change_log');
         break;
       }
-      case "VaultSplitChangeLog": {
-        typeName = t("daistats.vault_information.vault_split_change_log")
+      case 'VaultSplitChangeLog': {
+        typeName = t('daistats.vault_information.vault_split_change_log');
         break;
       }
-      case "VaultTransferChangeLog": {
-        typeName = t("daistats.vault_information.vault_transfer_change_log")
+      case 'VaultTransferChangeLog': {
+        typeName = t('daistats.vault_information.vault_transfer_change_log');
         break;
       }
       default: {
-        typeName = log.__typename
+        typeName = log.__typename;
         break;
       }
     }

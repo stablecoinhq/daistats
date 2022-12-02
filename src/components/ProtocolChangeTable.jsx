@@ -8,12 +8,12 @@ function ProtocolChangeTable(props) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.time")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.transaction")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.contract")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_parameter")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_parameter_category")}</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t("daistats.protocol_change.changed_value")}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.time')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.transaction')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.contract')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.changed_parameter')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.changed_parameter_category')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.protocol_change.changed_value')}</th>
         </tr>
       </thead>
     );

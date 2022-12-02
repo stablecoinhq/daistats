@@ -49,22 +49,22 @@ const Main = (props) => {
         <Tabs defaultIndex={tabNameToIndex()} onSelect={(index) => history.push(indexToTab[index])}>
           <TabList>
             <Tab>
-              <p className="is-size-5">{t("daistats.vaults_at_risk.title")}</p>
+              <p className="is-size-5">{t('daistats.vaults_at_risk.title')}</p>
             </Tab>
             <Tab>
-              <p className="is-size-5">{t("daistats.vault_information.title")}</p>
+              <p className="is-size-5">{t('daistats.vault_information.title')}</p>
             </Tab>
             <Tab>
-              <p className="is-size-5">{t("daistats.auction_participants.title")}</p>
+              <p className="is-size-5">{t('daistats.auction_participants.title')}</p>
             </Tab>
             <Tab>
-              <p className="is-size-5">{t("daistats.risk_model.title")}</p>
+              <p className="is-size-5">{t('daistats.risk_model.title')}</p>
             </Tab>
             <Tab>
-              <p className="is-size-5">{t("daistats.protocol_change.title")}</p>
+              <p className="is-size-5">{t('daistats.protocol_change.title')}</p>
             </Tab>
             <Tab>
-              <p className="is-size-5">{t("daistats.vote_history.title")}</p>
+              <p className="is-size-5">{t('daistats.vote_history.title')}</p>
             </Tab>
           </TabList>
           <TabPanel>
@@ -89,7 +89,7 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab>
-                  <p className="is-size-5">{t("daistats.vault_information.title")}</p>
+                  <p className="is-size-5">{t('daistats.vault_information.title')}</p>
                 </Tab>
               </TabList>
               <TabPanel>
@@ -101,7 +101,7 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab>
-                  <p className="is-size-5">{t("daistats.auction_participants.title")}</p>
+                  <p className="is-size-5">{t('daistats.auction_participants.title')}</p>
                 </Tab>
               </TabList>
               <TabPanel>
@@ -113,7 +113,7 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab>
-                  <p className="is-size-5">{t("daistats.risk_model.title")}</p>
+                  <p className="is-size-5">{t('daistats.risk_model.title')}</p>
                 </Tab>
               </TabList>
               <TabPanel>
@@ -125,7 +125,7 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab>
-                  <p className="is-size-5">{t("daistats.protocol_change.title")}</p>
+                  <p className="is-size-5">{t('daistats.protocol_change.title')}</p>
                 </Tab>
               </TabList>
               <TabPanel>
@@ -137,7 +137,7 @@ const Main = (props) => {
             <Tabs>
               <TabList>
                 <Tab>
-                  <p className="is-size-5">{t("daistats.vote_history.title")}</p>
+                  <p className="is-size-5">{t('daistats.vote_history.title')}</p>
                 </Tab>
               </TabList>
               <TabPanel>
