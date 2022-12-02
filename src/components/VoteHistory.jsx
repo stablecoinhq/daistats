@@ -3,10 +3,12 @@ import { useTranslate } from 'react-polyglot';
 import { gql } from 'graphql-request';
 import VoteHistoryApprovalTable from './VoteHistoryApprovalTable';
 import VoteHistoryLogTable from './VoteHistoryLogTable';
+import { utils } from 'ethers';
 
 var VoteHistory = (props) => {
   const [voteLogs, setVoteLogs] = useState(undefined);
   const [voteApprovals, setVoteApprovals] = useState(undefined);
+  const floatFromWad = (num) => utils.formatEther(num);
   const updateLogs = () => {
     const getData = async () => {
       const subgraphClient = props.subgraphClient;
@@ -78,9 +80,9 @@ var VoteHistory = (props) => {
                 type: voteLog.__typename.replace('VoteLog', ''),
               });
               if (voteLog.__typename == 'VoteLogLock') {
-                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: floatFromWad(voteLog.wad) });
               } else if (voteLog.__typename == 'VoteLogFree') {
-                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: voteLog.wad });
+                voteLog.description += t('daistats.vote_history.description.vote_log_lock', { mkr: floatFromWad(voteLog.wad) });
               } else if (voteLog.__typename == 'VoteLogLift') {
                 let message = '';
                 if (voteLog.oldHat) {
@@ -100,13 +102,13 @@ var VoteHistory = (props) => {
                 let message = '';
                 if (voteLog.oldSlate) {
                   message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
-                    yendao: voteLog.sender.voteWeight,
+                    yendao: floatFromWad(voteLog.sender.voteWeight),
                     newAddresses: voteLog.newSlate.addresses.join(', '),
                     oldAddresses: voteLog.oldSlate.addresses.join(', '),
                   });
                 } else {
                   message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
-                    yendao: voteLog.sender.voteWeight,
+                    yendao: floatFromWad(voteLog.sender.voteWeight),
                     newAddresses: voteLog.newSlate.addresses.join(', '),
                   });
                 }

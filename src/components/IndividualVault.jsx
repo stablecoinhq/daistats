@@ -5,6 +5,7 @@ import HistoricalVaultLogChart from './HistoricalVaultLogChart';
 import HistoricalVaultLogTable from './HistoricalVaultLogTable';
 
 var IndividualVault = (props) => {
+  const round = (num, digits = 2) => new Number(+num).toFixed(digits);
   const convertLowerCaseAddress = (cdpId) => {
     if (!cdpId) {
       return undefined;
@@ -21,9 +22,7 @@ var IndividualVault = (props) => {
     }
   };
 
-  const [cdpId, setCdpId] = useState(
-    convertLowerCaseAddress(props.cdpId) ?? '0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A',
-  );
+  const [cdpId, setCdpId] = useState(convertLowerCaseAddress(props.cdpId) ?? '1');
   const [vault, setVault] = useState(undefined);
   const [currentCollateralRatio, setCurrentCollateralRatio] = useState(undefined);
   const updateVault = () => {
@@ -479,28 +478,31 @@ var IndividualVault = (props) => {
                   onChange={(event) => setCdpId(convertLowerCaseAddress(event.target.value))}
                 />
                 <button onClick={updateVault}>{t('daistats.vault_information.go')}</button>
-              </p>{' '}
+              </p>
               {vault && vault.collateralType && vault.collateralType.id ? (
                 <div>
                   <p className="subtitle is-size-6">
                     {t('daistats.vault_information.collateral_type')}: {vault.collateralType.id}
                   </p>
                   <p className="subtitle is-size-6">
-                    {t('daistats.vault_information.min_collateral_ratio')}: {props.ilksByName[vault.collateralType.id].mat}
+                    {t('daistats.vault_information.min_collateral_ratio')}:{' '}
+                    {round(100 * props.ilksByName[vault.collateralType.id].mat)}%
                   </p>
                   <p className="subtitle is-size-6">
-                    {t('daistats.vault_information.current_price')}: {props.ilksByName[vault.collateralType.id].price}
+                    {t('daistats.vault_information.current_price')}: {round(props.ilksByName[vault.collateralType.id].price)}{' '}
+                    JPY
                   </p>
                   <p className="subtitle is-size-6">CDP ID: {vault.cdpId ? vault.cdpId : vault.id}</p>
                   <p className="subtitle is-size-6">
-                    {t('daistats.vault_information.collateral')}: {vault.collateral}
+                    {t('daistats.vault_information.collateral')}: {vault.collateral}{' '}
+                    {props.ilksByName[vault.collateralType.id].token}
                   </p>
                   <p className="subtitle is-size-6">
-                    {t('daistats.vault_information.debt')}:{' '}
-                    {parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate)}
+                    {t('daistats.vault_information.debt')}:
+                    {round(parseFloat(vault.debt) * parseFloat(props.ilksByName[vault.collateralType.id].rate))} JPYSC
                   </p>
                   <p className="subtitle is-size-6">
-                    {t('daistats.vault_information.current_collateral_ratio')}: {currentCollateralRatio}
+                    {t('daistats.vault_information.current_collateral_ratio')}: {round(100 * currentCollateralRatio)}%
                   </p>
                 </div>
               ) : (
@@ -536,7 +538,7 @@ var IndividualVault = (props) => {
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <HistoricalVaultLogTable heading={true} />
               <tbody>
-                {vault.logs.map((log, _idx) => (
+                {vault.logs.map((log) => (
                   <HistoricalVaultLogTable key={log.id} log={log} />
                 ))}
               </tbody>

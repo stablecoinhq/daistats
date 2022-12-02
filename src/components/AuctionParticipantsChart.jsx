@@ -24,53 +24,12 @@ const AuctionParticipantsChart = (props) => {
     [locale],
   );
 
-  const monthFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        month: 'short',
-        year: '2-digit',
-      }),
-    [locale],
-  );
-
-  const ticks = useMemo(() => {
-    let logs = props.auctions && props.auctions.length ? props.auctions : [];
-
-    return logs.reduce((output, point, index, points) => {
-      if (!point || !points) {
-        return output;
-      }
-
-      const c = new Date(point?.timestamp * 1000);
-      const p = new Date(points?.[index - 1]?.['timestamp'] * 1000);
-
-      if (c.getFullYear() !== p.getFullYear() || c.getMonth() !== p.getMonth()) {
-        output.push(index);
-      }
-
-      return output;
-    }, []);
-  }, [props]);
-
-  const formatTick = useCallback(
-    (index) => {
-      let logs = props.auctions && props.auctions.length ? props.auctions : [];
-      const timestamp = new Date((logs[index]?.['timestamp'] ?? 0) * 1000);
-      const month = new Date(timestamp.getFullYear(), timestamp.getMonth());
-
-      return monthFormatter.format(month);
-    },
-    [props, monthFormatter],
-  );
-
   const formatTooltipTitle = useCallback(
     (index) => {
-      let logs = props.auctions && props.auctions.length ? props.auctions : [];
-      const timestamp = new Date((logs[index]?.['timestamp'] ?? 0) * 1000);
-
+      const timestamp = new Date(index * 1000);
       return dateFormatter.format(timestamp);
     },
-    [props, dateFormatter],
+    [dateFormatter],
   );
 
   const formatTooltipValue = useCallback(
@@ -103,8 +62,14 @@ const AuctionParticipantsChart = (props) => {
     >
       <ResponsiveContainer>
         <ComposedChart data={props.auctions ?? []}>
-          <XAxis axisLine={false} ticks={ticks} tickFormatter={formatTick} style={{ userSelect: 'none' }} />
-          <YAxis yAxisId={1} label={{ value: 'DAI', angle: -90, dx: -20, fill: '#7E7E87' }} />
+          <XAxis
+            type="number"
+            dataKey="timestamp"
+            axisLine={false}
+            tickFormatter={(unixTime) => new Date(unixTime * 1000).toLocaleDateString()}
+            domain={['auto', 'auto']}
+          />
+          <YAxis dataKey="keepers" yAxisId={1} label={{ value: 'DAI', angle: -90, dx: -20, fill: '#7E7E87' }} />
           <Line
             yAxisId={1}
             dataKey="keepers"

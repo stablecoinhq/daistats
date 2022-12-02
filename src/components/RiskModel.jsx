@@ -12,11 +12,11 @@ var RiskModel = (props) => {
   // - keeper profit
   const defaultVaultType = 'FAU-A';
   const [vaultType, setVaultType] = useState(defaultVaultType);
-  const defaultJumpSeverity = 0.5;
+  const defaultJumpSeverity = 50;
   const [jumpSeverity, setJumpSeverity] = useState(defaultJumpSeverity);
   const defaultJumpFrequency = 2;
   const [jumpFrequency, setJumpFrequency] = useState(defaultJumpFrequency);
-  const defaultKeeperProfit = 0.05;
+  const defaultKeeperProfit = 5;
   const [keeperProfit, setKeeperProfit] = useState(defaultKeeperProfit);
   // variables propagated to child chart template
   const [riskPremiumByDebtExposure, setRiskPremiumByDebtExposure] = useState([]);
@@ -33,7 +33,7 @@ var RiskModel = (props) => {
       const ilk = props.ilksByName[vaultType];
       // calculate risk premium when debt exposure is $100M
       const totalDebtByVaultTypeValue = parseFloat(ilk && ilk.Art ? ilk.Art : 0);
-      const priceDropRatio = (1 - jumpSeverity) ** jumpFrequency;
+      const priceDropRatio = (1 - jumpSeverity / 100) ** jumpFrequency;
       // filter dangerous vaults with `dropRatio`.
       // we don't use `vaults-protected-score` data here.
       const dangerousVaults = allVaults
@@ -51,7 +51,7 @@ var RiskModel = (props) => {
         .map((vault) => vault.debt)
         .reduce((previous, current) => previous + parseFloat(current), 0);
 
-      const riskPremiumValue = ((1 + keeperProfit) * capitalAtRiskValue) / totalDebtByVaultTypeValue;
+      const riskPremiumValue = ((1 + keeperProfit / 100) * capitalAtRiskValue) / totalDebtByVaultTypeValue;
       // we set risk premium criteria as `0.1` as in https://maker.blockanalitica.com/simulations/risk-model/
       const riskPremiumCriteria = 0.1;
       const maximumDebtCeilingValue = (riskPremiumCriteria / riskPremiumValue) * totalDebtByVaultTypeValue;
@@ -97,7 +97,6 @@ var RiskModel = (props) => {
     };
     run();
   };
-  setTimeout(updateModel, 1000);
 
   const t = useTranslate();
   return (
@@ -120,6 +119,7 @@ var RiskModel = (props) => {
                 value={jumpSeverity ? jumpSeverity : defaultJumpSeverity}
                 onChange={(event) => setJumpSeverity(event.target.value)}
               />
+              %
             </p>
             <p className="subtitle is-size-6">
               {t('daistats.risk_model.jump_frequency')}:
@@ -136,6 +136,7 @@ var RiskModel = (props) => {
                 value={keeperProfit ? keeperProfit : defaultKeeperProfit}
                 onChange={(event) => setKeeperProfit(event.target.value)}
               />
+              %
             </p>
             <p className="subtitle is-size-6">
               <button onClick={updateModel}>{t('daistats.risk_model.go')}</button>

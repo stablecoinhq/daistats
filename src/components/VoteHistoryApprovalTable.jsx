@@ -1,8 +1,10 @@
+import { utils } from 'ethers';
 import React from 'react';
 import { useTranslate } from 'react-polyglot';
 
 const VoteHistoryApprovalTable = (props) => {
   const t = useTranslate();
+  const floatFromWad = (num) => utils.formatEther(num);
   const log = props.log;
   if (props.heading) {
     return (
@@ -20,7 +22,7 @@ const VoteHistoryApprovalTable = (props) => {
           {log.address}
         </td>
         <td className="has-text-left" title={log.approvals}>
-          {log.approvals}
+          {floatFromWad(log.approvals)}
         </td>
       </tr>
     );
