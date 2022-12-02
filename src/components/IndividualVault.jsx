@@ -482,6 +482,7 @@ var IndividualVault = (props) => {
               </p>{' '}
               {vault && vault.collateralType && vault.collateralType.id ? (
                 <div>
+                  <p className="subtitle is-size-6">CollateralType: {vault.collateralType.id}</p>
                   <p className="subtitle is-size-6">MinCollateralRatio: {props.ilksByName[vault.collateralType.id].mat}</p>
                   <p className="subtitle is-size-6">CurrentPrice: {props.ilksByName[vault.collateralType.id].price}</p>
                   <p className="subtitle is-size-6">CdpId: {vault.cdpId ? vault.cdpId : vault.id}</p>
