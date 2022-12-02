@@ -34,11 +34,9 @@ var AuctionParticipants = (props) => {
             const diffTimestamp = 60 * 60 * 24; // 1 day
             const minTimestamp = ((Math.min(...timestampList) / diffTimestamp) | 0) * diffTimestamp;
             const maxTimestamp = (((Math.max(...timestampList) / diffTimestamp) | 0) + 1) * diffTimestamp;
-            console.log(diffTimestamp, minTimestamp, maxTimestamp);
             for (let timestampIndex = minTimestamp; timestampIndex <= maxTimestamp; timestampIndex += diffTimestamp) {
               // collect auctions which happened around at `timeStampIndex`
               const auctionsInTimeWindow = saleAuctionsQueryResult.saleAuctions.filter(
-                // (saleAuction) => Math.abs(saleAuction.boughtAt - timestampIndex) < diffTimestamp / 2
                 (saleAuction) =>
                   timestampIndex < saleAuction.boughtAt && saleAuction.boughtAt <= timestampIndex + diffTimestamp,
               );
@@ -52,6 +50,11 @@ var AuctionParticipants = (props) => {
                 timestamp: timestampIndex,
               });
             }
+            auctionLogs.push({
+              keepers: auctionLogs[auctionLogs.length - 1].keepers,
+              takers: auctionLogs[auctionLogs.length - 1].takers,
+              timestamp: (Date.now() / 1000) | 0,
+            });
           }
         } catch (e) {
           console.log(`failed to fetch subgraph query`);

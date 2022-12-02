@@ -6,7 +6,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
   const t = useTranslate();
   let logs = [];
   if (vault && vault.logs) {
-    logs = Array.from(vault.logs);
+    logs = vault.logs;
     // add current situation as single point only if logs has single point that cannot form a graph
     if (new Set(logs.map((log) => log.timestamp)).size < 2) {
       logs = [
@@ -15,10 +15,19 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
           debtAfter: vault.debt,
           postCollateralizationRatio: currentCollateralRatio,
         },
-      ].concat(vault.logs);
+      ].concat(logs);
     }
   }
-  logs.reverse();
+  // create new object, clone from vault.logs
+  const logsPercent = logs
+    .reverse()
+    .concat()
+    .map((log) => {
+      const obj = Object.assign({}, log);
+      obj.postCollateralizationRatio = obj.postCollateralizationRatio * 100;
+      obj.preCollateralizationRatio = obj.preCollateralizationRatio * 100;
+      return obj;
+    });
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
     const liquidationRatioChangeLogList = originalData;
     const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;
@@ -50,7 +59,6 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
         ...lastLiquidationRatioChangeLogBeforeRange,
         timestamp: liquidationRatioChangeLogRangeMin,
       });
-      console.log({ msg: 'not in range', lastLiquidationRatioChangeLogBeforeRange });
     }
     const liquidationRatioChangeLogWithBothEnds =
       // add min value
@@ -69,8 +77,11 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             timestamp: liquidationRatioChangeLogRangeMax,
           },
         ]);
-
-    return liquidationRatioChangeLogWithBothEnds;
+    const liquidationRatioPercent = liquidationRatioChangeLogWithBothEnds.map((element) => {
+      element.mat = element.mat * 100;
+      return element;
+    });
+    return liquidationRatioPercent;
   };
   const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(
     vault.liquidationRatioChangeLog.reverse(),
@@ -126,15 +137,15 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       let output = amountFormatter.format(value);
 
       if (name === 'debtAfter') {
-        return [output, t('daistats.vault_information.debt')];
+        return [output, t('daistats.vault_information.debt') + '(JPYSC)'];
       }
 
       if (name === 'postCollateralizationRatio') {
-        return [output, t('daistats.vault_information.collateral_ratio')];
+        return [output, t('daistats.vault_information.collateral_ratio') + '(%)'];
       }
 
       if (name === 'mat') {
-        return [output, t('daistats.vault_information.liquidation_ratio')];
+        return [output, t('daistats.vault_information.liquidation_ratio') + '(%)'];
       }
 
       return output;
@@ -154,7 +165,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       }}
     >
       <ResponsiveContainer>
-        <ComposedChart data={logs}>
+        <ComposedChart data={logsPercent}>
           <defs>
             <linearGradient id="totalDebtColor" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#1AAB9B" stopOpacity={0.95} />
@@ -165,14 +176,14 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             axisLine={false}
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
-            domain={[parseInt(logs[0].timestamp), parseInt(logs[logs.length - 1].timestamp)]}
+            domain={[parseInt(logsPercent[0].timestamp), parseInt(logsPercent[logsPercent.length - 1].timestamp)]}
             type="number"
             dataKey="timestamp"
           />
           <YAxis yAxisId={1} label={{ value: 'DAI', angle: -90, dx: -20, fill: '#7E7E87' }} />
           <YAxis yAxisId={2} orientation="right" label={{ value: 'CR', angle: -90, dx: 20, fill: '#7E7E87' }} />
           <Area
-            data={logs}
+            data={logsPercent}
             yAxisId={2}
             dataKey="debtAfter"
             type="monotone"
@@ -182,7 +193,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             fillOpacity={1}
           />
           <Line
-            data={logs}
+            data={logsPercent}
             yAxisId={1}
             dataKey="postCollateralizationRatio"
             type="stepAfter"

@@ -22,9 +22,7 @@ var IndividualVault = (props) => {
     }
   };
 
-  const [cdpId, setCdpId] = useState(
-    convertLowerCaseAddress(props.cdpId) ?? '0x468e7aa34ca25986c7e46d6b78f1dfff0a8c8c02-ETH-A',
-  );
+  const [cdpId, setCdpId] = useState(convertLowerCaseAddress(props.cdpId) ?? '1');
   const [vault, setVault] = useState(undefined);
   const [currentCollateralRatio, setCurrentCollateralRatio] = useState(undefined);
   const updateVault = () => {
@@ -540,7 +538,7 @@ var IndividualVault = (props) => {
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <HistoricalVaultLogTable heading={true} />
               <tbody>
-                {vault.logs.map((log, _idx) => (
+                {vault.logs.map((log) => (
                   <HistoricalVaultLogTable key={log.id} log={log} />
                 ))}
               </tbody>
