@@ -4392,10 +4392,9 @@ default-gateway@^4.2.0:
     execa "^1.0.0"
     ip-regex "^2.1.0"
 
-defi18n@^0.0.13:
+"defi18n@https://github.com/stablecoinhq/defi18n.git#492fe9191e01e600b6ca6d4944ccda606e720e5c":
   version "0.0.13"
-  resolved "https://registry.npmjs.org/defi18n/-/defi18n-0.0.13.tgz"
-  integrity sha512-S+ArdTidyFBOP8N9rmybCvC0rhIQ5tKyypHYAB+rRG7+qu0hnu1HmD0yj+FPAyuBvYSbKGWmMbbykhIXLqR2Cg==
+  resolved "https://github.com/stablecoinhq/defi18n.git#492fe9191e01e600b6ca6d4944ccda606e720e5c"
 
 define-properties@^1.1.2, define-properties@^1.1.3, define-properties@^1.1.4:
   version "1.1.4"

@@ -8,22 +8,22 @@ const formatTwoDp = new Intl.NumberFormat('en-US', {
 });
 
 function Vest(props) {
-  const _t = useTranslate();
+  const t = useTranslate();
   const award = props.award;
   if (props.heading) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>ID</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Recipient</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Public</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Claimed</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Unpaid</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Accrued</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Total Reward</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Start Date</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>Cliff Date</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>End Date</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.id')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.recipient')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.public')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.claimed')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.unpaid')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.accrued')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.total_reward')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.start_date')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.cliff_date')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vesting.end_date')}</th>
         </tr>
       </thead>
     );

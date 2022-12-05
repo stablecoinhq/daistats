@@ -127,7 +127,7 @@ const CollateralChart = ({ ilks, debt, useValue, groupBy }) => {
   const others = all.filter((i) => !ilkThreshold(i));
   const data = all.filter(ilkThreshold);
   data.push({
-    'name': 'Others',
+    'name': t('daistats.collateral_chart.others'),
     'value': others.reduce((t, v) => t + v['value'], 0),
   });
 

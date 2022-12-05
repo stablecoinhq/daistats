@@ -14,37 +14,49 @@ const formatPercent = new Intl.NumberFormat('en-US', {
 });
 
 function Clip(props) {
-  const _t = useTranslate();
+  const t = useTranslate();
   if (props.heading) {
     return (
       <thead>
         <tr>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>Collateral (Ilk)</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>(Clip) Auctions</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>Active Auctions</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>Bad Debt (dirt)</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>Limit (hole)</th>
-          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>Penalty (chop)</th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Price Change Multiplier (cut)
+            {t('daistats.auction.clip.collateral_ilk')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Price Change Interval (step) seconds
+            {t('daistats.auction.clip.clip_auctions')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Auction Price Multiplier (buf)
+            {t('daistats.auction.clip.active_auctions')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Maximum Auction Drawdown (cusp)
+            {t('daistats.auction.clip.bad_debt_dirt')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Max Auction Duration (tail) minutes
+            {t('daistats.auction.clip.limit_hole')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Kick Incentive (chip)
+            {t('daistats.auction.clip.penalty_chop')}
           </th>
           <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
-            Flat Kick Incentive (tip)
+            {t('daistats.auction.clip.price_change_multiplier_cut')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.price_change_interval_step_seconds')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.auction_price_multiplier_buf')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.maximum_auction_drawdown_cusp')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.max_auction_duration_tail_minutes')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.kick_incentive_chip')}
+          </th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400, paddingLeft: '0.1em', paddingRight: '0.1em' }}>
+            {t('daistats.auction.clip.flat_kick_incentive_tip')}
           </th>
         </tr>
       </thead>

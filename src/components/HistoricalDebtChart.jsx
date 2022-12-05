@@ -81,7 +81,7 @@ const HistoricalDebtChart = ({ data }) => {
       }
 
       if (name === 'totalDebt') {
-        return [output, t('daistats.total_token', { token: 'Dai' })];
+        return [output, t('daistats.total_token', { token: 'JPYSC' })];
       }
 
       return output;
