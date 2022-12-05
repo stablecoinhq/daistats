@@ -20,6 +20,8 @@
     "recharts": "^2.0.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
     "@typescript-eslint/eslint-plugin": "^5.34.0",
     "eslint": "6.6.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -46,7 +48,7 @@
     "start:mainnet": "REACT_APP_NETWORK=mainnet react-scripts start",
     "start": "REACT_APP_NETWORK=mainnet react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject",
     "lint": "yarn lint:es && yarn lint:style && yarn lint:prettier",
     "lint:fix": "yarn -s lint:es:fix; yarn -s lint:style:fix; yarn -s lint:prettier:fix; yarn -s svgo",
