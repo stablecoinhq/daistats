@@ -30,70 +30,72 @@ var RiskModel = (props) => {
     const run = async () => {
       // props from fetched data
       const allVaults = props.allVaults && props.allVaults[vaultType] ? props.allVaults[vaultType] : [];
-      const ilk = props.ilksByName[vaultType];
-      // calculate risk premium when debt exposure is $100M
-      const totalDebtByVaultTypeValue = parseFloat(ilk && ilk.Art ? ilk.Art : 0);
-      const priceDropRatio = (1 - jumpSeverity / 100) ** jumpFrequency;
-      // filter dangerous vaults with `dropRatio`.
-      // we don't use `vaults-protected-score` data here.
-      const dangerousVaults = allVaults
-        .filter((vault) => vault.debt > 0 && vault.collateral > 0)
-        .filter((vault) => {
-          const collateral = parseFloat(vault.collateral);
-          const price = parseFloat(ilk.price);
-          const debt = parseFloat(vault.debt);
-          const rate = parseFloat(ilk.rate);
-          const mat = parseFloat(ilk.mat);
-          const collateralIsEnough = collateral * price * priceDropRatio > debt * mat * rate;
-          return !collateralIsEnough;
-        });
-      const capitalAtRiskValue = dangerousVaults
-        .map((vault) => vault.debt)
-        .reduce((previous, current) => previous + parseFloat(current), 0);
+      if (allVaults.length) {
+        const ilk = props.ilksByName[vaultType];
+        // calculate risk premium when debt exposure is $100M
+        const totalDebtByVaultTypeValue = parseFloat(ilk && ilk.Art ? ilk.Art : 0);
+        const priceDropRatio = (1 - jumpSeverity / 100) ** jumpFrequency;
+        // filter dangerous vaults with `dropRatio`.
+        // we don't use `vaults-protected-score` data here.
+        const dangerousVaults = allVaults
+          .filter((vault) => vault.debt > 0 && vault.collateral > 0)
+          .filter((vault) => {
+            const collateral = parseFloat(vault.collateral);
+            const price = parseFloat(ilk.price);
+            const debt = parseFloat(vault.debt);
+            const rate = parseFloat(ilk.rate);
+            const mat = parseFloat(ilk.mat);
+            const collateralIsEnough = collateral * price * priceDropRatio > debt * mat * rate;
+            return !collateralIsEnough;
+          });
+        const capitalAtRiskValue = dangerousVaults
+          .map((vault) => vault.debt)
+          .reduce((previous, current) => previous + parseFloat(current), 0);
 
-      const riskPremiumValue = ((1 + keeperProfit / 100) * capitalAtRiskValue) / totalDebtByVaultTypeValue;
-      // we set risk premium criteria as `0.1` as in https://maker.blockanalitica.com/simulations/risk-model/
-      const riskPremiumCriteria = 0.1;
-      const maximumDebtCeilingValue = (riskPremiumCriteria / riskPremiumValue) * totalDebtByVaultTypeValue;
+        const riskPremiumValue = ((1 + keeperProfit / 100) * capitalAtRiskValue) / totalDebtByVaultTypeValue;
+        // we set risk premium criteria as `0.1` as in https://maker.blockanalitica.com/simulations/risk-model/
+        const riskPremiumCriteria = 0.1;
+        const maximumDebtCeilingValue = (riskPremiumCriteria / riskPremiumValue) * totalDebtByVaultTypeValue;
 
-      // build graph data, decide showing x-axis range
-      let xAxisStart = 0,
-        xAxisEnd = 0;
-      if (maximumDebtCeilingValue > totalDebtByVaultTypeValue) {
-        xAxisStart = Math.max(
-          Math.min(
-            totalDebtByVaultTypeValue,
-            totalDebtByVaultTypeValue - (maximumDebtCeilingValue - totalDebtByVaultTypeValue) * 1,
-          ),
-          0,
-        );
-        xAxisEnd = maximumDebtCeilingValue + (maximumDebtCeilingValue - totalDebtByVaultTypeValue) * 5;
-      } else {
-        xAxisStart = Math.max(
-          Math.min(
-            maximumDebtCeilingValue,
-            maximumDebtCeilingValue - (totalDebtByVaultTypeValue - maximumDebtCeilingValue) * 1,
-          ),
-          0,
-        );
-        xAxisEnd = totalDebtByVaultTypeValue + (totalDebtByVaultTypeValue - maximumDebtCeilingValue) * 5;
-      }
-      const xAxisDiff = ((xAxisEnd - xAxisStart) * 1) / 100;
-      const riskPremiumByDebtExposureList = [];
-      for (let xAxisValue = xAxisStart; xAxisValue <= xAxisEnd; xAxisValue += xAxisDiff) {
-        let yAxisValue = 0;
-        if (xAxisValue < totalDebtByVaultTypeValue && totalDebtByVaultTypeValue < maximumDebtCeilingValue) {
-          yAxisValue = riskPremiumValue;
+        // build graph data, decide showing x-axis range
+        let xAxisStart = 0,
+          xAxisEnd = 0;
+        if (maximumDebtCeilingValue > totalDebtByVaultTypeValue) {
+          xAxisStart = Math.max(
+            Math.min(
+              totalDebtByVaultTypeValue,
+              totalDebtByVaultTypeValue - (maximumDebtCeilingValue - totalDebtByVaultTypeValue) * 1,
+            ),
+            0,
+          );
+          xAxisEnd = maximumDebtCeilingValue + (maximumDebtCeilingValue - totalDebtByVaultTypeValue) * 5;
         } else {
-          yAxisValue = (xAxisValue / maximumDebtCeilingValue) * riskPremiumCriteria;
+          xAxisStart = Math.max(
+            Math.min(
+              maximumDebtCeilingValue,
+              maximumDebtCeilingValue - (totalDebtByVaultTypeValue - maximumDebtCeilingValue) * 1,
+            ),
+            0,
+          );
+          xAxisEnd = totalDebtByVaultTypeValue + (totalDebtByVaultTypeValue - maximumDebtCeilingValue) * 5;
         }
-        riskPremiumByDebtExposureList.push({ debtExposure: xAxisValue, riskPremium: yAxisValue });
+        const xAxisDiff = ((xAxisEnd - xAxisStart) * 1) / 100;
+        const riskPremiumByDebtExposureList = [];
+        for (let xAxisValue = xAxisStart; xAxisValue <= xAxisEnd; xAxisValue += xAxisDiff) {
+          let yAxisValue = 0;
+          if (xAxisValue < totalDebtByVaultTypeValue && totalDebtByVaultTypeValue < maximumDebtCeilingValue) {
+            yAxisValue = riskPremiumValue;
+          } else {
+            yAxisValue = (xAxisValue / maximumDebtCeilingValue) * riskPremiumCriteria;
+          }
+          riskPremiumByDebtExposureList.push({ debtExposure: xAxisValue, riskPremium: yAxisValue });
+        }
+        setCapitalAtRisk(capitalAtRiskValue);
+        setRiskPremium(riskPremiumValue);
+        setMaximumDebtCeiling(maximumDebtCeilingValue);
+        setTotalDebtByVaultType(totalDebtByVaultTypeValue);
+        setRiskPremiumByDebtExposure(riskPremiumByDebtExposureList);
       }
-      setCapitalAtRisk(capitalAtRiskValue);
-      setRiskPremium(riskPremiumValue);
-      setMaximumDebtCeiling(maximumDebtCeilingValue);
-      setTotalDebtByVaultType(totalDebtByVaultTypeValue);
-      setRiskPremiumByDebtExposure(riskPremiumByDebtExposureList);
     };
     run();
   };
