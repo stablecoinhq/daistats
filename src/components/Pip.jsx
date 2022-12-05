@@ -18,14 +18,14 @@ var Pip = (props) => {
     <div className="column">
       <div className="box has-text-centered">
         <h3 className="title" title={ilk.price}>
-          ${props.formater.format(ilk.price)}
+          ￥{props.formater.format(ilk.price)}
         </h3>
         <p className="title subtitle is-size-4">{t('daistats.token_price', { token: props.token })}</p>
         {ilk.priceNxt > 0 && (
           <p className="subtitle is-size-6">
             {t('daistats.next_osm_price')}:{' '}
             <span className={nextPrice(ilk.price, ilk.priceNxt)} title={ilk.priceNxt}>
-              ${props.formater.format(ilk.priceNxt)}
+              ￥{props.formater.format(ilk.priceNxt)}
             </span>
           </p>
         )}
@@ -34,7 +34,7 @@ var Pip = (props) => {
         )}
         {ilk.priceMedian && (
           <p className="title subtitle is-size-6" title={ilk.priceMedian}>
-            Median: ${props.formater.format(ilk.priceMedian)}
+            {t('daistats.pip.median')}: ￥{props.formater.format(ilk.priceMedian)}
           </p>
         )}
       </div>

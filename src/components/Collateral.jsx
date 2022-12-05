@@ -31,7 +31,7 @@ const formatPercentNoDecimals = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
-function autoLine(props, label) {
+function autoLine(props, label, gapLabel, lastChangeLabel, ttlLabel) {
   const ilk = props.ilksByName[props.ilk];
   if (ilk.lineMax > 0) {
     return (
@@ -40,9 +40,11 @@ function autoLine(props, label) {
           {label}: {formatAmount.format(ilk.lineMax)}
         </p>
         <p className="title subtitle is-size-6">
-          Gap: {formatAmount.format(ilk.gap)} Ttl: {ilk.ttl / 60 / 60}h
+          {gapLabel}: {formatAmount.format(ilk.gap)} {ttlLabel}: {ilk.ttl / 60 / 60}h
         </p>
-        <p className="title subtitle is-size-6">Last Change: {ilk.lastInc}</p>
+        <p className="title subtitle is-size-6">
+          {lastChangeLabel}: {ilk.lastInc}
+        </p>
       </>
     );
   } else {
@@ -72,7 +74,13 @@ var Collateral = (props) => {
               {t('daistats.dai_from_token', { token: ilk.ilk })} (
               {formatAmount.format(((ilk.Art * ilk.rate) / props.debt) * 100)}%)
             </p>
-            {autoLine(props, t('maker.debt_ceiling'))}
+            {autoLine(
+              props,
+              t('maker.debt_ceiling'),
+              t('daistats.collateral.gap'),
+              t('daistats.collateral.last_change'),
+              t('daistats.collateral.ttl'),
+            )}
             <p className="subtitle is-size-6">
               {t('daistats.utilization')}: {formatAmount.format(((ilk.Art * ilk.rate) / ilk.line) * 100)}%
             </p>
@@ -89,12 +97,13 @@ var Collateral = (props) => {
             </p>
             {ilk.mat && (
               <p className="title subtitle is-size-6" title={ilk.mat}>
-                Collateral Ratio: {formatPercentNoDecimals.format(ilk.mat)}
+                {t('daistats.collateral.collateral_ratio')}: {formatPercentNoDecimals.format(ilk.mat)}
               </p>
             )}
             {ilk.dust > 0 && (
               <p className="title subtitle is-size-6" title={ilk.dust}>
-                {/*{t('daistats.dust')}*/}Dust: {formatAmount.format(ilk.dust)}
+                {/*{t('daistats.dust')}*/}
+                {t('daistats.collateral.dust')}: {formatAmount.format(ilk.dust)}
               </p>
             )}
           </div>
@@ -109,7 +118,7 @@ var Collateral = (props) => {
               {t('daistats.token_supply_locked', { token: ilk.ilk })}: {formatPercent.format(ilk.locked / supply)}
             </p>
             <p className="title subtitle is-size-6" title={ilk.value}>
-              Value Locked: ${formatAmount.format(ilk.value)}
+              {t('daistats.collateral.value_locked')}: ￥{formatAmount.format(ilk.value)}
             </p>
             {ilk.conduitIn && <p className="title subtitle is-size-6">Conduit In: {formatAmount.format(ilk.conduitIn)}</p>}
             {ilk.conduitOut && <p className="title subtitle is-size-6">Conduit Out: {formatAmount.format(ilk.conduitOut)}</p>}

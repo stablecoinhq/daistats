@@ -7,10 +7,10 @@ import * as serviceWorker from './serviceWorker';
 
 class Root extends Component {
   state = {
-    locale: 'en',
+    locale: 'ja',
     messages: {
-      ...require('defi18n/en/daistats.json'),
-      ...require(`defi18n/en/maker.json`),
+      ...require('defi18n/jp/daistats.json'),
+      ...require(`defi18n/jp/maker.json`),
     },
   };
 
@@ -20,8 +20,8 @@ class Root extends Component {
     if (locale) {
       this.state.locale = locale;
       this.state.messages = {
-        ...require('defi18n/en/daistats.json'),
-        ...require(`defi18n/en/maker.json`),
+        ...require('defi18n/jp/daistats.json'),
+        ...require(`defi18n/jp/maker.json`),
       };
     }
   }

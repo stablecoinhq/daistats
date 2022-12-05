@@ -363,11 +363,11 @@ let url;
 if (process.env.REACT_APP_NETWORK === 'mainnet') {
   VEST_DAI_IDS = 13;
   VEST_MKR_TREASURY_IDS = 24;
-  url = 'https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.6';
+  url = 'https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.14';
 } else {
   VEST_DAI_IDS = 0;
   VEST_MKR_TREASURY_IDS = 0;
-  url = 'https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.54';
+  url = 'https://api.studio.thegraph.com/query/33920/dai-goerli-test/v0.0.57';
 }
 
 const subgraphClient = new GraphQLClient(url, { mode: 'cors' });
@@ -1849,12 +1849,10 @@ class App extends Component {
           {/* <NavBar /> */}
           <div className="notification is-primary has-text-centered">
             {/* eslint-disable-next-line */}
-            {t('daistats.block')}: <strong>{this.state.blockNumber}</strong> Time:{' '}
+            {t('daistats.block')}: <strong>{this.state.blockNumber}</strong> {t('daistats.header_time')}:{' '}
             <strong title={this.state.timestamp}>{this.state.timestampHHMM}</strong>.{' '}
             {this.state.paused ? `${t('daistats.pause')}.` : `${t('daistats.auto_updating')}.`}{' '}
             <a onClick={this.togglePause}>{this.state.paused ? t('daistats.restart') : t('daistats.pause')}</a>
-            <br />
-            Welcome Societe Generale 🇫🇷 and H.V. BANK 🏦
             <br />
             <div className="buttons is-centered">
               <button className="button is-small is-rounded" onClick={() => this.props.toggle('en')}>
