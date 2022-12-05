@@ -536,10 +536,10 @@ var IndividualVault = (props) => {
           </h3>
           {vault && vault.logs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
-              <HistoricalVaultLogTable heading={true} />
+              <HistoricalVaultLogTable {...props} heading={true} />
               <tbody>
                 {vault.logs.map((log) => (
-                  <HistoricalVaultLogTable key={log.id} log={log} />
+                  <HistoricalVaultLogTable {...props} key={log.id} log={log} />
                 ))}
               </tbody>
             </table>

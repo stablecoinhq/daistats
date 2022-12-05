@@ -24,7 +24,7 @@ function ProtocolChangeTable(props) {
           {new Date(parseInt(log.timestamp) * 1000).toLocaleString()}
         </td>
         <td className="has-text-left">
-          <a href={`https://etherscan.io/tx/${log.transaction}`} target="_blank" rel="noopener noreferrer">
+          <a href={`${props.etherscanBaseUrl}/tx/${log.transaction}`} target="_blank" rel="noopener noreferrer">
             <p className="subtitle is-size-6" style={{ 'lineHeight': '24px' }}>
               {log.transaction}
             </p>

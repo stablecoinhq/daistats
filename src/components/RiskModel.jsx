@@ -108,18 +108,14 @@ var RiskModel = (props) => {
           <div className="box has-text-centered">
             <p className="subtitle is-size-6">
               {t('daistats.risk_model.vault_type')}:
-              <input
-                type="text"
-                value={vaultType ? vaultType : defaultVaultType}
-                onChange={(event) => setVaultType(event.target.value)}
-              />
+              <input type="text" value={vaultType ? vaultType : ''} onChange={(event) => setVaultType(event.target.value)} />
             </p>
             <p className="subtitle is-size-6">
               {t('daistats.risk_model.jump_severity')}:
               <input
                 type="text"
-                value={jumpSeverity ? jumpSeverity : defaultJumpSeverity}
-                onChange={(event) => setJumpSeverity(event.target.value)}
+                value={jumpSeverity ? jumpSeverity : ''}
+                onChange={(event) => setJumpSeverity(+event.target.value)}
               />
               %
             </p>
@@ -127,16 +123,16 @@ var RiskModel = (props) => {
               {t('daistats.risk_model.jump_frequency')}:
               <input
                 type="text"
-                value={jumpFrequency ? jumpFrequency : defaultJumpFrequency}
-                onChange={(event) => setJumpFrequency(event.target.value)}
+                value={jumpFrequency ? jumpFrequency : ''}
+                onChange={(event) => setJumpFrequency(+event.target.value)}
               />
             </p>
             <p className="subtitle is-size-6">
               {t('daistats.risk_model.keeper_profit')}:
               <input
                 type="text"
-                value={keeperProfit ? keeperProfit : defaultKeeperProfit}
-                onChange={(event) => setKeeperProfit(event.target.value)}
+                value={keeperProfit ? keeperProfit : ''}
+                onChange={(event) => setKeeperProfit(+event.target.value)}
               />
               %
             </p>

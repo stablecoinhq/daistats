@@ -75,7 +75,7 @@ function VaultsAtRisk(props) {
                   <p className="subtitle is-size-6">
                     {t('daistats.vaults_at_risk.simulated_collateral_ratio')}:{' '}
                     {round(
-                      (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price) * parseFloat(priceDropRatio / 100))) /
+                      (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price) * parseFloat(1 - priceDropRatio / 100))) /
                         (parseFloat(vault.debt) * parseFloat(ilk.rate)),
                     )}
                     %

@@ -115,10 +115,10 @@ var ProtocolChange = (props) => {
         <div className="column" key="ProtocolChangeTable">
           {logs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
-              <ProtocolChangeTable heading={true} />
+              <ProtocolChangeTable {...props} heading={true} />
               <tbody>
                 {logs.map((log, idx) => (
-                  <ProtocolChangeTable log={log} key={idx} />
+                  <ProtocolChangeTable {...props} log={log} key={idx} />
                 ))}
               </tbody>
             </table>

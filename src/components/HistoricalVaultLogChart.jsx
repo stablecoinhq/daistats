@@ -87,6 +87,23 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
     vault.liquidationRatioChangeLog.reverse(),
   );
 
+  logsPercent.map((log, index) => {
+    for (
+      let liquidationRatioChangeLogIndex = 0;
+      liquidationRatioChangeLogIndex < liquidationRatioChangeLogWithBothEnds.length;
+      liquidationRatioChangeLogIndex++
+    ) {
+      const matChangeLog = liquidationRatioChangeLogWithBothEnds[liquidationRatioChangeLogIndex];
+      if (log.timestamp <= matChangeLog.timestamp) {
+        logsPercent[index].mat = matChangeLog.mat;
+        break;
+      } else if (liquidationRatioChangeLogIndex === liquidationRatioChangeLogWithBothEnds.length - 1) {
+        logsPercent[index].mat = matChangeLog.mat;
+        break;
+      }
+    }
+  });
+
   const locale = useMemo(() => t._polyglot.currentLocale, [t]);
 
   const amountFormatter = useMemo(
@@ -203,7 +220,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
           />
           <Line
             yAxisId={1}
-            data={liquidationRatioChangeLogWithBothEnds}
+            data={logsPercent}
             dataKey="mat"
             type="stepAfter"
             dot={false}

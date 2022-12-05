@@ -168,9 +168,9 @@ let networkId = undefined;
 if (typeof window.ethereum !== 'undefined') {
   window.ethereum.autoRefreshOnNetworkChange = false;
   if (process.env.REACT_APP_NETWORK === 'mainnet') {
-    // provider = new ethers.providers.Web3Provider(window.ethereum);
+    networkId = 1;
   } else if (process.env.REACT_APP_NETWORK === 'goerli') {
-    // provider = new ethers.providers.Web3Provider(window.ethereum);
+    networkId = 5;
   }
 }
 const build = (address, name) => {
@@ -1171,6 +1171,21 @@ class App extends Component {
 
     // if (parseInt(utils.formatUnits(res[1], 45)) >= 300000000) confetti.rain()
 
+    // etherscan domain hostname
+    const etherscanBaseUrl = ((networkId) => {
+      switch (networkId) {
+        case 1: {
+          return `https://etherscan.io/`;
+        }
+        case 5: {
+          return `https://goerli.etherscan.io/`;
+        }
+        default: {
+          return `https://etherscan.io/`;
+        }
+      }
+    })(networkId);
+
     this.setState((_state) => {
       let obj;
       if (process.env.REACT_APP_NETWORK === 'mainnet') {
@@ -1262,6 +1277,7 @@ class App extends Component {
           historicalDebt,
           allVaults,
           subgraphClient,
+          etherscanBaseUrl,
         };
       } else {
         obj = {
@@ -1320,6 +1336,7 @@ class App extends Component {
           historicalDebt,
           allVaults,
           subgraphClient,
+          etherscanBaseUrl,
         };
       }
       return obj;
@@ -1849,10 +1866,7 @@ class App extends Component {
           <div className="notification is-primary has-text-centered">
             {/* eslint-disable-next-line */}
             {t('daistats.block')}: <strong>{this.state.blockNumber}</strong> {t('daistats.header_time')}:{' '}
-            <strong title={this.state.timestamp}>{this.state.timestampHHMM}</strong>.{' '}
-            {this.state.paused ? `${t('daistats.pause')}.` : `${t('daistats.auto_updating')}.`}{' '}
-            <a onClick={this.togglePause}>{this.state.paused ? t('daistats.restart') : t('daistats.pause')}</a>
-            <br />
+            <strong title={this.state.timestamp}>{this.state.timestampHHMM}</strong>. <br />
             <div className="buttons is-centered">
               <button className="button is-small is-rounded" onClick={() => this.props.toggle('en')}>
                 English
