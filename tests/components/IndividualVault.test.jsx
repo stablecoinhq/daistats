@@ -72,4 +72,17 @@ describe('IndividualVault component', () => {
     await act(async () => render(<IndividualVault {...props} cdpId={cdpId} />));
     expect(screen.getAllByText(/cdp_id_or_vault_id/).length).toBeTruthy();
   });
+
+  test('empty case', async () => {
+    const props = {
+      subgraphClient: {
+        request: async () => {
+          return null;
+        },
+      },
+    };
+    const cdpId = '1';
+    await act(async () => render(<IndividualVault {...props} cdpId={cdpId} />));
+    expect(screen.getAllByText(/cdp_id_or_vault_id/).length).toBeTruthy();
+  });
 });
