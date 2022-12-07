@@ -95,7 +95,8 @@
       }
     ],
     "no-useless-constructor": "off",
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "@next/next/no-img-element": "off"
   },
   "overrides": [
     {
