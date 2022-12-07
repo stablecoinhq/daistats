@@ -9,7 +9,6 @@ const prepareMocks = () => {
       }),
     };
   });
+  return true;
 };
-prepareMocks();
-const helper = {};
-export default helper;
+export const prepareMocksResult = prepareMocks();
