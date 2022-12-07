@@ -14,3 +14,18 @@ jest.mock('react-polyglot', () => {
     }),
   };
 });
+
+import React from 'react';
+
+jest.mock('recharts', () => {
+  const OriginalModule = jest.requireActual('recharts');
+
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({ height, children }) => (
+      <OriginalModule.ResponsiveContainer width={800} height={height}>
+        {children}
+      </OriginalModule.ResponsiveContainer>
+    ),
+  };
+});
