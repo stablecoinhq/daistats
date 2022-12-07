@@ -17,6 +17,8 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
         },
       ].concat(logs);
     }
+  } else {
+    return null
   }
   // create new object, clone from vault.logs
   const logsPercent = logs
