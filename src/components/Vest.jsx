@@ -34,7 +34,7 @@ function Vest(props) {
           {award.id}
         </td>
         <td className="has-text-left">
-          <a href={`https://etherscan.io/address/${award.usr}`} target="_blank" rel="noopener noreferrer">
+          <a href={`${props.etherscanBaseUrl}/address/${award.usr}`} target="_blank" rel="noopener noreferrer">
             <p className="subtitle is-size-6" style={{ 'lineHeight': '24px' }}>
               {award.usrName}
               {!award.usrName && award.usr.substring(0, 6) + '...' + award.usr.substring(37, 42)}
