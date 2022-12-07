@@ -5,7 +5,16 @@ import AuctionParticipants from '../../src/components/AuctionParticipants';
 describe('AuctionParticipants component', () => {
   beforeAll(() => {});
   test('should chart container', () => {
-    render(<AuctionParticipants />);
+    const props = {
+      subgraphClient: {
+        request: async () => {
+          return {
+            saleAuctions: [],
+          };
+        },
+      },
+    };
+    render(<AuctionParticipants {...props} />);
     expect(screen.getAllByText(/auction_participants_chart/).length).toBeTruthy();
   });
 });
