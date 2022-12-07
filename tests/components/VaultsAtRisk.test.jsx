@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import ProtocolChange from '../../src/components/ProtocolChange';
+import VaultsAtRisk from '../../src/components/VaultsAtRisk';
 
-describe('ProtocolChange component', () => {
+describe('VaultsAtRisk component', () => {
   beforeAll(() => {});
   test('should show', () => {
     const props = {
@@ -14,7 +14,7 @@ describe('ProtocolChange component', () => {
         },
       },
     };
-    render(<ProtocolChange {...props} />);
-    expect(document.querySelector('.columns')).toBeTruthy();
+    render(<VaultsAtRisk {...props} ilk="ETH-A" />);
+    expect(document.querySelector('div')).toBeTruthy();
   });
 });

@@ -17,8 +17,6 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
         },
       ].concat(logs);
     }
-  } else {
-    return null
   }
   // create new object, clone from vault.logs
   const logsPercent = logs
@@ -31,6 +29,9 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       return obj;
     });
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
+    if (!logs.length) {
+      return [];
+    }
     const liquidationRatioChangeLogList = originalData;
     const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;
     const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp;
@@ -86,7 +87,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
     return liquidationRatioPercent;
   };
   const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(
-    vault.liquidationRatioChangeLog.reverse(),
+    vault && vault.liquidationRatioChangeLog ? vault.liquidationRatioChangeLog.reverse() : [],
   );
 
   logsPercent.map((log, index) => {
@@ -195,7 +196,10 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             axisLine={false}
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
-            domain={[parseInt(logsPercent[0].timestamp), parseInt(logsPercent[logsPercent.length - 1].timestamp)]}
+            domain={[
+              logsPercent.length ? parseInt(logsPercent[0].timestamp) : 'auto',
+              logsPercent.length ? parseInt(logsPercent[logsPercent.length - 1].timestamp) : 'auto',
+            ]}
             type="number"
             dataKey="timestamp"
           />

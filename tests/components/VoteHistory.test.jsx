@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import ProtocolChange from '../../src/components/ProtocolChange';
+import VoteHistory from '../../src/components/VoteHistory';
 
-describe('ProtocolChange component', () => {
+describe('VoteHistory component', () => {
   beforeAll(() => {});
   test('should show', () => {
     const props = {
@@ -14,7 +14,7 @@ describe('ProtocolChange component', () => {
         },
       },
     };
-    render(<ProtocolChange {...props} />);
-    expect(document.querySelector('.columns')).toBeTruthy();
+    render(<VoteHistory {...props} />);
+    expect(document.querySelector('div.columns')).toBeTruthy();
   });
 });
