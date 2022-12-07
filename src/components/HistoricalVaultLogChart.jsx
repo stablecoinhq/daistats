@@ -29,7 +29,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       return obj;
     });
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
-    if (!logs.length) {
+    if (!logs.length || !originalData.length) {
       return [];
     }
     const liquidationRatioChangeLogList = originalData;

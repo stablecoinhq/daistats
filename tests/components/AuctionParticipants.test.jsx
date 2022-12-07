@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import AuctionParticipants from '../../src/components/AuctionParticipants';
 
 describe('AuctionParticipants component', () => {
-  beforeAll(() => { });
+  beforeAll(() => {});
   test('should show empty chart', () => {
     const props = {
       subgraphClient: {
@@ -23,11 +23,11 @@ describe('AuctionParticipants component', () => {
         request: async () => {
           return {
             saleAuctions: [
-              { boughtAt: 1, userIncentives: { id: "0x02" }, userTaker: "0x01" },
-              { boughtAt: 1, userIncentives: { id: "0x02" }, userTaker: "0x03" },
-              { boughtAt: 2, userIncentives: { id: "0x02" }, userTaker: "0x04" },
-              { boughtAt: 3, userIncentives: { id: "0x03" }, userTaker: "0x01" },
-              { boughtAt: 3, userIncentives: { id: "0x02" }, userTaker: "0x04" },
+              { boughtAt: 1, userIncentives: { id: '0x02' }, userTaker: '0x01' },
+              { boughtAt: 1, userIncentives: { id: '0x02' }, userTaker: '0x03' },
+              { boughtAt: 2, userIncentives: { id: '0x02' }, userTaker: '0x04' },
+              { boughtAt: 3, userIncentives: { id: '0x03' }, userTaker: '0x01' },
+              { boughtAt: 3, userIncentives: { id: '0x02' }, userTaker: '0x04' },
             ],
           };
         },

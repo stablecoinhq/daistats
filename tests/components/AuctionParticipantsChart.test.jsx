@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import AuctionParticipantsChart from '../../src/components/AuctionParticipantsChart';
 
 describe('AuctionParticipantsChart component', () => {
-  beforeAll(() => { });
+  beforeAll(() => {});
   test('should draw empty chart', () => {
     const props = {
       auctions: [],

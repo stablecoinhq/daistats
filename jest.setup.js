@@ -22,10 +22,12 @@ jest.mock('recharts', () => {
 
   return {
     ...OriginalModule,
-    ResponsiveContainer: ({ height, children }) => (
-      <OriginalModule.ResponsiveContainer width={800} height={height}>
-        {children}
-      </OriginalModule.ResponsiveContainer>
-    ),
+    ResponsiveContainer: function ({ height, children }) {
+      return (
+        <OriginalModule.ResponsiveContainer width={800} height={height}>
+          {children}
+        </OriginalModule.ResponsiveContainer>
+      );
+    },
   };
 });
