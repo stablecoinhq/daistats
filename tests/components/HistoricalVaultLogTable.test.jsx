@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { prepareMocksResult } from '../utils/helper';
-import Clip from '../../src/components/Clip';
+import HistoricalVaultLogTable from '../../src/components/HistoricalVaultLogTable';
 
-describe('clip component', () => {
+describe('HistoricalVaultLogTable component', () => {
   beforeAll(() => {});
   test('should show table header', () => {
     expect(prepareMocksResult).toBeTruthy();
     render(
       <table>
-        <Clip heading={true} />
+        <HistoricalVaultLogTable heading={true} />
       </table>,
     );
-    expect(screen.getAllByText(/clip/).length).toBeTruthy();
+    expect(screen.getAllByText(/collateral_change/).length).toBeTruthy();
   });
 });
