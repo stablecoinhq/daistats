@@ -7,7 +7,6 @@ import eth from './web3';
 import Main from './Main';
 import Dai from './Dai';
 import daiLogo from './dai-pixel.png';
-import Image from 'next/image';
 // import confetti from './confetti'
 
 const ethers = require('ethers');
@@ -1937,7 +1936,7 @@ class App extends Component {
         <section className="section">
           <div className="container has-text-centered">
             <figure className="image is-128x128 container">
-              <Image src={daiLogo} alt="Dai Logo" width={128} height={128} />
+              <img src={daiLogo} alt="Dai Logo" width={128} height={128} />
             </figure>
             <br />
             <progress className="progress is-small is-primary" max="100">
