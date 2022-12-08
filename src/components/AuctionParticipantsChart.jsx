@@ -69,10 +69,7 @@ const AuctionParticipantsChart = (props) => {
             tickFormatter={(unixTime) => new Date(unixTime * 1000).toLocaleDateString()}
             domain={['auto', 'auto']}
           />
-          <YAxis
-            domain={['auto', 'auto']}
-            yAxisId={1} label={{ value: 'Users', angle: -90, dx: -20, fill: '#7E7E87' }}
-          />
+          <YAxis domain={['auto', 'auto']} yAxisId={1} label={{ value: 'Users', angle: -90, dx: -20, fill: '#7E7E87' }} />
           <Line
             yAxisId={1}
             dataKey="keepers"
