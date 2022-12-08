@@ -162,7 +162,7 @@ const Main = (props) => {
                   <p className="is-size-5">ERC-20</p>
                 </Tab>
                 {isMainnet && (
-                  <div>
+                  <>
                     <Tab>
                       <p className="is-size-5">ERC-20 LP</p>
                     </Tab>
@@ -178,15 +178,15 @@ const Main = (props) => {
                     <Tab>
                       <p className="is-size-5">Deprecated</p>
                     </Tab>
-                  </div>
+                  </>
                 )}
               </TabList>
 
               <TabPanel>
                 <Collateral {...props} ilk="ETH-A" supply={props.ethSupply} />
-                <Collateral {...props} ilk="FAU-A" />
+                {!isMainnet && <Collateral {...props} ilk="FAU-A" />}
                 {isMainnet && (
-                  <span>
+                  <>
                     <Collateral {...props} ilk="ETH-B" supply={props.ethSupply} />
                     <Collateral {...props} ilk="ETH-C" supply={props.ethSupply} />
                     <Collateral {...props} ilk="WSTETH-A" />
@@ -202,11 +202,11 @@ const Main = (props) => {
                     <Collateral {...props} ilk="GUSD-A" />
                     <Collateral {...props} ilk="RENBTC-A" />
                     <Collateral {...props} ilk="MATIC-A" />
-                  </span>
+                  </>
                 )}
               </TabPanel>
               {isMainnet && (
-                <div>
+                <>
                   <TabPanel>
                     <span>
                       <Collateral {...props} ilk="UNIV2USDCETH-A" showLockedDecimals={true} />
@@ -354,86 +354,68 @@ const Main = (props) => {
                       <Collateral {...props} ilk="ZRX-A" />{' '}
                     </span>
                   </TabPanel>
-                </div>
+                </>
               )}
             </Tabs>
           </TabPanel>
           <TabPanel>
             <div className="columns">
               <Pip {...props} token="ETH" ilk="ETH-A" formater={formatTwoDp} />
-              <Pip {...props} token="FAU" ilk="FAU-A" formater={formatTwoDp} />
+              {!isMainnet && <Pip {...props} token="FAU" ilk="FAU-A" formater={formatTwoDp} />}
               {isMainnet && (
-                <span>
+                <>
                   <Pip {...props} token="wstETH" ilk="WSTETH-A" formater={formatTwoDp} />
                   <Pip {...props} token="BTC" ilk="WBTC-A" formater={formatTwoDp} />{' '}
-                </span>
+                </>
               )}
             </div>
             {isMainnet && (
-              <div>
+              <>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="LINK" ilk="LINK-A" formater={formatTwoDp} />
-                    <Pip {...props} token="MANA" ilk="MANA-A" formater={formatCurrency} />
-                    <Pip {...props} token="MATIC" ilk="MATIC-A" formater={formatCurrency} />{' '}
-                  </span>
+                  <Pip {...props} token="LINK" ilk="LINK-A" formater={formatTwoDp} />
+                  <Pip {...props} token="MANA" ilk="MANA-A" formater={formatCurrency} />
+                  <Pip {...props} token="MATIC" ilk="MATIC-A" formater={formatCurrency} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="YFI" ilk="YFI-A" formater={formatTwoDp} />
-                    <Pip {...props} token="USDC, TUSD, USDP, GUSD, aDAI" ilk="USDC-A" formater={formatCurrency} />{' '}
-                  </span>
+                  <Pip {...props} token="YFI" ilk="YFI-A" formater={formatTwoDp} />
+                  <Pip {...props} token="USDC, TUSD, USDP, GUSD, aDAI" ilk="USDC-A" formater={formatCurrency} />{' '}
                 </div>
                 <div className="columns"></div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="UniV2UsdcEth" ilk="UNIV2USDCETH-A" formater={formatNoDecimals} />
-                    <Pip {...props} token="UniV2DaiUsdc" ilk="UNIV2DAIUSDC-A" formater={formatNoDecimals} />{' '}
-                  </span>
+                  <Pip {...props} token="UniV2UsdcEth" ilk="UNIV2USDCETH-A" formater={formatNoDecimals} />
+                  <Pip {...props} token="UniV2DaiUsdc" ilk="UNIV2DAIUSDC-A" formater={formatNoDecimals} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="GUniV3DaiUsdc1" ilk="GUNIV3DAIUSDC1-A" formater={formatTwoDp} />
-                    <Pip {...props} token="GUniV3DaiUsdc2" ilk="GUNIV3DAIUSDC2-A" formater={formatFiveDp} />
-                    <Pip {...props} token="CrvV1EthSteth" ilk="CRVV1ETHSTETH-A" formater={formatTwoDp} />{' '}
-                  </span>
+                  <Pip {...props} token="GUniV3DaiUsdc1" ilk="GUNIV3DAIUSDC1-A" formater={formatTwoDp} />
+                  <Pip {...props} token="GUniV3DaiUsdc2" ilk="GUNIV3DAIUSDC2-A" formater={formatFiveDp} />
+                  <Pip {...props} token="CrvV1EthSteth" ilk="CRVV1ETHSTETH-A" formater={formatTwoDp} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="RWA001" ilk="RWA001-A" formater={formatTwoDp} />
-                    <Pip {...props} token="RWA002" ilk="RWA002-A" formater={formatTwoDp} />{' '}
-                  </span>
+                  <Pip {...props} token="RWA001" ilk="RWA001-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA002" ilk="RWA002-A" formater={formatTwoDp} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="RWA003" ilk="RWA003-A" formater={formatTwoDp} />
-                    <Pip {...props} token="RWA004" ilk="RWA004-A" formater={formatTwoDp} />{' '}
-                  </span>
+                  <Pip {...props} token="RWA003" ilk="RWA003-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA004" ilk="RWA004-A" formater={formatTwoDp} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="RWA005" ilk="RWA005-A" formater={formatTwoDp} />
-                    <Pip {...props} token="RWA006" ilk="RWA006-A" formater={formatTwoDp} />{' '}
-                  </span>
+                  <Pip {...props} token="RWA005" ilk="RWA005-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA006" ilk="RWA006-A" formater={formatTwoDp} />{' '}
                 </div>
                 <div className="columns">
-                  <span>
-                    <Pip {...props} token="RWA008" ilk="RWA008-A" formater={formatTwoDp} />
-                    <Pip {...props} token="RWA009" ilk="RWA009-A" formater={formatTwoDp} />{' '}
-                  </span>
+                  <Pip {...props} token="RWA008" ilk="RWA008-A" formater={formatTwoDp} />
+                  <Pip {...props} token="RWA009" ilk="RWA009-A" formater={formatTwoDp} />{' '}
                 </div>
 
-                <span>
-                  <div className="column">
-                    <div className="box has-text-centered">
-                      <h3 className="title" title={props.mkrPrice}>
-                        ${formatCurrency.format(props.mkrPrice)}
-                      </h3>
-                      <p className="title subtitle is-size-4">YENDAO Price</p>
-                    </div>
-                  </div>{' '}
-                </span>
-              </div>
+                <div className="column">
+                  <div className="box has-text-centered">
+                    <h3 className="title" title={props.mkrPrice}>
+                      ${formatCurrency.format(props.mkrPrice)}
+                    </h3>
+                    <p className="title subtitle is-size-4">YENDAO Price</p>
+                  </div>
+                </div>
+              </>
             )}
           </TabPanel>
           <TabPanel>
@@ -533,7 +515,7 @@ const Main = (props) => {
                     {t('daistats.surplus_buffer')}: {formatAmount.format(props.surplusBuffer)}
                   </p>
                   {isMainnet && (
-                    <div>
+                    <>
                       <p className="title subtitle is-size-4">{t('daistats.auction.hump_lerp')}</p>
                       <p className="title subtitle is-size-6" title={props.lerpHumpStart}>
                         {t('daistats.auction.start')}: {formatNoDecimals.format(props.lerpHumpStart)}
@@ -554,7 +536,7 @@ const Main = (props) => {
                       <p className="title subtitle is-size-6" title={props.lerpHumpAdjustment}>
                         {t('daistats.auction.pending_change')}: {formatNoDecimals.format(props.lerpHumpAdjustment)}
                       </p>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -585,9 +567,9 @@ const Main = (props) => {
                   <Clip heading={true} />
                   <tbody>
                     <Clip {...props} token="ETH-A" ilk="ETH-A" />
-                    <Clip {...props} token="FAU-A" ilk="FAU-A" />
+                    {!isMainnet && <Clip {...props} token="FAU-A" ilk="FAU-A" />}
                     {isMainnet && (
-                      <span>
+                      <>
                         <Clip {...props} token="ETH-B" ilk="ETH-B" />
                         <Clip {...props} token="ETH-C" ilk="ETH-C" />
                         <Clip {...props} token="WSTETH-A" ilk="WSTETH-A" />
@@ -629,7 +611,7 @@ const Main = (props) => {
                         <Clip {...props} token="PSM-USDP-A" ilk="PSM-USDP-A" />
                         <Clip {...props} token="PSM-GUSD-A" ilk="PSM-GUSD-A" />
                         <Clip {...props} token="DIRECT-AAVEV2-DAI" ilk="DIRECT-AAVEV2-DAI" />{' '}
-                      </span>
+                      </>
                     )}
                   </tbody>
                 </table>
@@ -730,7 +712,7 @@ const Main = (props) => {
               </div>
             </div>
             {isMainnet && (
-              <div>
+              <>
                 <div className="columns">
                   <div className="column">
                     <div className="box has-text-centered">
@@ -840,12 +822,12 @@ const Main = (props) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </TabPanel>
           <TabPanel>
             {isMainnet && (
-              <div>
+              <>
                 <div className="columns">
                   <div className="column">
                     <div className="box has-text-centered">
@@ -1137,7 +1119,7 @@ const Main = (props) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
             <hr />
             <div className="columns">
@@ -1200,7 +1182,7 @@ const Main = (props) => {
                 </div>
               </div>
               {isMainnet && (
-                <div>
+                <>
                   <div className="column">
                     <div className="box has-text-centered">
                       <a href={`${props.etherscanBaseUrl}/token/${props.BAT}`} target="_blank" rel="noopener noreferrer">
@@ -1231,12 +1213,12 @@ const Main = (props) => {
                       </a>
                     </div>
                   </div>
-                </div>
+                </>
               )}
             </div>
 
             {isMainnet && (
-              <div>
+              <>
                 <div className="columns">
                   <div className="column">
                     <div className="box has-text-centered">
@@ -1704,7 +1686,7 @@ const Main = (props) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </TabPanel>
           <TabPanel>
