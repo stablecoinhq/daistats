@@ -100,17 +100,19 @@ var VoteHistory = (props) => {
                 });
               } else if (voteLog.__typename == 'VoteLogVote') {
                 let message = '';
-                if (voteLog.oldSlate) {
-                  message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
-                    yendao: floatFromWad(voteLog.sender.voteWeight),
-                    newAddresses: voteLog.newSlate.addresses.join(', '),
-                    oldAddresses: voteLog.oldSlate.addresses.join(', '),
-                  });
-                } else {
-                  message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
-                    yendao: floatFromWad(voteLog.sender.voteWeight),
-                    newAddresses: voteLog.newSlate.addresses.join(', '),
-                  });
+                if (voteLog.sender) {
+                  if (voteLog.oldSlate) {
+                    message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
+                      yendao: floatFromWad(voteLog.sender.voteWeight),
+                      newAddresses: voteLog.newSlate.addresses.join(', '),
+                      oldAddresses: voteLog.oldSlate.addresses.join(', '),
+                    });
+                  } else {
+                    message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
+                      yendao: floatFromWad(voteLog.sender.voteWeight),
+                      newAddresses: voteLog.newSlate.addresses.join(', '),
+                    });
+                  }
                 }
                 voteLog.description += message;
               }
@@ -139,6 +141,7 @@ var VoteHistory = (props) => {
     <div>
       <div className="columns">
         <div className="column" key="VoteHistoryApprovalTable">
+          <h4 className="subtitle is-size-3">{t('daistats.vote_history.popular_candidates')}</h4>
           {voteApprovals ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <VoteHistoryApprovalTable heading={true} />
@@ -153,6 +156,7 @@ var VoteHistory = (props) => {
           )}
         </div>
         <div className="column" key="VoteHistoryLogTableKey">
+          <h4 className="subtitle is-size-3">{t('daistats.vote_history.user_vote_actions')}</h4>
           {voteLogs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <VoteHistoryLogTable {...props} heading={true} />
