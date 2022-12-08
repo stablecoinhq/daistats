@@ -279,7 +279,10 @@ let lerp;
 if (process.env.REACT_APP_NETWORK === 'mainnet') {
   lerp = build(add.LERP_HUMP, 'Lerp');
 }
-const fau = build(add.FAU, 'ERC20');
+let fau;
+if (process.env.REACT_APP_NETWORK !== 'mainnet') {
+  fau = build(add.FAU, 'ERC20');
+}
 
 const ethAIlkBytes = utils.formatBytes32String('ETH-A');
 const ethBIlkBytes = utils.formatBytes32String('ETH-B');
@@ -1454,21 +1457,6 @@ class App extends Component {
       }
       valueBn = value;
       value = utils.formatUnits(value, 45);
-
-      if (ilkName == 'FAU-A') {
-        console.log({
-          zzz,
-          price,
-          tokenDp,
-          valueBn,
-          value,
-          gem,
-          units,
-          base,
-          priceNxt,
-          priceMedian,
-        });
-      }
     }
 
     const r = {
