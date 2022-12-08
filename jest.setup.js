@@ -6,7 +6,13 @@ jest.mock('react-polyglot', () => {
     __esModule: true,
     ...originalModule,
     useTranslate: jest.fn(() => {
-      const f = (key) => key;
+      const f = (key, value) => {
+        let vals = '';
+        if (value) {
+          vals = ': ' + JSON.stringify(value);
+        }
+        return key + vals;
+      };
       f._polyglot = {
         currentLocale: 'en',
       };
