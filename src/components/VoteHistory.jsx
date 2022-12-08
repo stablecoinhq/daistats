@@ -141,6 +141,7 @@ var VoteHistory = (props) => {
     <div>
       <div className="columns">
         <div className="column" key="VoteHistoryApprovalTable">
+          <h4 className="subtitle is-size-3">{t('daistats.vote_history.popular_candidates')}</h4>
           {voteApprovals ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <VoteHistoryApprovalTable heading={true} />
@@ -155,6 +156,7 @@ var VoteHistory = (props) => {
           )}
         </div>
         <div className="column" key="VoteHistoryLogTableKey">
+          <h4 className="subtitle is-size-3">{t('daistats.vote_history.user_vote_actions')}</h4>
           {voteLogs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
               <VoteHistoryLogTable {...props} heading={true} />

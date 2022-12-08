@@ -6,7 +6,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
   const t = useTranslate();
   let logs = [];
   if (vault && vault.logs) {
-    logs = vault.logs;
+    logs = vault.logs.map((log) => Object.assign({}, log));
     // add current situation as single point only if logs has single point that cannot form a graph
     if (new Set(logs.map((log) => log.timestamp)).size < 2) {
       logs = [
@@ -19,15 +19,12 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
     }
   }
   // create new object, clone from vault.logs
-  const logsPercent = logs
-    .reverse()
-    .concat()
-    .map((log) => {
-      const obj = Object.assign({}, log);
-      obj.postCollateralizationRatio = obj.postCollateralizationRatio * 100;
-      obj.preCollateralizationRatio = obj.preCollateralizationRatio * 100;
-      return obj;
-    });
+  const logsPercent = logs.reverse().map((log) => {
+    const obj = Object.assign({}, log);
+    obj.postCollateralizationRatio = obj.postCollateralizationRatio * 100;
+    obj.preCollateralizationRatio = obj.preCollateralizationRatio * 100;
+    return obj;
+  });
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
     if (!logs.length || !originalData.length) {
       return [];
@@ -177,7 +174,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
     <div
       style={{
         width: '100%',
-        height: 180,
+        height: 250,
         marginTop: -24,
         display: 'flex',
         alignItems: 'center',

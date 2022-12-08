@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslate } from 'react-polyglot';
+import { useHistory } from 'react-router-dom';
 
 function VaultsAtRisk(props) {
   const [priceDropRatio, setPriceDropRatio] = useState('20');
@@ -10,6 +11,7 @@ function VaultsAtRisk(props) {
   const round = (num, digits = 2) => new Number(+num).toFixed(digits);
   const allVaults = props.allVaults ? props.allVaults[props.ilk] : undefined;
   const t = useTranslate();
+  const history = useHistory();
   if (allVaults) {
     const ilk = props.ilksByName[props.ilk];
 
@@ -55,33 +57,38 @@ function VaultsAtRisk(props) {
           </div>
           {dangerousVaultsChunks.map((vaultList, vaultListIndex) => (
             <div className="columns" key={`vaultListIndex_${vaultListIndex}`}>
-              {vaultList.map((vault) => (
-                <div className="column box has-text-centered" key={vault.id}>
-                  <p className="subtitle is-size-6">CDP ID: {vault.cdpId ? vault.cdpId : vault.id}</p>
-                  <p className="subtitle is-size-6">
-                    {t('daistats.vaults_at_risk.collateral')}: {round(vault.collateral)} {props.ilksByName[props.ilk].token}
-                  </p>
-                  <p className="subtitle is-size-6">
-                    {t('daistats.vaults_at_risk.debt')}: {round(parseFloat(vault.debt) * parseFloat(ilk.rate))} JPY
-                  </p>
-                  <p className="subtitle is-size-6">
-                    {t('daistats.vaults_at_risk.current_collateral_ratio')}:{' '}
-                    {round(
-                      (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price))) /
-                        (parseFloat(vault.debt) * parseFloat(ilk.rate)),
-                    )}
-                    %
-                  </p>
-                  <p className="subtitle is-size-6">
-                    {t('daistats.vaults_at_risk.simulated_collateral_ratio')}:{' '}
-                    {round(
-                      (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price) * parseFloat(1 - priceDropRatio / 100))) /
-                        (parseFloat(vault.debt) * parseFloat(ilk.rate)),
-                    )}
-                    %
-                  </p>
-                </div>
-              ))}
+              {vaultList.map((vault) => {
+                const cdpIdString = vault.cdpId ? vault.cdpId : vault.id;
+                return (
+                  <div className="column box has-text-centered" key={vault.id}>
+                    <p className="subtitle is-size-6" onClick={() => history.push(`/vault-information/${cdpIdString}`)}>
+                      CDP ID: {cdpIdString}
+                    </p>
+                    <p className="subtitle is-size-6">
+                      {t('daistats.vaults_at_risk.collateral')}: {round(vault.collateral)} {props.ilksByName[props.ilk].token}
+                    </p>
+                    <p className="subtitle is-size-6">
+                      {t('daistats.vaults_at_risk.debt')}: {round(parseFloat(vault.debt) * parseFloat(ilk.rate))} JPYSC
+                    </p>
+                    <p className="subtitle is-size-6">
+                      {t('daistats.vaults_at_risk.current_collateral_ratio')}:{' '}
+                      {round(
+                        (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price))) /
+                          (parseFloat(vault.debt) * parseFloat(ilk.rate)),
+                      )}
+                      %
+                    </p>
+                    <p className="subtitle is-size-6">
+                      {t('daistats.vaults_at_risk.simulated_collateral_ratio')}:{' '}
+                      {round(
+                        (100 * (parseFloat(vault.collateral) * parseFloat(ilk.price) * parseFloat(1 - priceDropRatio / 100))) /
+                          (parseFloat(vault.debt) * parseFloat(ilk.rate)),
+                      )}
+                      %
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
