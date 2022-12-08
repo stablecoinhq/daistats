@@ -100,17 +100,19 @@ var VoteHistory = (props) => {
                 });
               } else if (voteLog.__typename == 'VoteLogVote') {
                 let message = '';
-                if (voteLog.oldSlate) {
-                  message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
-                    yendao: floatFromWad(voteLog.sender.voteWeight),
-                    newAddresses: voteLog.newSlate.addresses.join(', '),
-                    oldAddresses: voteLog.oldSlate.addresses.join(', '),
-                  });
-                } else {
-                  message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
-                    yendao: floatFromWad(voteLog.sender.voteWeight),
-                    newAddresses: voteLog.newSlate.addresses.join(', '),
-                  });
+                if (voteLog.sender) {
+                  if (voteLog.oldSlate) {
+                    message = t('daistats.vote_history.description.vote_log_vote.old_slate', {
+                      yendao: floatFromWad(voteLog.sender.voteWeight),
+                      newAddresses: voteLog.newSlate.addresses.join(', '),
+                      oldAddresses: voteLog.oldSlate.addresses.join(', '),
+                    });
+                  } else {
+                    message = t('daistats.vote_history.description.vote_log_vote.not_old_slate', {
+                      yendao: floatFromWad(voteLog.sender.voteWeight),
+                      newAddresses: voteLog.newSlate.addresses.join(', '),
+                    });
+                  }
                 }
                 voteLog.description += message;
               }
