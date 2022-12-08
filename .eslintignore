@@ -1,0 +1,6 @@
+/generated/
+/.next/
+/node_modules/
+*.config.js
+*.lock*
+/jest.setup.js

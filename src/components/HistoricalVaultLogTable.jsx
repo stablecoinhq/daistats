@@ -1,51 +1,86 @@
-import React from 'react'
+import React from 'react';
 import { useTranslate } from 'react-polyglot';
 
-const formatTwoDp = new Intl.NumberFormat('en-US', {
-  style: 'decimal',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-})
-
 function HistoricalVaultLogTable(props) {
-  const t = useTranslate()
-  const log = props.log
-  console.log(JSON.stringify({ log }))
+  const t = useTranslate();
+  const round = (num, digits = 2) => new Number(+num).toFixed(digits);
+  const log = props.log;
   if (props.heading) {
-    return (<thead>
-      <tr>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Time</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Operations</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Collateral Change ()</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Debt Change (DAI)</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Paid fees (DAI)</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Market Price (USD)</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Oracle Price (USD)</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Pre Collateralization Ratio</th>
-        <th style={{ color: "#e6e8f1", fontWeight: 400 }}>Post Collateralization Ratio</th>
-      </tr>
-    </thead>)
+    return (
+      <thead>
+        <tr>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.time')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.operations')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.collateral_change')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.debt_change')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.market_price')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.oracle_price')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.pre_collateralization_ratio')}</th>
+          <th style={{ color: '#e6e8f1', fontWeight: 400 }}>{t('daistats.vault_information.post_collateralization_ratio')}</th>
+        </tr>
+      </thead>
+    );
   } else {
+    let typeName = '';
+    switch (log.__typename) {
+      case 'VaultCreationLog': {
+        typeName = t('daistats.vault_information.vault_creation_log');
+        break;
+      }
+      case 'VaultCollateralChangeLog': {
+        typeName = t('daistats.vault_information.vault_collateral_change_log');
+        break;
+      }
+      case 'VaultDebtChangeLog': {
+        typeName = t('daistats.vault_information.vault_debt_change_log');
+        break;
+      }
+      case 'VaultSplitChangeLog': {
+        typeName = t('daistats.vault_information.vault_split_change_log');
+        break;
+      }
+      case 'VaultTransferChangeLog': {
+        typeName = t('daistats.vault_information.vault_transfer_change_log');
+        break;
+      }
+      default: {
+        typeName = log.__typename;
+        break;
+      }
+    }
     return (
       <tr>
-        <td className="has-text-right" title={log.timestamp}>{(new Date(parseInt(log.timestamp) * 1000)).toLocaleString()}</td>
+        <td className="has-text-right" title={log.timestamp}>
+          {new Date(parseInt(log.timestamp) * 1000).toLocaleString()}
+        </td>
         <td className="has-text-left">
-          <a href={`https://etherscan.io/tx/${log.transaction}`} target="_blank" rel="noopener noreferrer">
+          <a href={`${props.etherscanBaseUrl}/tx/${log.transaction}`} target="_blank" rel="noopener noreferrer">
             <p className="subtitle is-size-6" style={{ 'lineHeight': '24px' }}>
-              {log.__typename}
+              {typeName}
             </p>
           </a>
         </td>
-        <td className="has-text-right" title={log.collateralChange}>{log.collateralChange}</td>
-        <td className="has-text-right" title={log.debtChange}>{log.debtChange}</td>
-        <td className="has-text-right" title={log.paidFees}>{log.paidFees}</td>
-        <td className="has-text-right" title={log.oraclePrice}>{log.oraclePrice}</td>
-        <td className="has-text-right" title={log.oraclePrice}>{log.oraclePrice}</td>
-        <td className="has-text-right" title={log.preCollateralizationRatio}>{log.preCollateralizationRatio}</td>
-        <td className="has-text-right" title={log.postCollateralizationRatio}>{log.postCollateralizationRatio}</td>
+        <td className="has-text-right" title={log.collateralChange}>
+          {log.collateralChange}
+        </td>
+        <td className="has-text-right" title={log.debtChange}>
+          {log.debtChange}
+        </td>
+        <td className="has-text-right" title={log.oraclePrice}>
+          {log.oraclePrice}
+        </td>
+        <td className="has-text-right" title={log.oraclePrice}>
+          {log.oraclePrice}
+        </td>
+        <td className="has-text-right" title={log.preCollateralizationRatio}>
+          {round(100 * log.preCollateralizationRatio)}%
+        </td>
+        <td className="has-text-right" title={log.postCollateralizationRatio}>
+          {round(100 * log.postCollateralizationRatio)}%
+        </td>
       </tr>
-    )
+    );
   }
 }
 
-export default HistoricalVaultLogTable
+export default HistoricalVaultLogTable;
