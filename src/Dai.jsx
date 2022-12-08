@@ -7,7 +7,7 @@ const formatAmount = new Intl.NumberFormat('en-US', {
 });
 
 const Dai = (props) => {
-  document.title = `Total Supply of Dai - Dai Stats`;
+  document.title = `Total Supply of JPYSC - JPYSC Stats`;
   const { debt, vice, daiSupply, savingsDai, vow_dai, vow_sin, bigSin } = props;
   return (
     <div>

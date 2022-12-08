@@ -155,10 +155,10 @@ var VoteHistory = (props) => {
         <div className="column" key="VoteHistoryLogTableKey">
           {voteLogs ? (
             <table className="table" style={{ margin: '0 auto', backgroundColor: '#192734', color: '#e6e8f1' }}>
-              <VoteHistoryLogTable heading={true} />
+              <VoteHistoryLogTable {...props} heading={true} />
               <tbody>
                 {voteLogs.map((log, idx) => (
-                  <VoteHistoryLogTable log={log} key={idx} />
+                  <VoteHistoryLogTable {...props} log={log} key={idx} />
                 ))}
               </tbody>
             </table>

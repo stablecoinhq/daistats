@@ -18,7 +18,7 @@ const formatNoDecimals = new Intl.NumberFormat('en-US', {
 
 const Main = (props) => {
   const t = useTranslate();
-  document.title = `${formatNoDecimals.format(props.debt)} - Dai Stats`;
+  document.title = `${formatNoDecimals.format(props.debt)} - JPYSC Stats`;
 
   // hack till Main component is broken into component per section
   const location = useLocation();

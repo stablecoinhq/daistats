@@ -29,6 +29,9 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
       return obj;
     });
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
+    if (!logs.length || !originalData.length) {
+      return [];
+    }
     const liquidationRatioChangeLogList = originalData;
     const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;
     const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp;
@@ -84,8 +87,25 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
     return liquidationRatioPercent;
   };
   const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(
-    vault.liquidationRatioChangeLog.reverse(),
+    vault && vault.liquidationRatioChangeLog ? vault.liquidationRatioChangeLog.reverse() : [],
   );
+
+  logsPercent.map((log, index) => {
+    for (
+      let liquidationRatioChangeLogIndex = 0;
+      liquidationRatioChangeLogIndex < liquidationRatioChangeLogWithBothEnds.length;
+      liquidationRatioChangeLogIndex++
+    ) {
+      const matChangeLog = liquidationRatioChangeLogWithBothEnds[liquidationRatioChangeLogIndex];
+      if (log.timestamp <= matChangeLog.timestamp) {
+        logsPercent[index].mat = matChangeLog.mat;
+        break;
+      } else if (liquidationRatioChangeLogIndex === liquidationRatioChangeLogWithBothEnds.length - 1) {
+        logsPercent[index].mat = matChangeLog.mat;
+        break;
+      }
+    }
+  });
 
   const locale = useMemo(() => t._polyglot.currentLocale, [t]);
 
@@ -176,7 +196,10 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
             axisLine={false}
             tickFormatter={formatTick}
             style={{ userSelect: 'none' }}
-            domain={[parseInt(logsPercent[0].timestamp), parseInt(logsPercent[logsPercent.length - 1].timestamp)]}
+            domain={[
+              logsPercent.length ? parseInt(logsPercent[0].timestamp) : 'auto',
+              logsPercent.length ? parseInt(logsPercent[logsPercent.length - 1].timestamp) : 'auto',
+            ]}
             type="number"
             dataKey="timestamp"
           />
@@ -203,7 +226,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio }) => {
           />
           <Line
             yAxisId={1}
-            data={liquidationRatioChangeLogWithBothEnds}
+            data={logsPercent}
             dataKey="mat"
             type="stepAfter"
             dot={false}
