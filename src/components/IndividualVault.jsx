@@ -24,6 +24,7 @@ var IndividualVault = (props) => {
 
   const [cdpId, setCdpId] = useState(convertLowerCaseAddress(props.cdpId) ?? '1');
   const [vault, setVault] = useState(undefined);
+  const [priceList, setPriceList] = useState([]);
   const [currentCollateralRatio, setCurrentCollateralRatio] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
@@ -206,9 +207,12 @@ var IndividualVault = (props) => {
                 })
                 .flat();
             }
+            console.log(fetchResult.saleAuctions);
+            console.log(reversedLogs.map((log) => ({ _t: log.__typename, t: log.timestamp })));
             const vaultWithAuctionLogs = reversedLogs
               .concat(auctionLogs)
               .sort((left, right) => left.timestamp - right.timestamp);
+            console.log(vaultWithAuctionLogs.map((log) => ({ _t: log.__typename, t: log.timestamp })));
 
             // logs have collateral/debt change in different format.
             // calculate before/after/change value.
@@ -284,10 +288,26 @@ var IndividualVault = (props) => {
               const logUpdatedDebtChange = updateDebtChange(logUpdatedCollateralChange, mapIndex);
               return logUpdatedDebtChange;
             });
+            // get list of time points where price values will be fetched
+            const getUnsortedPriceTimestampList = (logs) => {
+              const priceTimestampList = logs.map((log) => log.timestamp);
+              if (new Set(priceTimestampList).size < 2) {
+                priceTimestampList.push(((Date.now() / 1000) | 0).toString());
+              }
+              const firstTimestamp = +priceTimestampList[0];
+              const lastTimestamp = +priceTimestampList[priceTimestampList.length - 1];
+              const numberOfPoints = 100;
+              const pointDiff = +(lastTimestamp - firstTimestamp) / numberOfPoints;
+              const middlePoints = [...Array(numberOfPoints).keys()].map((_v, index) =>
+                ((firstTimestamp + index * pointDiff) | 0).toString(),
+              );
+              return priceTimestampList.concat(middlePoints);
+            };
+            const priceTimestampList = getUnsortedPriceTimestampList(modifiedLogs);
             // get oracle price log
-            const priceListGql = modifiedLogs.map((log, index) => {
+            const priceListGql = priceTimestampList.map((timestamp, index) => {
               return `
-                _${index}: collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${log.timestamp}, collateral: "${collateralType.id}"}){
+                _${index}: collateralPriceUpdateLogs(first: 1, orderBy: timestamp, orderDirection: desc, where: {timestamp_lte: ${timestamp}, collateral: "${collateralType.id}"}){
                   id,
                   newValue,
                   newSpotPrice,
@@ -297,18 +317,18 @@ var IndividualVault = (props) => {
                 }
               `;
             });
-            const priceList = await subgraphClient.request(gql`{ ${priceListGql} }`);
+            const unsortedPriceList = await subgraphClient.request(gql`{ ${priceListGql} }`);
 
             // update all log records for view
             for (let logIndex = 0; logIndex < vaultWithAuctionLogs.length; logIndex++) {
               // oracle price
               if (
-                priceList &&
-                priceList[`_${logIndex}`] &&
-                priceList[`_${logIndex}`][0] &&
-                priceList[`_${logIndex}`][0].newValue
+                unsortedPriceList &&
+                unsortedPriceList[`_${logIndex}`] &&
+                unsortedPriceList[`_${logIndex}`][0] &&
+                unsortedPriceList[`_${logIndex}`][0].newValue
               ) {
-                vaultWithAuctionLogs[logIndex].oraclePrice = priceList[`_${logIndex}`][0].newValue;
+                vaultWithAuctionLogs[logIndex].oraclePrice = unsortedPriceList[`_${logIndex}`][0].newValue;
               } else if (
                 vaultWithAuctionLogs[logIndex - 1] &&
                 vaultWithAuctionLogs[logIndex - 1].oraclePrice &&
@@ -322,12 +342,12 @@ var IndividualVault = (props) => {
 
               // spot price
               if (
-                priceList &&
-                priceList[`_${logIndex}`] &&
-                priceList[`_${logIndex}`][0] &&
-                priceList[`_${logIndex}`][0].newSpotPrice
+                unsortedPriceList &&
+                unsortedPriceList[`_${logIndex}`] &&
+                unsortedPriceList[`_${logIndex}`][0] &&
+                unsortedPriceList[`_${logIndex}`][0].newSpotPrice
               ) {
-                vaultWithAuctionLogs[logIndex].spotPrice = priceList[`_${logIndex}`][0].newSpotPrice;
+                vaultWithAuctionLogs[logIndex].spotPrice = unsortedPriceList[`_${logIndex}`][0].newSpotPrice;
               } else if (
                 vaultWithAuctionLogs[logIndex - 1] &&
                 vaultWithAuctionLogs[logIndex - 1].spotPrice &&
@@ -408,8 +428,12 @@ var IndividualVault = (props) => {
 
             // reverse it again to view as from new to old
             fetchResult.vaults[0].logs = vaultWithAuctionLogs.reverse().map((log) => Object.assign({}, log));
-          } else {
-            fetchResult.vaults[0].logs = [];
+
+            // add price list
+            const priceListDeepElement = Object.keys(unsortedPriceList).map((key) => unsortedPriceList[key][0]);
+            fetchResult.priceList = [...new Map(priceListDeepElement.map((item) => [item.timestamp, item])).values()].sort(
+              (left, right) => +left.timestamp - +right.timestamp,
+            );
           }
         }
         return fetchResult;
@@ -453,14 +477,17 @@ var IndividualVault = (props) => {
         if (getSingleVaultResult && getSingleVaultResult.vaults && getSingleVaultResult.vaults[0]) {
           const singleVault = getSingleVaultResult.vaults[0];
           const liquidationRatioChangeLog = await getLiquidationRatioChangeLog(singleVault.collateralType.id);
+          const collateralFloat = parseFloat(singleVault.collateral);
+          const floatPrice = parseFloat(props.ilksByName[singleVault.collateralType.id].price);
           const denominator = parseFloat(singleVault.debt) * parseFloat(props.ilksByName[singleVault.collateralType.id].rate);
-          const currentCollateralRatioValue = denominator
-            ? (parseFloat(singleVault.collateral) * parseFloat(props.ilksByName[singleVault.collateralType.id].price)) /
-              denominator
-            : 0;
+          const currentCollateralRatioValue = denominator ? (collateralFloat * floatPrice) / denominator : 0;
           singleVault.liquidationRatioChangeLog = liquidationRatioChangeLog;
           setVault(singleVault);
           setCurrentCollateralRatio(currentCollateralRatioValue);
+        }
+        // get price list
+        if (getSingleVaultResult && getSingleVaultResult.priceList) {
+          setPriceList(getSingleVaultResult.priceList);
         }
       }
     };
@@ -530,7 +557,11 @@ var IndividualVault = (props) => {
               )}
             </h3>
             <h4 className="subtitle is-size-3">{t('daistats.vault_information.individual_vault_history')}</h4>
-            {vault ? <HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} /> : <div></div>}
+            {vault ? (
+              <HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} priceList={priceList} />
+            ) : (
+              <div></div>
+            )}
           </div>
         </div>
       </div>

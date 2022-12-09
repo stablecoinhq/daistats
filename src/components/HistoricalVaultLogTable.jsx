@@ -43,6 +43,14 @@ function HistoricalVaultLogTable(props) {
         typeName = t('daistats.vault_information.vault_transfer_change_log');
         break;
       }
+      case 'liquidationStartLog': {
+        typeName = t('daistats.vault_information.liquidation_start_log');
+        break;
+      }
+      case 'liquidationFinishLog': {
+        typeName = t('daistats.vault_information.liquidation_finish_log');
+        break;
+      }
       default: {
         typeName = log.__typename;
         break;
