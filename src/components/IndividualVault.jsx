@@ -427,7 +427,9 @@ var IndividualVault = (props) => {
             fetchResult.vaults[0].logs = vaultWithAuctionLogs.reverse().map((log) => Object.assign({}, log));
 
             // add price list
-            const priceListDeepElement = Object.keys(unsortedPriceList).map((key) => unsortedPriceList[key][0]);
+            const priceListDeepElement = Object.keys(unsortedPriceList)
+              .map((key) => unsortedPriceList[key][0])
+              .filter((v) => v);
             fetchResult.priceList = [...new Map(priceListDeepElement.map((item) => [item.timestamp, item])).values()].sort(
               (left, right) => +left.timestamp - +right.timestamp,
             );

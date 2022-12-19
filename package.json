@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://daistats.com",
   "dependencies": {
-    "defi18n": "https://github.com/stablecoinhq/defi18n.git#b7c0706ee9c1fa1e3e1191f79e8e501f3aac4829",
+    "defi18n": "https://github.com/stablecoinhq/defi18n.git#1d15a8b8a4f73932f52627a784622a0b6cc77774",
     "ethers": "^5.0.31",
     "gh-pages": "^3.1.0",
     "graphql": "^15.5.0",

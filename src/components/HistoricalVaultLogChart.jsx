@@ -33,10 +33,12 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
       const log = Object.assign({}, searchedLogPoint);
       if (log) {
         if (vault.collateralType && vault.collateralType.rate && pricePoint.newValue) {
-          // const price = pricePoint.spotPrice
-          // console.log(log.collateralAfter, pricePoint.spotPrice, log.debtAfter, vault.collateralType.rate, (log.collateralAfter * pricePoint.spotPrice), (log.debtAfter * vault.collateralType.rate), (log.collateralAfter * pricePoint.spotPrice) / (log.debtAfter * vault.collateralType.rate))
-          log.postCollateralizationRatio =
-            (log.collateralAfter * pricePoint.newValue) / (log.debtAfter * vault.collateralType.rate);
+          if (log.debtAfter * vault.collateralType.rate) {
+            log.postCollateralizationRatio =
+              (log.collateralAfter * pricePoint.newValue) / (log.debtAfter * vault.collateralType.rate);
+          } else {
+            log.postCollateralizationRatio = 0;
+          }
         }
         log.timestamp = pricePoint.timestamp;
       }
@@ -278,7 +280,7 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
             data={logsPercent}
             yAxisId={2}
             dataKey="debtAfter"
-            type="monotone"
+            type="stepAfter"
             animationDuration={750}
             stroke="#008E7B"
             fill="url(#totalDebtColor)"

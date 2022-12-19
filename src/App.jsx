@@ -364,7 +364,7 @@ let subgraphUrl;
 if (process.env.REACT_APP_NETWORK === 'mainnet') {
   VEST_DAI_IDS = 13;
   VEST_MKR_TREASURY_IDS = 24;
-  subgraphUrl = 'https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.14';
+  subgraphUrl = 'https://api.studio.thegraph.com/query/33920/dai-goerli/v0.0.15';
 } else {
   VEST_DAI_IDS = 0;
   VEST_MKR_TREASURY_IDS = 0;

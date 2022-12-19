@@ -57,7 +57,7 @@ var AuctionParticipants = (props) => {
             });
           }
         } catch (e) {
-          console.log(`failed to fetch subgraph query`);
+          console.log(`failed to fetch subgraph query: ` + e);
         }
         return auctionLogs;
       };
