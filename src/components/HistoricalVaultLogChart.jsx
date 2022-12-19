@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslate } from 'react-polyglot';
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-const HistoricalVaultLogChart = ({ vault, currentCollateralRatio, priceList }) => {
+const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, priceList }) => {
   // vault.logs contains preprocessed data for vault manipulation logs in descending order.
   // currentCollateralRatio is a scalar value for current collateral ratio.
   // priceList contains price map for vault manipulation logs and its middle points.
@@ -17,7 +17,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio, priceList }) =
       logs = [
         {
           timestamp: (Date.now() / 1000) | 0,
-          debtAfter: vault.debt,
+          debtAfter: parseFloat(vault.debt) * parseFloat(ilksByName[vault.collateralType.id].rate),
           collateral: vault.collateral,
           postCollateralizationRatio: +currentCollateralRatio,
         },
@@ -87,13 +87,7 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio, priceList }) =
     log.postCollateralizationRatio = log.postCollateralizationRatio * 100;
     return log;
   });
-  console.log(duplicateLogsWithPricePoint);
-  const uniqueLogsWithPricePoint =
-    // [...new Map(duplicateLogsWithPricePoint.map(item =>
-    //   [item.timestamp, item]
-    // )).values()]
-    duplicateLogsWithPricePoint;
-  // .sort((left, right) => (+left.timestamp) - (+right.timestamp))
+  const uniqueLogsWithPricePoint = duplicateLogsWithPricePoint;
   const logsPercent =
     priceList.length && logs[0].timestamp - logs[logs.length - 1].timestamp > 60 * 60 * 24 * 7
       ? uniqueLogsWithPricePoint
@@ -101,7 +95,6 @@ const HistoricalVaultLogChart = ({ vault, currentCollateralRatio, priceList }) =
           log.postCollateralizationRatio = log.postCollateralizationRatio * 100;
           return log;
         });
-  console.log(logsPercent);
   // add liquidation ratio change data points to datasets
   const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
     if (!logs.length || !originalData.length) {

@@ -207,12 +207,9 @@ var IndividualVault = (props) => {
                 })
                 .flat();
             }
-            console.log(fetchResult.saleAuctions);
-            console.log(reversedLogs.map((log) => ({ _t: log.__typename, t: log.timestamp })));
             const vaultWithAuctionLogs = reversedLogs
               .concat(auctionLogs)
               .sort((left, right) => left.timestamp - right.timestamp);
-            console.log(vaultWithAuctionLogs.map((log) => ({ _t: log.__typename, t: log.timestamp })));
 
             // logs have collateral/debt change in different format.
             // calculate before/after/change value.
@@ -558,7 +555,12 @@ var IndividualVault = (props) => {
             </h3>
             <h4 className="subtitle is-size-3">{t('daistats.vault_information.individual_vault_history')}</h4>
             {vault ? (
-              <HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} priceList={priceList} />
+              <HistoricalVaultLogChart
+                {...props}
+                vault={vault}
+                currentCollateralRatio={currentCollateralRatio}
+                priceList={priceList}
+              />
             ) : (
               <div></div>
             )}
