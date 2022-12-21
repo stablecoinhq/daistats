@@ -21,9 +21,27 @@ describe('HistoricalVaultLogChart component', () => {
         { timestamp: 1, mat: '1.01234' },
         { timestamp: 10, mat: '1.01234' },
       ],
+      collateralType: {
+        id: 'ETH-A',
+      },
     };
+    const props = {
+      ilksByName: {
+        'ETH-A': {
+          rate: 1.1234,
+        },
+      },
+    };
+    const priceList = [];
     const currentCollateralRatio = 1;
-    render(<HistoricalVaultLogChart vault={vault} currentCollateralRatio={currentCollateralRatio} />);
+    render(
+      <HistoricalVaultLogChart
+        {...props}
+        vault={vault}
+        currentCollateralRatio={currentCollateralRatio}
+        priceList={priceList}
+      />,
+    );
     const container = document.querySelector('.recharts-responsive-container');
     expect(container).toBeTruthy();
   });

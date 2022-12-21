@@ -59,6 +59,17 @@ describe('IndividualVault component', () => {
               { mat: '1.03', timestamp: 4 },
               { mat: '1.04', timestamp: 5 },
             ];
+          } else if (query.match(/collateralPriceUpdateLogs\(/)) {
+            return [
+              {
+                id: '0x12341234',
+                newValue: 1234,
+                newSpotPrice: 1234,
+                block: 800000,
+                timestamp: 1671439090,
+                transaction: '0x12341234',
+              },
+            ];
           }
         },
       },
