@@ -11,7 +11,7 @@ const RiskModelChart = (props) => {
 
   const formatTooltipTitle = useCallback(
     (value, _name) => {
-      return `${t('daistats.risk_model.debt_exposure')}: ${(value | 0).toLocaleString()} JPYSC`;
+      return `${t('daistats.risk_model.debt_exposure')}: ${Math.floor(value).toLocaleString()} JPYSC`;
     },
     [t],
   );
@@ -28,7 +28,7 @@ const RiskModelChart = (props) => {
     <div
       style={{
         width: '100%',
-        height: 180,
+        height: 240,
         marginTop: -10,
         display: 'flex',
         alignItems: 'center',

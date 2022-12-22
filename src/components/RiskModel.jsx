@@ -48,15 +48,20 @@ var RiskModel = (props) => {
             const collateralIsEnough = collateral * price * priceDropRatio > debt * mat * rate;
             return !collateralIsEnough;
           });
-        const capitalAtRiskValue = dangerousVaults
-          .map((vault) => vault.debt)
-          .reduce((previous, current) => previous + parseFloat(current), 0);
+        const capitalAtRiskValue = dangerousVaults.reduce((previous, current) => {
+          // this coefficient can be anything with safety level.
+          // if it has higher safety level, coeffient should be smaller.
+          const coefficient = 1 / Math.min(1, Math.max(2, (current.safetyLevel ?? 0) / 100));
+          return previous + parseFloat(current.debt * coefficient);
+        }, 0);
 
         const riskPremiumValue = ((1 + keeperProfit / 100) * capitalAtRiskValue) / totalDebtByVaultTypeValue;
         // we set risk premium criteria as `0.1` as in https://maker.blockanalitica.com/simulations/risk-model/
         const riskPremiumCriteria = 0.1;
-        const maximumDebtCeilingValue = (riskPremiumCriteria / riskPremiumValue) * totalDebtByVaultTypeValue;
-
+        const maximumDebtCeilingValue = Math.min(
+          (riskPremiumCriteria / riskPremiumValue) * totalDebtByVaultTypeValue,
+          Number.MAX_SAFE_INTEGER / 1000, // this should be total cap? or is it just a simulation so no cap?
+        );
         // build graph data, decide showing x-axis range
         let xAxisStart = 0,
           xAxisEnd = 0;

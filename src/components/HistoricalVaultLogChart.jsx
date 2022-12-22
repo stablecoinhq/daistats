@@ -29,6 +29,7 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
   }
 
   // calculate and merge chart data based on price list, vault change log, and vault
+  // the result will be in ascending order
   const getLogsPercent = (priceList, logs, vault) => {
     // convert price point to graph data
     const searchLogPointBeforeEqualTimestamp = (logPoints, timestamp) => logPoints.find((log) => +log.timestamp <= +timestamp);
@@ -108,14 +109,15 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
   const logsPercent = logs.length ? getLogsPercent(priceList, logs, vault) : [];
 
   // add liquidation ratio change data points to datasets
-  const getLiquidationRatioChangeLogWithBothEnds = (originalData) => {
-    if (!logs.length || !originalData.length) {
+  // argument lists are both descending order, the result will be in descending order
+  const getLiquidationRatioChangeLogWithBothEnds = (originalData, debtLogs) => {
+    if (!debtLogs.length || !originalData.length) {
       return [];
     }
     const liquidationRatioChangeLogList = originalData;
-    const liquidationRatioChangeLogRangeMin = +logs[0].timestamp;
-    const liquidationRatioChangeLogRangeMax = +logs[logs.length - 1].timestamp;
-    // get list within `logs` range
+    const liquidationRatioChangeLogRangeMin = +debtLogs[debtLogs.length - 1].timestamp;
+    const liquidationRatioChangeLogRangeMax = +debtLogs[0].timestamp;
+    // get list within `debtLogs` range
     const liquidationRatioChangeLogWithinRange = liquidationRatioChangeLogList.filter(
       (liquidationRatioChangeLog) =>
         +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp &&
@@ -130,10 +132,11 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
       const liquidationRatioChangeLogAfterRange = liquidationRatioChangeLogList.filter(
         (liquidationRatioChangeLog) => +liquidationRatioChangeLogRangeMin < +liquidationRatioChangeLog.timestamp,
       );
-      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogAfterRange[0];
-    } else {
       lastLiquidationRatioChangeLogBeforeRange =
-        liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1];
+        liquidationRatioChangeLogAfterRange[liquidationRatioChangeLogAfterRange.length - 1];
+    } else {
+      lastLiquidationRatioChangeLogBeforeRange = liquidationRatioChangeLogBeforeRange[0];
+      // liquidationRatioChangeLogBeforeRange[liquidationRatioChangeLogBeforeRange.length - 1];
     }
     // if there is no element, get last element
     if (!liquidationRatioChangeLogWithinRange.length) {
@@ -144,20 +147,20 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
       });
     }
     const liquidationRatioChangeLogWithBothEnds =
-      // add min value
+      // add max value
       [
         {
-          mat: lastLiquidationRatioChangeLogBeforeRange.mat,
-          timestamp: liquidationRatioChangeLogRangeMin,
+          mat: liquidationRatioChangeLogWithinRange[liquidationRatioChangeLogWithinRange.length - 1].mat,
+          timestamp: liquidationRatioChangeLogRangeMax,
         },
       ]
         // original data within range
         .concat(liquidationRatioChangeLogWithinRange)
-        // add max value
+        // add min value
         .concat([
           {
-            mat: liquidationRatioChangeLogWithinRange[liquidationRatioChangeLogWithinRange.length - 1].mat,
-            timestamp: liquidationRatioChangeLogRangeMax,
+            mat: lastLiquidationRatioChangeLogBeforeRange.mat,
+            timestamp: liquidationRatioChangeLogRangeMin,
           },
         ]);
     const liquidationRatioPercent = liquidationRatioChangeLogWithBothEnds.map((element) => {
@@ -166,11 +169,16 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
     });
     return liquidationRatioPercent;
   };
-  const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(
-    vault && vault.liquidationRatioChangeLog ? vault.liquidationRatioChangeLog.reverse() : [],
-  );
+  const liquidationRatioChangeLogDesc =
+    vault && vault.liquidationRatioChangeLog ? vault.liquidationRatioChangeLog.map((v) => Object.assign({}, v)).reverse() : [];
+  const liquidationRatioChangeLogWithBothEnds = getLiquidationRatioChangeLogWithBothEnds(liquidationRatioChangeLogDesc, logs);
 
   // set liquidation ratio value
+  // liquidationRatioChangeLogWithBothEnds is descending order
+  // logsPercent is ascending order
+  // iterate logsPercent ascending order, then inside loop,
+  // look up liquidationRatioChangeLogWithBothEnds array from descending order.
+  // if you find any ratio change event that happened before log, that ratio will be assigned to log.
   logsPercent.map((log, index) => {
     for (
       let liquidationRatioChangeLogIndex = 0;
@@ -178,7 +186,7 @@ const HistoricalVaultLogChart = ({ ilksByName, vault, currentCollateralRatio, pr
       liquidationRatioChangeLogIndex++
     ) {
       const matChangeLog = liquidationRatioChangeLogWithBothEnds[liquidationRatioChangeLogIndex];
-      if (log.timestamp <= matChangeLog.timestamp) {
+      if (log.timestamp >= matChangeLog.timestamp) {
         logsPercent[index].mat = matChangeLog.mat;
         break;
       } else if (liquidationRatioChangeLogIndex === liquidationRatioChangeLogWithBothEnds.length - 1) {
