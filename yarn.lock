@@ -4662,9 +4662,9 @@ default-gateway@^4.2.0:
     execa "^1.0.0"
     ip-regex "^2.1.0"
 
-"defi18n@https://github.com/stablecoinhq/defi18n.git#1d15a8b8a4f73932f52627a784622a0b6cc77774":
+"defi18n@https://github.com/stablecoinhq/defi18n.git#cf3db7fe930dd65a7d684fbc11cc057320968d91":
   version "0.0.13"
-  resolved "https://github.com/stablecoinhq/defi18n.git#1d15a8b8a4f73932f52627a784622a0b6cc77774"
+  resolved "https://github.com/stablecoinhq/defi18n.git#cf3db7fe930dd65a7d684fbc11cc057320968d91"
 
 define-properties@^1.1.2, define-properties@^1.1.3:
   version "1.1.3"
