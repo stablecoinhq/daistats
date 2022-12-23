@@ -26,6 +26,7 @@ var IndividualVault = (props) => {
   const [vault, setVault] = useState(undefined);
   const [priceList, setPriceList] = useState([]);
   const [currentCollateralRatio, setCurrentCollateralRatio] = useState(undefined);
+  const [vaultIdInputError, setVaultIdInputError] = useState(undefined);
   const updateVault = () => {
     const getData = async () => {
       const subgraphClient = props.subgraphClient;
@@ -483,11 +484,16 @@ var IndividualVault = (props) => {
           singleVault.liquidationRatioChangeLog = liquidationRatioChangeLog;
           setVault(singleVault);
           setCurrentCollateralRatio(currentCollateralRatioValue);
+          setVaultIdInputError(undefined);
+        } else {
+          setVaultIdInputError(true);
         }
         // get price list
         if (getSingleVaultResult && getSingleVaultResult.priceList) {
           setPriceList(getSingleVaultResult.priceList);
         }
+      } else {
+        setVaultIdInputError(true);
       }
     };
     getData();
@@ -505,15 +511,27 @@ var IndividualVault = (props) => {
         <div className="column">
           <div className="has-text-centered">
             <div className="box has-text-centered">
-              <p className="subtitle is-size-6">
+              <div className="subtitle is-size-6">
                 {t('daistats.vault_information.cdp_id_or_vault_id')}:
-                <input
-                  type="text"
-                  value={cdpId ? cdpId : undefined}
-                  onChange={(event) => setCdpId(convertLowerCaseAddress(event.target.value))}
-                />
-                <button onClick={updateVault}>{t('daistats.vault_information.go')}</button>
-              </p>
+                <div className="field has-addons has-addons-centered">
+                  <div className="control">
+                    <input
+                      type="text"
+                      value={cdpId ? cdpId : undefined}
+                      onChange={(event) => setCdpId(convertLowerCaseAddress(event.target.value))}
+                      className={!vaultIdInputError ? 'input' : 'input is-danger'}
+                    />
+                  </div>
+                  <div className="control">
+                    <div className="button is-info" onClick={updateVault}>
+                      {t('daistats.vault_information.go')}
+                    </div>
+                  </div>
+                </div>
+                {vaultIdInputError && (
+                  <div className="help has-text-warning">{t('daistats.vault_information.vault_id_input_error')}</div>
+                )}
+              </div>
               {vault && vault.collateralType && vault.collateralType.id ? (
                 <div>
                   <p className="subtitle is-size-6">
