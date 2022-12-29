@@ -13,7 +13,6 @@ function VaultsAtRisk(props) {
   const t = useTranslate();
   if (allVaults) {
     const ilk = props.ilksByName[props.ilk];
-    console.log(allVaults);
     let dangerousVaults = [];
     if (+priceDropRatio >= 0 && +priceDropRatio <= 100) {
       dangerousVaults = allVaults

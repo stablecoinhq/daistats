@@ -1802,7 +1802,8 @@ class App extends Component {
       const vaultTypesResultMap = vaultTypes.map(async (vaultType) => {
         const collateralTypeVaultCount = await subgraphClient.request(gql`{
           collateralType(id: "${vaultType}") {
-            vaultCount
+            vaultCount,
+            unmanagedVaultCount,
           }
           vaults(where: { collateralType: "${vaultType}", collateral_not: 0, debt_not: 0 }, first: 1, orderBy: id, orderDirection: desc){
             id
@@ -1812,7 +1813,7 @@ class App extends Component {
         let maxId = 0;
         Object.entries(collateralTypeVaultCount).forEach(([key, value]) => {
           if (key === 'collateralType') {
-            vaultCount = value.vaultCount;
+            vaultCount = value.vaultCount + value.unmanagedVaultCount;
           } else if (key === 'vaults') {
             maxId = value[0] ? value[0].id : 0;
           }
