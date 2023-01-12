@@ -57,9 +57,9 @@ var RiskModel = (props) => {
             // this coefficient can be anything with safety level.
             // if it has higher safety level, coeffient should be smaller.
             // fit model
-            let coefficient = 1.0
+            let coefficient = 1.0;
             if (current.safetyLevel > 25) {
-              coefficient = 0.1
+              coefficient = 0.1;
             }
             return previous + parseFloat(current.debt * coefficient);
           }, 0);
