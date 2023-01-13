@@ -56,7 +56,11 @@ var RiskModel = (props) => {
           const capitalAtRiskValue = dangerousVaults.reduce((previous, current) => {
             // this coefficient can be anything with safety level.
             // if it has higher safety level, coeffient should be smaller.
-            const coefficient = 1 / Math.min(1, Math.max(2, (current.safetyLevel ?? 0) / 100));
+            // fit model
+            let coefficient = 1.0;
+            if (current.safetyLevel > 25) {
+              coefficient = 0.1;
+            }
             return previous + parseFloat(current.debt * coefficient);
           }, 0);
 
